@@ -7,15 +7,8 @@ var Filter = React.createClass({
 			clientX: ev.clientX,
 			clientY: ev.clientY
 		};
-		// set opacity of source element to 40%
-		ev.target.style.opacity = '0.4';
-
 		ev.dataTransfer.setData('text/plain', JSON.stringify(data));
 		ev.dataTransfer.effectAllowed = 'move';
-		ev.dataTransfer.dropEffect = 'none';
-	},
-	handleDragEnd: function(ev) {
-		ev.target.style.opacity = '1';
 	},
 	render: function() {
 		var style = {
