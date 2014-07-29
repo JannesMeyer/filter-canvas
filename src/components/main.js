@@ -14,8 +14,6 @@ var Main = React.createClass({
 		}
 	},
 	handleDragOver: function(ev) {
-		// TODO: only accept filter elements
-		// Allow dropping
 		ev.preventDefault();
 	},
 	handleDrop: function(ev) {
@@ -23,7 +21,7 @@ var Main = React.createClass({
 		ev.preventDefault();
 
 		// Get data (could throw)
-		var data = JSON.parse(ev.dataTransfer.getData('text/plain'));
+		var data = JSON.parse(ev.dataTransfer.getData('application/json'));
 
 		// Update state
 		var nextState = this.state;

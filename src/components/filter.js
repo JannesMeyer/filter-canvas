@@ -7,8 +7,12 @@ var Filter = React.createClass({
 			clientX: ev.clientX,
 			clientY: ev.clientY
 		};
-		ev.dataTransfer.setData('text/plain', JSON.stringify(data));
+		ev.target.classList.add('dragging');
+		ev.dataTransfer.setData('application/json', JSON.stringify(data));
 		ev.dataTransfer.effectAllowed = 'move';
+	},
+	handleDragEnd: function(ev) {
+		ev.target.classList.remove('dragging');
 	},
 	render: function() {
 		var style = {

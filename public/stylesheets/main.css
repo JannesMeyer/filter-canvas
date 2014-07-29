@@ -36,6 +36,13 @@ html, body, .m-workbench {
 	font-size: 1em;
 	font-weight: normal;
 }
+.filter.dragging {
+	border-color: #444;
+}
+.filter.dragging > h2 {
+	background: #444;
+	border-bottom-color: #444;
+}
 .filter > div {
 	padding: 0.25em 0.4em;
 	min-height: 3em;
