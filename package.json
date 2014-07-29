@@ -1,0 +1,16 @@
+{
+  "name": "Pipes",
+  "version": "1.0.0",
+  "author": "Jannes Meyer <jannes.meyer@gmail.com>",
+  "private": true,
+  "scripts": {
+  	"start": "webpack -wc",
+    "prepublish": "webpack"
+  },
+  "description": "Configuration tool for filters and pipes architectures",
+  "devDependencies": {
+    "webpack": "1.x",
+    "jsx-loader": "0.x",
+    "react": "0.x"
+  }
+}

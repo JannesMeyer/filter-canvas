@@ -1,0 +1,42 @@
+body {
+	font-family: sans-serif;
+	font-size: 10px;
+	color: #444;
+	background: linear-gradient(transparent 90%, #eee 10%),
+	            linear-gradient(90deg, transparent 90%, #eee 10%);
+	background-size: 10px 10px;
+	margin: 0;
+}
+[draggable] {
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+html, body, .m-workbench {
+	height: 100%;
+}
+.m-workbench {
+	/*background: red;*/
+}
+.filter {
+	position: absolute;
+	border: 1px solid #009fff;
+	background: white;
+	display: inline-block;
+	min-width: 15em;
+	border-radius: 3px;
+	cursor: move;
+}
+.filter > h2 {
+	background: linear-gradient(to bottom, #00bdff, #00d9ff); /* #009fff */
+	color: #fff;
+	margin: 0;
+	border-bottom: 1px solid #009fff;
+	padding: 0.25em 0.4em;
+	font-size: 1em;
+	font-weight: normal;
+}
+.filter > div {
+	padding: 0.25em 0.4em;
+	min-height: 3em;
+}
