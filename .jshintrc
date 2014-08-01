@@ -1,0 +1,21 @@
+{
+	"node": true,
+	"browser": true,
+	"predef": [ "React", "Immutable", "Fluxxor" ],
+	"esnext": true,
+
+	"curly": true,
+	"bitwise": true,
+	"eqeqeq": true,
+	"freeze": true,
+	"newcap": false,
+	"noarg": true,
+	"nonbsp": true,
+	"nonew": true,
+	"undef": true,
+	"unused": true,
+	"maxdepth": 3,
+	"maxstatements": 50,
+	"maxlen": 100,
+	"quotmark": "single"
+}
