@@ -4,13 +4,17 @@
   "author": "Jannes Meyer <jannes.meyer@gmail.com>",
   "private": true,
   "scripts": {
-  	"start": "webpack -wc",
+    "start": "webpack -wc",
     "prepublish": "webpack"
   },
   "description": "Configuration tool for filters and pipes architectures",
   "devDependencies": {
-    "webpack": "1.x",
+    "immutable": "^2.0.1",
     "jsx-loader": "0.x",
-    "react": "0.x"
+    "react": "0.x",
+    "webpack": "1.x"
+  },
+  "dependencies": {
+    "fluxxor": "^1.3.2"
   }
 }
