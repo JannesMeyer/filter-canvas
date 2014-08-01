@@ -7,7 +7,7 @@ function resolve(dir) {
 	return path.join(__dirname, dir);
 }
 
-module.exports = {
+var config = {
 	cache: true,
 	entry: './src/main.js',
 	output: {
@@ -20,8 +20,6 @@ module.exports = {
 			'Fluxxor': 'fluxxor',
 			'Immutable': 'immutable'
 		})
-		// new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }),
-		// new webpack.optimize.UglifyJsPlugin()
 	],
 	module: {
 		loaders: [
@@ -33,3 +31,11 @@ module.exports = {
 		]
 	}
 };
+
+if ('production' === process.env.NODE_ENV) {
+	console.log('Compiling for production...');
+	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': process.env.NODE_ENV }));
+	config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+}
+
+module.exports = config;

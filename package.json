@@ -4,8 +4,8 @@
   "author": "Jannes Meyer <jannes.meyer@gmail.com>",
   "private": true,
   "scripts": {
-    "start": "webpack -wc",
-    "prepublish": "webpack"
+    "start": "webpack -cw",
+    "prepublish": "NODE_ENV=production webpack -c"
   },
   "description": "Configuration tool for filters and pipes architectures",
   "devDependencies": {

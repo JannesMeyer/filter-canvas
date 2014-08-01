@@ -18,6 +18,9 @@ var Workbench = React.createClass({
 				startX: filter.get('x') - ev.clientX,
 				startY: filter.get('y') - ev.clientY
 			};
+			// TODO: new action that makes the z-index part of the state
+			// maybe that's not necessary, if overlapping isn't allowed for dropped elements
+			this.drag.element.style.zIndex = 9999;
 			ev.preventDefault();
 		}
 	},
@@ -33,9 +36,8 @@ var Workbench = React.createClass({
 			var x = this.drag.startX + ev.clientX;
 			var y = this.drag.startY + ev.clientY;
 			this.getFlux().actions.dropFilter(this.drag.id, x, y);
-			if (this.drag) {
-				this.drag = null;
-			}
+			this.drag.element.style.zIndex = 'auto';
+			this.drag = null;
 		}
 	},
 	render() {
