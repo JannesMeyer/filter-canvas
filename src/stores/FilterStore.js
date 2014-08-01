@@ -3,11 +3,15 @@
 module.exports = Fluxxor.createStore({
 	initialize() {
 		this.filters = Immutable.fromJS({
-			'Header 1': { content: 'Content 1', x: 20, y: 24 },
-			'Header 2': { content: 'Content 2', x: 20, y: 24 + 1 * 80 },
-			'Header 3': { content: 'Content 3', x: 20, y: 24 + 2 * 80 },
-			'Header 4': { content: 'Content 4', x: 20, y: 24 + 3 * 80 },
-			'Header 5': { content: 'Content 5', x: 20, y: 24 + 4 * 80 }
+			'Filter 1': { content: '', x: 20, y: 20+0*65 },
+			'Filter 2': { content: '', x: 20, y: 20+1*65 },
+			'Filter 3': { content: '', x: 20, y: 20+2*65 },
+			'Filter 4': { content: '', x: 20, y: 20+3*65 },
+			'Filter 5': { content: '', x: 20, y: 20+4*65 },
+			'Filter 6': { content: '', x: 20, y: 20+5*65 },
+			'Filter 7': { content: '', x: 20, y: 20+6*65 },
+			'Filter 8': { content: '', x: 20, y: 20+7*65 },
+			'Filter 9': { content: '', x: 20, y: 20+8*65 },
 		});
 
 		this.bindActions(

@@ -16,6 +16,5 @@
 	"unused": true,
 	"maxdepth": 3,
 	"maxstatements": 50,
-	"maxlen": 100,
 	"quotmark": "single"
 }
