@@ -19,7 +19,7 @@ module.exports = {
 			'React': 'react',
 			'Fluxxor': 'fluxxor',
 			'Immutable': 'immutable'
-		}),
+		})
 		// new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }),
 		// new webpack.optimize.UglifyJsPlugin()
 	],

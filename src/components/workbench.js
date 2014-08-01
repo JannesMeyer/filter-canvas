@@ -29,14 +29,13 @@ var Workbench = React.createClass({
 		}
 	},
 	componentWillMount() {
-		var flux = this.getFlux();
-		this.filterStore = flux.store('FilterStore');
+		this.filterStore = this.getFlux().store('FilterStore');
 	},
 	handleMouseDown(filterId, ev) {
 		if (ev.button === 0) {
 			var filter = this.filterStore.filter.get(filterId);
 			this.drag.id = filterId;
-			this.drag.element = this.filterStore.domNodes[filterId];
+			this.drag.element = ev.currentTarget;
 			this.drag.startX = filter.get('x') - ev.clientX;
 			this.drag.startY = filter.get('y') - ev.clientY;
 			ev.preventDefault();

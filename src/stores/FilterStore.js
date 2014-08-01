@@ -9,15 +9,10 @@ module.exports = Fluxxor.createStore({
 			'Header 4': { content: 'Content 4', x: 20, y: 24 + 3 * 80 },
 			'Header 5': { content: 'Content 5', x: 20, y: 24 + 4 * 80 }
 		});
-		this.domNodes = {};
 
 		this.bindActions(
-			'FILTER_DID_MOUNT', this.filterDidMount,
 			'DROP_FILTER', this.dropFilter
 		);
-	},
-	filterDidMount(data) {
-		this.domNodes[data.key] = data.domNode;
 	},
 	dropFilter(data) {
 		this.filter = this.filter.withMutations(function(filters) {
