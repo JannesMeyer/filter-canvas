@@ -5,14 +5,24 @@ var Filter = require('./filter');
 
 var Workbench = React.createClass({
 	mixins: [ Fluxxor.FluxMixin(React) ],
-	drag: {
-		id: null,
-		element: null,
-		startX: null,
-		startY: null
+	drag: null,
+	componentWillMount() {
+		this.filterStore = this.getFlux().store('FilterStore');
+	},
+	handleMouseDown(filterId, ev) {
+		if (ev.button === 0) {
+			var filter = this.filterStore.filters.get(filterId);
+			this.drag = {
+				id: filterId,
+				element: ev.currentTarget,
+				startX: filter.get('x') - ev.clientX,
+				startY: filter.get('y') - ev.clientY
+			};
+			ev.preventDefault();
+		}
 	},
 	handleMouseMove(ev) {
-		if (this.drag.id) {
+		if (this.drag) {
 			var x = this.drag.startX + ev.clientX;
 			var y = this.drag.startY + ev.clientY;
 			this.drag.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
@@ -23,28 +33,16 @@ var Workbench = React.createClass({
 			var x = this.drag.startX + ev.clientX;
 			var y = this.drag.startY + ev.clientY;
 			this.getFlux().actions.dropFilter(this.drag.id, x, y);
-			if (this.drag.id) {
-				this.drag.id = null;
+			if (this.drag) {
+				this.drag = null;
 			}
 		}
 	},
-	componentWillMount() {
-		this.filterStore = this.getFlux().store('FilterStore');
-	},
-	handleMouseDown(filterId, ev) {
-		if (ev.button === 0) {
-			var filter = this.filterStore.filter.get(filterId);
-			this.drag.id = filterId;
-			this.drag.element = ev.currentTarget;
-			this.drag.startX = filter.get('x') - ev.clientX;
-			this.drag.startY = filter.get('y') - ev.clientY;
-			ev.preventDefault();
-		}
-	},
 	render() {
+		var filters = this.filterStore.filters;
 		return (
 			<div className="m-workbench" onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
-			{this.filterStore.filter.map((filter, key) => {
+			{filters.map((filter, key) => {
 				return <Filter key={key} onMouseDown={this.handleMouseDown.bind(null, key)} />;
 			}).toArray()}
 			</div>

@@ -2,7 +2,7 @@
 
 module.exports = Fluxxor.createStore({
 	initialize() {
-		this.filter = Immutable.fromJS({
+		this.filters = Immutable.fromJS({
 			'Header 1': { content: 'Content 1', x: 20, y: 24 },
 			'Header 2': { content: 'Content 2', x: 20, y: 24 + 1 * 80 },
 			'Header 3': { content: 'Content 3', x: 20, y: 24 + 2 * 80 },
@@ -15,7 +15,7 @@ module.exports = Fluxxor.createStore({
 		);
 	},
 	dropFilter(data) {
-		this.filter = this.filter.withMutations(function(filters) {
+		this.filters = this.filters.withMutations(function(filters) {
 			filters.updateIn([data.key, 'x'], prev => data.x);
 			filters.updateIn([data.key, 'y'], prev => data.y);
 		});
