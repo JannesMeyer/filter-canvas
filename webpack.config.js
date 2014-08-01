@@ -34,7 +34,7 @@ var config = {
 
 if ('production' === process.env.NODE_ENV) {
 	console.log('Compiling for production...');
-	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': process.env.NODE_ENV }));
+	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"' + process.env.NODE_ENV + '"' }));
 	config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 }
 
