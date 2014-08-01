@@ -22,7 +22,7 @@ var Workbench = React.createClass({
 		if (ev.button === 0) {
 			var x = this.drag.startX + ev.clientX;
 			var y = this.drag.startY + ev.clientY;
-			// this.actions.filterDrop(this.drag.id, x, y);
+			this.getFlux().actions.dropFilter(this.drag.id, x, y);
 			if (this.drag.id) {
 				this.drag.id = null;
 			}
@@ -36,7 +36,7 @@ var Workbench = React.createClass({
 		if (ev.button === 0) {
 			var filter = this.filterStore.filter.get(filterId);
 			this.drag.id = filterId;
-			this.drag.element = filter.get('domNode');
+			this.drag.element = this.filterStore.domNodes[filterId];
 			this.drag.startX = filter.get('x') - ev.clientX;
 			this.drag.startY = filter.get('y') - ev.clientY;
 			ev.preventDefault();

@@ -17,16 +17,17 @@ module.exports = {
 	plugins: [
 		new webpack.ProvidePlugin({
 			'React': 'react',
-			'Fluxxor': 'fluxxor'
-		})
-		// new webpack.DefinePlugin({ 'process.env.NODE_ENV': '\'production\'' })
+			'Fluxxor': 'fluxxor',
+			'Immutable': 'immutable'
+		}),
+		// new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }),
 		// new webpack.optimize.UglifyJsPlugin()
 	],
 	module: {
 		loaders: [
 			{
 				test: /\.js$/,
-				loader: 'jsx-loader?harmony', // ?insertPragma=React.DOM
+				loader: 'jsx-loader?harmony',
 				exclude: [ resolve('node_modules') ]
 			}
 		]

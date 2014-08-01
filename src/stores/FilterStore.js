@@ -1,32 +1,30 @@
 'use strict';
 
-var Immutable = require('immutable');
-var constants = require('../constants');
-
 module.exports = Fluxxor.createStore({
 	initialize() {
 		this.filter = Immutable.fromJS({
-			'Header 1': { content: 'Content 1', x: 20, y: 24, domNode: null },
-			'Header 2': { content: 'Content 2', x: 20, y: 24 + 1 * 80, domNode: null },
-			'Header 3': { content: 'Content 3', x: 20, y: 24 + 2 * 80, domNode: null },
-			'Header 4': { content: 'Content 4', x: 20, y: 24 + 3 * 80, domNode: null },
-			'Header 5': { content: 'Content 5', x: 20, y: 24 + 4 * 80, domNode: null }
+			'Header 1': { content: 'Content 1', x: 20, y: 24 },
+			'Header 2': { content: 'Content 2', x: 20, y: 24 + 1 * 80 },
+			'Header 3': { content: 'Content 3', x: 20, y: 24 + 2 * 80 },
+			'Header 4': { content: 'Content 4', x: 20, y: 24 + 3 * 80 },
+			'Header 5': { content: 'Content 5', x: 20, y: 24 + 4 * 80 }
 		});
-		this.dragging = false;
+		this.domNodes = {};
 
 		this.bindActions(
-			constants.START_DRAG, this.onStartDrag,
-			constants.FILTER_DID_MOUNT, this.filterDidMount
+			'FILTER_DID_MOUNT', this.filterDidMount,
+			'DROP_FILTER', this.dropFilter
 		);
 	},
-	filterDidMount(filter) {
-		this.filter = this.filter.updateIn([filter.key, 'domNode'], prev => filter.domNode);
+	filterDidMount(data) {
+		this.domNodes[data.key] = data.domNode;
 	},
-	onStartDrag() {
-		this.dragging = true;
+	dropFilter(data) {
+		this.filter = this.filter.withMutations(function(filters) {
+			filters.updateIn([data.key, 'x'], prev => data.x);
+			filters.updateIn([data.key, 'y'], prev => data.y);
+		});
+		// No re-render needed! Because we already update the position
 		this.emit('change');
-	},
-	getDragging() {
-		return this.dragging;
 	}
 });
