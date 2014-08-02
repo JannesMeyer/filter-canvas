@@ -3,18 +3,20 @@
 var webpack = require('webpack');
 var path = require('path');
 
-function resolve(dir) {
-	return path.join(__dirname, dir);
-}
-
+var getPath = path.join.bind(path, __dirname);
 var config = {
 	cache: true,
-	entry: './src/main.js',
+	entry: [
+		'webpack/hot/dev-server',
+		getPath('src', 'main.js'),
+	],
 	output: {
-		path: './public/javascripts',
+		path: getPath('public', 'javascripts'),
 		filename: '[name].bundle.js',
+		publicPath: '/javascripts/'
 	},
 	plugins: [
+		new webpack.HotModuleReplacementPlugin(),
 		new webpack.ProvidePlugin({
 			'React': 'react',
 			'Fluxxor': 'fluxxor',
@@ -24,17 +26,30 @@ var config = {
 	module: {
 		loaders: [
 			{
+				test: /\.jsx$/,
+				loaders: [
+					'react-hot',
+					'jsx?harmony&insertPragma=React.DOM'
+				],
+				include: [ getPath() ],
+				exclude: [ getPath('node_modules') ]
+			},
+			{
 				test: /\.js$/,
-				loader: 'jsx-loader?harmony',
-				include: [ resolve('') ],
-				exclude: [ resolve('node_modules') ]
+				loader: 'jsx?harmony',
+				include: [ getPath() ],
+				exclude: [ getPath('node_modules') ]
 			}
 		]
+	},
+	resolve: {
+		extensions: ['', '.js', '.jsx']
 	}
 };
 
 if ('production' === process.env.NODE_ENV) {
-	console.log('Compiling for production...');
+	// config.plugins.push(new webpack.optimize.DedupePlugin());
+	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
 	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
 	config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 }

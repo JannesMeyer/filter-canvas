@@ -1,4 +1,3 @@
-/** @jsx React.DOM */
 'use strict';
 
 var Filter = React.createClass({
