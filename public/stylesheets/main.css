@@ -19,14 +19,14 @@ html, body, .m-workbench {
 }
 .filter {
 	position: absolute;
+	left: 0;
+	top: 0;
 	border: 1px solid #009fff;
 	background: white;
 	display: inline-block;
 	min-width: 15em;
 	border-radius: 3px;
 	cursor: move;
-	left: 0;
-	top: 0;
 }
 .filter > h2 {
 	background: linear-gradient(to bottom, #00bdff, #00d9ff); /* #009fff */

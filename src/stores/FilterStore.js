@@ -19,11 +19,11 @@ module.exports = Fluxxor.createStore({
 		);
 	},
 	dropFilter(data) {
-		this.filters = this.filters.withMutations(function(filters) {
-			filters.updateIn([data.key, 'x'], () => data.x);
-			filters.updateIn([data.key, 'y'], () => data.y);
-		});
-		// No re-render needed! Because we already update the position
-		this.emit('change');
-	}
+        this.filters = this.filters.withMutations(function (filters) {
+            filters.updateIn([data.key, 'x'], () => data.x);
+            filters.updateIn([data.key, 'y'], () => data.y);
+        });
+        // No re-render needed!
+        // this.emit('change');
+    }
 });
