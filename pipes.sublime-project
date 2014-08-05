@@ -1,0 +1,10 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": false,
+			"path": ".",
+			"folder_exclude_patterns": [ ".idea", "node_modules" ]
+		}
+	]
+}
