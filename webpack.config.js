@@ -1,5 +1,6 @@
 'use strict';
 var webpack = require('webpack');
+var ErrorNotificationPlugin = require('./WebpackErrorNotificationPlugin');
 var path = require('path');
 var getPath = path.join.bind(path, __dirname);
 
@@ -8,18 +9,6 @@ var paths = {
 	modules: getPath('node_modules'),
 	javascripts: getPath('public', 'javascripts'),
 	stylesheets: getPath('public', 'stylesheets')
-};
-
-function BellOnErrorPlugin() {
-}
-BellOnErrorPlugin.prototype.apply = function(compiler) {
-	compiler.plugin('done', function(stats) {
-		console.log('done');
-		// if (stats.hasErrors()) {
-		// 	// System bell character
-		// 	console.log('Error\u0007');
-		// }
-	});
 };
 
 var config = {
@@ -35,13 +24,13 @@ var config = {
 	},
 	watchDelay: 50,
 	plugins: [
-		new webpack.HotModuleReplacementPlugin(),
 		new webpack.ProvidePlugin({
 			'React': 'react',
 			'Fluxxor': 'fluxxor',
 			'Immutable': 'immutable'
 		}),
-		new BellOnErrorPlugin()
+		new webpack.HotModuleReplacementPlugin(),
+		new ErrorNotificationPlugin()
 	],
 	module: {
 		loaders: [
