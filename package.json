@@ -4,16 +4,14 @@
   "author": "Jannes Meyer <jannes.meyer@gmail.com>",
   "private": true,
   "scripts": {
-    "start": "webpack -cw",
-    "prepublish": "NODE_ENV=production webpack -c"
+    "start": "./server.js",
+    "prepublish": "NODE_ENV=production webpack"
   },
   "description": "Configuration tool for filters and pipes architectures",
-  "dependencies": {
-    "fluxxor": "1.x"
-  },
   "devDependencies": {
-    "immutable": "2.x",
     "react": "0.x",
+    "immutable": "2.x",
+    "fluxxor": "1.x",
     "webpack": "1.x",
     "webpack-dev-server": "1.x",
     "style-loader": "0.x",
