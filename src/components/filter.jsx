@@ -7,7 +7,6 @@ var Filter = React.createClass({
 	},
 	render() {
 		var filter = this.filterStore.filters.get(this.props.key);
-
 		var inlineStyle = {
 			transform: 'translate(' + filter.get('x') + 'px,' + filter.get('y') + 'px)'
 		};

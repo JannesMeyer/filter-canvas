@@ -1,21 +1,22 @@
 'use strict';
+
 var webpack = require('webpack');
 var ErrorNotificationPlugin = require('./WebpackErrorNotificationPlugin');
 var path = require('path');
-var getPath = path.join.bind(path, __dirname);
+var getAbsolutePath = path.join.bind(path, __dirname);
 
 var paths = {
-	main: getPath(),
-	modules: getPath('node_modules'),
-	javascripts: getPath('public', 'javascripts'),
-	stylesheets: getPath('public', 'stylesheets')
+	main: getAbsolutePath(),
+	modules: getAbsolutePath('node_modules'),
+	javascripts: getAbsolutePath('public', 'javascripts'),
+	stylesheets: getAbsolutePath('public', 'stylesheets')
 };
 
 var config = {
 	cache: true,
 	entry: [
 		'webpack/hot/dev-server',
-		getPath('src', 'main.js'),
+		getAbsolutePath('src', 'main.js'),
 	],
 	output: {
 		path: paths.javascripts,
@@ -26,8 +27,8 @@ var config = {
 	plugins: [
 		new webpack.ProvidePlugin({
 			'React': 'react',
-			'Fluxxor': 'fluxxor',
-			'Immutable': 'immutable'
+			'Immutable': 'immutable',
+			'Fluxxor': 'fluxxor'
 		}),
 		new webpack.HotModuleReplacementPlugin(),
 		new ErrorNotificationPlugin()
@@ -36,19 +37,19 @@ var config = {
 		loaders: [
 			{
 				test: /\.jsx$/,
-				loaders: ['react-hot-loader', 'jsx-loader?harmony&insertPragma=React.DOM'],
+				loaders: ['react-hot-loader', 'jsx?harmony&insertPragma=React.DOM'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
 			{
 				test: /\.js$/,
-				loader: 'jsx-loader?harmony',
+				loaders: ['jsx?harmony'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
 			{
 				test: /\.css$/,
-				loaders: ['style-loader', 'css-loader']
+				loaders: ['style', 'css']
 			}
 		]
 	},
