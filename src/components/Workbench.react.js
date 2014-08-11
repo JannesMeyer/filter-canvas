@@ -1,6 +1,6 @@
 var Filter = require('./Filter.react');
-var FilterStore = require('../stores/FilterStore');
-var FilterActions = require('../actions/FilterActions');
+var FilterStore = require('../flux/FilterStore');
+var FilterActions = require('../flux/FilterActions');
 
 function getState() {
 	return {

@@ -1,4 +1,4 @@
-var FilterStore = require('../stores/FilterStore');
+var FilterStore = require('../flux/FilterStore');
 
 var Filter = React.createClass({
 	render() {
