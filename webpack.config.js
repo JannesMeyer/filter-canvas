@@ -8,6 +8,7 @@ var getAbsolutePath = path.join.bind(path, __dirname);
 var paths = {
 	main: getAbsolutePath(),
 	modules: getAbsolutePath('node_modules'),
+	entryScript: getAbsolutePath('src', 'main.js'),
 	javascripts: getAbsolutePath('public', 'javascripts'),
 	stylesheets: getAbsolutePath('public', 'stylesheets')
 };
@@ -16,7 +17,7 @@ var config = {
 	cache: true,
 	entry: [
 		'webpack/hot/dev-server',
-		getAbsolutePath('src', 'main.js'),
+		paths.entryScript
 	],
 	output: {
 		path: paths.javascripts,
@@ -26,9 +27,7 @@ var config = {
 	watchDelay: 50,
 	plugins: [
 		new webpack.ProvidePlugin({
-			'React': 'react',
-			'Immutable': 'immutable',
-			'Fluxxor': 'fluxxor'
+			'React': 'react'
 		}),
 		new webpack.HotModuleReplacementPlugin(),
 		new ErrorNotificationPlugin()
@@ -36,7 +35,7 @@ var config = {
 	module: {
 		loaders: [
 			{
-				test: /\.jsx$/,
+				test: /\.react\.js$/,
 				loaders: ['react-hot-loader', 'strict', 'jsx?harmony&insertPragma=React.DOM'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]

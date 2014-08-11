@@ -1,10 +1,8 @@
+var FilterStore = require('../stores/FilterStore');
+
 var Filter = React.createClass({
-	mixins: [ Fluxxor.FluxChildMixin(React) ],
-	componentWillMount() {
-		this.filterStore = this.getFlux().store('FilterStore');
-	},
 	render() {
-		var filter = this.filterStore.filters.get(this.props.key);
+		var filter = FilterStore.get(this.props.key);
 		var inlineStyle = {
 			transform: 'translate(' + filter.get('x') + 'px,' + filter.get('y') + 'px)'
 		};

@@ -1,7 +1,4 @@
-require('main.css'); // webpack
-var Workbench = require('./components/workbench');
-var stores = require('./stores');
-var actions = require('./actions');
+var Workbench = require('./components/Workbench.react');
 
-var flux = new Fluxxor.Flux(stores, actions);
-React.renderComponent(Workbench({ flux }), document.body);
+require('main.css'); // Import CSS with webpack
+React.renderComponent(Workbench(), document.body);
