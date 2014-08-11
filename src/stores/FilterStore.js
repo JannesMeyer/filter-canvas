@@ -1,9 +1,9 @@
 var EventEmitter = require('events').EventEmitter;
 var immutable = require('immutable');
 var merge = require('react/lib/merge');
+
 var AppDispatcher = require('../dispatcher/AppDispatcher');
 var constants = require('../constants');
-
 var CHANGE_EVENT = 'change';
 
 var filters = immutable.fromJS({
@@ -44,17 +44,15 @@ var FilterStore = merge(EventEmitter.prototype, {
 });
 
 AppDispatcher.register(function(payload) {
-	var action = payload.action;
+	var {action} = payload;
+	var {actionType} = action;
 
-	switch(action.actionType) {
-		case constants.FILTER_MOVE:
-			move(action.id, action.x, action.y);
-			// No re-render needed
-			// FilterStore.emitChange();
-			break;
+	if (actionType === constants.FILTER_MOVE) {
+		move(action.id, action.x, action.y);
+		// No re-render needed
+		// FilterStore.emitChange();
+		return;
 	}
-
-	return true; // No errors.  Needed by promise in Dispatcher.
 });
 
 module.exports = FilterStore;
