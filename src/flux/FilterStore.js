@@ -2,7 +2,7 @@ var EventEmitter = require('events').EventEmitter;
 var Immutable = require('immutable');
 var merge = require('react/lib/merge');
 var dispatcher = require('./app-dispatcher');
-var constants = require('./constants');
+var constants = require('./app-constants');
 
 var CHANGE_EVENT = 'change';
 

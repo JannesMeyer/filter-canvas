@@ -12,11 +12,14 @@ var Workbench = React.createClass({
 	drag: null,
 	zCounter: 0,
 	getInitialState: getState,
+	onChange() {
+		this.setState(getState());
+	},
 	componentDidMount() {
-		FilterStore.addChangeListener(this._onChange);
+		FilterStore.addChangeListener(this.onChange);
 	},
 	componentWillUnmount() {
-		FilterStore.removeChangeListener(this._onChange);
+		FilterStore.removeChangeListener(this.onChange);
 	},
 	handleMouseDown(id, ev) {
 		if (ev.button !== 0) {
@@ -64,9 +67,6 @@ var Workbench = React.createClass({
 			}).toArray()}
 			</div>
 		);
-	},
-	_onChange() {
-		this.setState(getState());
 	}
 });
 

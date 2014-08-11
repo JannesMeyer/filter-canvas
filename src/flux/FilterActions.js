@@ -1,5 +1,5 @@
 var dispatcher = require('./app-dispatcher');
-var constants = require('./constants');
+var constants = require('./app-constants');
 
 /**
  * FilterActions single object

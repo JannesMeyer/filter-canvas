@@ -1,4 +1,7 @@
 var Workbench = require('./components/Workbench.react');
 
-require('main.css'); // Import CSS with webpack
+// Import CSS with webpack
+require('main.css');
+
+// Render controller view
 React.renderComponent(Workbench(), document.body);
