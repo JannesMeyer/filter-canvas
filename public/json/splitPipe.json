@@ -1,0 +1,71 @@
+{
+    "factoryVersion": "0.2",
+    "filters": [{
+        "filterID": 0,
+        "class": "C1",
+        "parameter": [{
+            "parameter1": 0.5,
+            "parameter2": 1
+        }],
+
+        "inputs": [],
+
+        "outputs": [{
+            "outputID": 1,
+            "type": "T1"
+        }]
+
+    }, {
+        "filterID": 1,
+        "class": "C2",
+        "parameter": [],
+        "inputs": [{
+            "inputID": 1,
+            "type": "T1"
+        }],
+        "outputs": []
+    }, {
+        "filterID": 2,
+        "class": "C3",
+        "parameter": [],
+        "inputs": [{
+            "inputID": 2,
+            "type": "T1"
+        }],
+        "outputs": []
+    }, {
+        "filterID": 3,
+        "class": "C4",
+        "parameter": [],
+        "inputs": [{
+            "inputID": 3,
+            "type": "T1"
+        }],
+        "outputs": []
+    }],
+
+    "pipes": [{
+        "pipeID": 0,
+        "type": "split",
+        "parameter": [{
+            "synch": true
+        }],
+        "mappings": [{
+            "inFilter": 0,
+            "output": 1,
+            "outFilter": 1,
+            "input": 1
+        }, {
+            "inFilter": 0,
+            "output": 1,
+            "outFilter": 2,
+            "input": 2
+        }, {
+            "inFilter": 0,
+            "output": 1,
+            "outFilter": 3,
+            "input": 3
+        }]
+
+    }]
+}

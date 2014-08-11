@@ -1,4 +1,3 @@
-'use strict';
 require('main.css'); // webpack
 var Workbench = require('./components/workbench');
 var stores = require('./stores');

@@ -1,0 +1,58 @@
+{
+    "factoryVersion": "0.2",
+    "filters": [{
+        "filterID": 0,
+        "class": "C1",
+        "parameter": [],
+
+        "inputs": [],
+
+        "outputs": [{
+            "outputID": 1,
+            "type": "T1"
+        }]
+
+    }, {
+        "filterID": 1,
+        "class": "C2",
+        "parameter": [],
+
+        "inputs": [],
+
+        "outputs": [{
+            "outputID": 2,
+            "type": "T2"
+        }]
+
+    }, {
+        "filterID": 2,
+        "class": "C3",
+        "parameter": [],
+        "inputs": [{
+            "inputID": 1,
+            "Type": "T1"
+        }, {
+            "inputID": 2,
+            "Type": "T2"
+        }],
+        "outputs": []
+    }],
+    "pipes": [{
+        "pipeID": 0,
+        "type": "synch",
+        "parameter": [],
+        "mappings": [{
+            "inFilter": 0,
+            "output": 1,
+            "outFilter": 2,
+            "input": 1
+        }, {
+            "inFilter": 1,
+            "output": 2,
+            "outFilter": 2,
+            "input": 2
+        }]
+
+    }]
+
+}

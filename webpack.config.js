@@ -37,13 +37,13 @@ var config = {
 		loaders: [
 			{
 				test: /\.jsx$/,
-				loaders: ['react-hot-loader', 'jsx?harmony&insertPragma=React.DOM'],
+				loaders: ['react-hot-loader', 'strict', 'jsx?harmony&insertPragma=React.DOM'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
 			{
 				test: /\.js$/,
-				loaders: ['jsx?harmony'],
+				loaders: ['strict', 'jsx?harmony'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},

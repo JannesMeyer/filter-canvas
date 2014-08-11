@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = Fluxxor.createStore({
 	initialize() {
 		this.filters = Immutable.fromJS({

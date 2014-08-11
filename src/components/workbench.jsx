@@ -1,5 +1,3 @@
-'use strict';
-
 var Filter = require('./filter');
 
 var Workbench = React.createClass({

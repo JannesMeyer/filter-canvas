@@ -2,8 +2,8 @@
 	"folders":
 	[
 		{
-			"follow_symlinks": false,
 			"path": ".",
+			"follow_symlinks": false,
 			"folder_exclude_patterns": [
 				".*",
 				"node_modules"

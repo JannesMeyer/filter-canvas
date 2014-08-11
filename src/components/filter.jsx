@@ -1,5 +1,3 @@
-'use strict';
-
 var Filter = React.createClass({
 	mixins: [ Fluxxor.FluxChildMixin(React) ],
 	componentWillMount() {
