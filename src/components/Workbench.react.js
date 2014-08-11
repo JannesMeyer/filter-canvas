@@ -1,39 +1,30 @@
 var Filter = require('./Filter.react');
 var FilterStore = require('../stores/FilterStore');
-var AppActions = require('../actions');
+var FilterActions = require('../actions/FilterActions');
 
-function getFilterState() {
+function getState() {
 	return {
-		// allTodos: TodoStore.getAll(),
-		// areAllComplete: TodoStore.areAllComplete()
+		filters: FilterStore.getAll()
 	};
 }
 
 var Workbench = React.createClass({
 	drag: null,
 	zCounter: 0,
-
-	getInitialState: getFilterState,
-
-	_onChange: function() {
-		this.setState(getFilterState());
-	},
-
-	componentDidMount: function() {
+	getInitialState: getState,
+	componentDidMount() {
 		FilterStore.addChangeListener(this._onChange);
 	},
-
-	componentWillUnmount: function() {
+	componentWillUnmount() {
 		FilterStore.removeChangeListener(this._onChange);
 	},
-
-	handleMouseDown(filterId, ev) {
+	handleMouseDown(id, ev) {
 		if (ev.button !== 0) {
 			return;
 		}
-		var filter = FilterStore.get(filterId);
+		var filter = FilterStore.get(id);
 		this.drag = {
-			id: filterId,
+			id,
 			element: ev.currentTarget,
 			x: filter.get('x') - ev.clientX,
 			y: filter.get('y') - ev.clientY
@@ -48,8 +39,8 @@ var Workbench = React.createClass({
 		var x = this.drag.x + ev.clientX;
 		var y = this.drag.y + ev.clientY;
 		// Snap to grid
-		x = Math.round(x / 5 + 1) * 5 - 1;
-		y = Math.round(y / 5 + 1) * 5 - 1;
+		// x = Math.round(x / 5 + 1) * 5 - 1;
+		// y = Math.round(y / 5 + 1) * 5 - 1;
 		// Set transform
 		this.drag.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
 	},
@@ -59,7 +50,10 @@ var Workbench = React.createClass({
 		}
 		var x = this.drag.x + ev.clientX;
 		var y = this.drag.y + ev.clientY;
-		AppActions.move(this.drag.id, x, y);
+		// Snap to grid
+		// x = Math.round(x / 5 + 1) * 5 - 1;
+		// y = Math.round(y / 5 + 1) * 5 - 1;
+		FilterActions.move(this.drag.id, x, y);
 		this.drag = null;
 	},
 	render() {
@@ -70,6 +64,10 @@ var Workbench = React.createClass({
 			}).toArray()}
 			</div>
 		);
+	},
+	_onChange() {
+		this.setState(getState());
 	}
 });
+
 module.exports = Workbench;

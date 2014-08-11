@@ -1,14 +1,12 @@
 var AppDispatcher = require('../dispatcher/AppDispatcher');
-var Constants = require('../constants');
+var constants = require('../constants');
 
 var actions = {
 	move: function(id, x, y) {
 		AppDispatcher.handleViewAction({
-			actionType: Constants.FILTER_MOVE,
-			id,
-			x,
-			y
+			id, x, y, actionType: constants.FILTER_MOVE
 		});
 	}
 };
+
 module.exports = actions;

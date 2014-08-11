@@ -1,12 +1,12 @@
-var AppDispatcher = require('../dispatcher/AppDispatcher');
 var EventEmitter = require('events').EventEmitter;
+var immutable = require('immutable');
 var merge = require('react/lib/merge');
-var Constants = require('../constants');
-var Immutable = require('immutable');
+var AppDispatcher = require('../dispatcher/AppDispatcher');
+var constants = require('../constants');
 
 var CHANGE_EVENT = 'change';
 
-var _filters = Immutable.fromJS({
+var filters = immutable.fromJS({
 	'Filter 1': { content: '', x: 20, y: 20+0*65 },
 	'Filter 2': { content: '', x: 20, y: 20+1*65 },
 	'Filter 3': { content: '', x: 20, y: 20+2*65 },
@@ -19,7 +19,7 @@ var _filters = Immutable.fromJS({
 });
 
 function move(id, x, y) {
-	_filters = _filters.withMutations(filters => {
+	filters = filters.withMutations(filters => {
 		filters.updateIn([id, 'x'], () => x);
 		filters.updateIn([id, 'y'], () => y);
 	});
@@ -27,10 +27,10 @@ function move(id, x, y) {
 
 var FilterStore = merge(EventEmitter.prototype, {
 	getAll: function() {
-		return _filters;
+		return filters;
 	},
 	get: function(id) {
-		return _filters.get(id);
+		return filters.get(id);
 	},
 	emitChange: function() {
 		this.emit(CHANGE_EVENT);
@@ -47,8 +47,10 @@ AppDispatcher.register(function(payload) {
 	var action = payload.action;
 
 	switch(action.actionType) {
-		case Constants.FILTER_MOVE:
+		case constants.FILTER_MOVE:
 			move(action.id, action.x, action.y);
+			// No re-render needed
+			// FilterStore.emitChange();
 			break;
 	}
 
