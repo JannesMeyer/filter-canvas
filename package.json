@@ -9,13 +9,17 @@
   },
   "description": "Configuration tool for filters and pipes architectures",
   "devDependencies": {
-    "react": "0.x",
-    "immutable": "2.x",
-    "webpack": "1.x",
-    "webpack-dev-server": "1.x",
-    "style-loader": "0.x",
     "css-loader": "0.x",
+    "immutable": "2.x",
     "jsx-loader": "0.x",
-    "react-hot-loader": "0.x"
+    "react": "0.x",
+    "react-hot-loader": "0.x",
+    "style-loader": "0.x",
+    "stylus-loader": "^0.4.0",
+    "webpack": "1.x",
+    "webpack-dev-server": "1.x"
+  },
+  "dependencies": {
+    "normalize.css": "^3.0.1"
   }
 }

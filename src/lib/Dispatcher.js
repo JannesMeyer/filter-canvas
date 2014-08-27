@@ -7,7 +7,7 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-var invariant = require('./invariant');
+var invariant = require('react/lib/invariant');
 
 var _lastID = 1;
 var _prefix = 'ID_';

@@ -9,8 +9,7 @@ var paths = {
 	main: getAbsolutePath(),
 	modules: getAbsolutePath('node_modules'),
 	entryScript: getAbsolutePath('src', 'main.js'),
-	javascripts: getAbsolutePath('public', 'javascripts'),
-	stylesheets: getAbsolutePath('public', 'stylesheets')
+	publicScripts: getAbsolutePath('public', 'javascripts')
 };
 
 var config = {
@@ -20,7 +19,7 @@ var config = {
 		paths.entryScript
 	],
 	output: {
-		path: paths.javascripts,
+		path: paths.publicScripts,
 		filename: '[name].bundle.js',
 		publicPath: '/javascripts/'
 	},
@@ -36,24 +35,27 @@ var config = {
 		loaders: [
 			{
 				test: /\.react\.js$/,
-				loaders: ['react-hot-loader', 'strict', 'jsx?harmony&insertPragma=React.DOM'],
+				loaders: ['react-hot-loader', 'strict-loader', 'jsx-loader?harmony&insertPragma=React.DOM'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
 			{
 				test: /\.js$/,
-				loaders: ['strict', 'jsx?harmony'],
+				loaders: ['strict-loader', 'jsx-loader?harmony'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
 			{
 				test: /\.css$/,
-				loaders: ['style', 'css']
+				loaders: ['style-loader', 'css-loader']
+			},
+			{
+				test: /\.styl$/,
+				loaders: ['style-loader', 'css-loader', 'stylus-loader']
 			}
 		]
 	},
 	resolve: {
-		root: paths.stylesheets,
 		extensions: ['', '.js', '.jsx', '.json']
 	}
 };

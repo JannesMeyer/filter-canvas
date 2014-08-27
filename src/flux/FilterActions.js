@@ -1,11 +1,11 @@
-var dispatcher = require('./app-dispatcher');
-var constants = require('./app-constants');
+var dispatcher = require('./dispatcher');
+var constants = require('./constants');
 
 /**
- * FilterActions single object
+ * filterActions single object
  * (like a singleton in Java)
  */
-var FilterActions = {
+var filterActions = {
 	move(id, x, y) {
 		dispatcher.dispatch({
 			actionType: constants.FILTER_MOVE,
@@ -13,4 +13,4 @@ var FilterActions = {
 		});
 	}
 };
-module.exports = FilterActions;
+module.exports = filterActions;
