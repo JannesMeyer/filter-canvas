@@ -108,6 +108,7 @@ Dispatcher.register(function(action) {
 		setDragItem(action);
 		// TODO: do this smarter
 		dragItem.element.style.zIndex = ++zCounter;
+		dragItem.element.classList.add('active');
 		Store.emit(Store.DRAG_EVENT);
 	return;
 
@@ -116,6 +117,10 @@ Dispatcher.register(function(action) {
 		x += dragItem.filter.get('x');
 		y += dragItem.filter.get('y');
 		dragItem.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+	return;
+
+	case Constants.END_DRAG_ON_WORKBENCH:
+		dragItem.element.classList.remove('active');
 	return;
 
 	case Constants.MOVE_BY_ON_WORKBENCH:
