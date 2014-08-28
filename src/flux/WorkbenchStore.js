@@ -19,6 +19,12 @@ var Store = merge(EventEmitter.prototype, {
 	},
 	isNotDragging() {
 		return !dragItem.filter;
+	},
+	getAmountDragged(clientX, clientY) {
+		return {
+			x: clientX - dragItem.clientX,
+			y: clientY - dragItem.clientY
+		};
 	}
 	// Store.emit(Store.CHANGE_EVENT)
 	// Store.on(Store.CHANGE_EVENT, callback)
@@ -86,13 +92,6 @@ function setDragItem(sourceObj) {
 	dragItem.clientY = sourceObj.clientY;
 }
 
-function getAmountDragged(clientX, clientY) {
-	return {
-		x: clientX - dragItem.clientX,
-		y: clientY - dragItem.clientY
-	};
-}
-
 function moveFilterTo(id, x, y) {
 	filters = filters.withMutations(filters => {
 		filters.updateIn([id, 'x'], () => x);
@@ -113,17 +112,22 @@ Dispatcher.register(function(action) {
 	return;
 
 	case Constants.DRAGGING_ON_WORKBENCH:
-		var {x, y} = getAmountDragged(action.clientX, action.clientY);
+		var {x, y} = Store.getAmountDragged(action.clientX, action.clientY);
 		x += dragItem.filter.get('x');
 		y += dragItem.filter.get('y');
 		dragItem.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
 	return;
 
-	case Constants.END_DRAG_ON_WORKBENCH:
-		var {x, y} = getAmountDragged(action.clientX, action.clientY);
-		x += dragItem.filter.get('x');
-		y += dragItem.filter.get('y');
+	case Constants.MOVE_BY_ON_WORKBENCH:
+		var x = action.x + dragItem.filter.get('x');
+		var y = action.y + dragItem.filter.get('y');
 		moveFilterTo(dragItem.id, x, y);
+		dragItem = {};
+		Store.emit(Store.CHANGE_EVENT);
+	return;
+
+	case Constants.ITEM_CLICKED_ON_WORKBENCH:
+		console.log('clicked: ' + dragItem.id);
 		dragItem = {};
 		Store.emit(Store.CHANGE_EVENT);
 	return;
