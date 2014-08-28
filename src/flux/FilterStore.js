@@ -2,8 +2,8 @@ var immutable = require('immutable');
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
 
-var dispatcher = require('./dispatcher');
-var constants = require('./constants');
+var Dispatcher = require('./Dispatcher');
+var Constants = require('./Constants');
 
 var CHANGE_EVENT = 'change';
 var Store = merge(EventEmitter.prototype, {
@@ -82,9 +82,9 @@ function move(id, x, y) {
 }
 
 // Register for all actions
-dispatcher.register(function(action) {
+Dispatcher.register(function(action) {
 	var type = action.actionType;
-	if (type === constants.FILTER_MOVE) {
+	if (type === Constants.FILTER_MOVE) {
 		move(action.id, action.x, action.y);
 		return;
 	}

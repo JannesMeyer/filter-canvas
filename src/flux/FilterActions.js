@@ -1,16 +1,21 @@
-var dispatcher = require('./dispatcher');
-var constants = require('./constants');
+var Dispatcher = require('./Dispatcher');
+var Constants = require('./Constants');
 
 /**
- * filterActions single object
- * (like a singleton in Java)
+ * FilterActions single object (like a singleton)
  */
-var filterActions = {
+var FilterActions = {
+	startDragFromRepo(id, x, y) {
+		Dispatcher.dispatch({
+			actionType: Constants.START_DRAG_FROM_REPO,
+			id, x, y
+		});
+	},
 	move(id, x, y) {
-		dispatcher.dispatch({
-			actionType: constants.FILTER_MOVE,
+		Dispatcher.dispatch({
+			actionType: Constants.FILTER_MOVE,
 			id, x, y
 		});
 	}
 };
-module.exports = filterActions;
+module.exports = FilterActions;

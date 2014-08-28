@@ -1,7 +1,6 @@
 var Dispatcher = require('../lib/Dispatcher');
 
 /**
- * dispatcher single object
- * (like a singleton in Java)
+ * Dispatcher single object (like a singleton)
  */
 module.exports = new Dispatcher();

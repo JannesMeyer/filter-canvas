@@ -2,10 +2,10 @@ var immutable = require('immutable');
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
 
-var dispatcher = require('./dispatcher');
-var constants = require('./constants');
+var Dispatcher = require('./Dispatcher');
+var Constants = require('./Constants');
 
-// Repository store
+// RepositoryStore single object (like a singleton)
 var Store = merge(EventEmitter.prototype, {
 	FILTERS_CHANGE: 'filters change',
 	PIPES_CHANGE: 'pipes change',
@@ -94,9 +94,9 @@ var pipes = immutable.fromJS({
 });
 
 // Register for all actions
-dispatcher.register(function(action) {
+Dispatcher.register(function(action) {
 	var type = action.actionType;
-	// if (type === constants.FILTER_MOVE) {
+	// if (type === Constants.FILTER_MOVE) {
 	// 	move(action.id, action.x, action.y);
 	// 	return;
 	// }
