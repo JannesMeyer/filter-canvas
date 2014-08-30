@@ -25,38 +25,46 @@ body
 		position: absolute
 		left: 0
 		top: 0
-
+		height: 60px
 		border: 1px solid #000
 		background: #fff
-		display: inline-block
-		padding: 12px
-		// min-width: 15em
-		// border-radius: 3px
-
 		cursor: move
 
-		> h4,
-		> p
-			margin: 0
+		> h4
+			margin: 0 20px
+			line-height: @height - 2
 
-		> .input,
-		> .output
+		> .inputs,
+		> .outputs
 			position: absolute
-			margin: auto
-			width: 3px
-			height: 6px
-			background: black
+			top: 50%
+			transform: translateY(-50%)
 
-		> .input
-			border-radius: 0 3px 3px 0
-			left: -1px
+		> .inputs
+			left: 0
 
-		> .output
-			border-radius: 3px 0 0 3px
-			right: -1px
+		> .outputs
+			right: 0
 
-	> .m-filter-on-canvas.active
-		background: red
+		.connector
+			position: relative
+			width: 12px
+			height: 8px
+			margin-top: 4px
+			margin-bottom: 4px
+			// border-radius: 0.5 * @width
+			background: #000
+			cursor: pointer
+
+		.connector.input
+			left: -7px
+
+		.connector.output
+			right: -7px
+
+	> .m-filter-on-canvas:focus
+		outline: 0
+		background: #dcecfc
 
 
 .m-repository

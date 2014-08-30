@@ -5,6 +5,13 @@ var merge = require('react/lib/merge');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 
+var wires = [
+	immutable.fromJS({
+		fromPoint: [258, 210],
+		toPoint: [600, 600]
+	})
+];
+
 var Store = merge(EventEmitter.prototype, {
 	CHANGE_EVENT: 'change',
 	DRAG_EVENT: 'drag',
@@ -14,11 +21,17 @@ var Store = merge(EventEmitter.prototype, {
 	getAllFilters() {
 		return filters;
 	},
+	getWire(id) {
+		return wires[id];
+	},
+	getWireWidth() {
+		return 8;
+	},
 	getDragItem() {
 		return dragItem;
 	},
 	isNotDragging() {
-		return !dragItem.filter;
+		return !dragItem.dragging;
 	},
 	getAmountDragged(clientX, clientY) {
 		return {
@@ -86,7 +99,6 @@ var dragItem = {};
 
 function setDragItem(sourceObj) {
 	dragItem.id = sourceObj.id;
-	dragItem.filter = filters.get(sourceObj.id);
 	dragItem.element = sourceObj.element;
 	dragItem.clientX = sourceObj.clientX;
 	dragItem.clientY = sourceObj.clientY;
@@ -101,12 +113,14 @@ function moveFilterTo(id, x, y) {
 
 // Register for all actions
 Dispatcher.register(function(action) {
-	console.log(action.actionType);
-
 	switch(action.actionType) {
 	case Constants.START_DRAG_ON_WORKBENCH:
 		setDragItem(action);
+		dragItem.filter = filters.get(dragItem.id);
+		dragItem.dragging = true;
+
 		// TODO: do this smarter
+		dragItem.element.focus();
 		dragItem.element.style.zIndex = ++zCounter;
 		dragItem.element.classList.add('active');
 		Store.emit(Store.DRAG_EVENT);
@@ -116,24 +130,27 @@ Dispatcher.register(function(action) {
 		var {x, y} = Store.getAmountDragged(action.clientX, action.clientY);
 		x += dragItem.filter.get('x');
 		y += dragItem.filter.get('y');
-		dragItem.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+		// dragItem.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+		dragItem.element.style.left = x + 'px';
+		dragItem.element.style.top = y + 'px';
 	return;
 
 	case Constants.END_DRAG_ON_WORKBENCH:
 		dragItem.element.classList.remove('active');
+		dragItem.dragging = false;
 	return;
 
 	case Constants.MOVE_BY_ON_WORKBENCH:
 		var x = action.x + dragItem.filter.get('x');
 		var y = action.y + dragItem.filter.get('y');
 		moveFilterTo(dragItem.id, x, y);
-		dragItem = {};
+
 		Store.emit(Store.CHANGE_EVENT);
 	return;
 
 	case Constants.ITEM_CLICKED_ON_WORKBENCH:
 		console.log('clicked: ' + dragItem.id);
-		dragItem = {};
+
 		Store.emit(Store.CHANGE_EVENT);
 	return;
 	}

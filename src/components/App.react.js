@@ -32,6 +32,7 @@ var App = React.createClass({
 		AppActions.endDragOnWorkbench(ev.clientX, ev.clientY);
 	},
 	render() {
+		console.log('rendering');
 		return (
 			<div className="m-container" onMouseMove={this.handleMouseMove} onMouseUp={this.handleMouseUp}>
 				<Workbench />

@@ -2,8 +2,7 @@ var WorkbenchStore = require('../flux/WorkbenchStore');
 var RepositoryStore = require('../flux/RepositoryStore');
 var AppActions = require('../flux/AppActions');
 
-var WInput = require('./WInput.react');
-var WOutput = require('./WOutput.react');
+var WConnector = require('./WConnector.react');
 
 var WFilter = React.createClass({
 	handleMouseDown(ev) {
@@ -22,20 +21,21 @@ var WFilter = React.createClass({
 		var numInputs = filterClass.get('inputs');
 		var numOutputs = filterClass.get('outputs');
 
-		var style = { transform: 'translate(' + filter.get('x') + 'px,' + filter.get('y') + 'px)' };
+		// var style = { transform: 'translate(' + filter.get('x') + 'px,' + filter.get('y') + 'px)' };
+		var style = { left: filter.get('x') + 'px', top: filter.get('y') + 'px' };
 		var inputs = [];
 		for (var i = 0; i < numInputs; ++i) {
-			inputs.push(<WInput key={i} />);
+			inputs.push(<WConnector key={i} type="input" />);
 		}
 		var outputs = [];
 		for (var i = 0; i < numOutputs; ++i) {
-			outputs.push(<WOutput key={i} />);
+			outputs.push(<WConnector key={i} type="output" />);
 		}
 		return (
-			<div className="m-filter-on-canvas" onMouseDown={this.handleMouseDown} style={style}>
+			<div className="m-filter-on-canvas" onMouseDown={this.handleMouseDown} style={style} tabIndex="0">
 				<h4>{filterClassName}</h4>
-				{inputs}
-				{outputs}
+				<div className="inputs">{inputs}</div>
+				<div className="outputs">{outputs}</div>
 			</div>
 		);
 	}
