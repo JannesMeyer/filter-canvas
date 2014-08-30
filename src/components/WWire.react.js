@@ -7,7 +7,6 @@ var WWire = React.createClass({
 		        this.props.lineWidth !== nextProps.lineWidth);
 	},
 	draw() {
-		console.log('redraw');
 		ctx.beginPath();
 		ctx.moveTo(pStart[0], pStart[1]);
 		ctx.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], pEnd[0], pEnd[1]);
@@ -45,12 +44,11 @@ var WWire = React.createClass({
 		c2 = [xMiddle, pEnd[1]];
 
 		var style = {
-			position: 'absolute',
 			left: pFrom[0] + 'px',
 			top: (pFrom[1] - halfOfLineWidth) + 'px'
 		};
 		return (
-			<canvas width={width} height={height + halfOfLineWidth * 2} style={style} />
+			<canvas className="wire" width={width} height={height + halfOfLineWidth * 2} style={style} />
 		);
 	}
 });

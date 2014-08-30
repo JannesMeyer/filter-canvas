@@ -12,5 +12,9 @@
 				".*"
 			]
 		}
-	]
+	],
+	"settings": {
+		"afn_use_project_root": true,
+		"afn_proj_root": "/Users/jannes/filter-canvas/public"
+	}
 }

@@ -1,7 +1,6 @@
 var immutable = require('immutable');
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
-
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 
@@ -25,7 +24,7 @@ var Store = merge(EventEmitter.prototype, {
 		return wires[id];
 	},
 	getWireWidth() {
-		return 8;
+		return 4;
 	},
 	getDragItem() {
 		return dragItem;
