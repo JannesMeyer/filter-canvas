@@ -3,14 +3,14 @@ var pStart, c1, c2, pEnd;
 
 var WWire = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
-		return (this.props.wire !== nextProps.wire ||
-		        this.props.lineWidth !== nextProps.lineWidth);
+		return (this.props.connection !== nextProps.connection ||
+		        this.props.width !== nextProps.width);
 	},
 	draw() {
 		ctx.beginPath();
 		ctx.moveTo(pStart[0], pStart[1]);
 		ctx.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], pEnd[0], pEnd[1]);
-		ctx.lineWidth = this.props.lineWidth;
+		ctx.lineWidth = this.props.width;
 		// ctx.strokeStyle = '#f00';
 		ctx.stroke();
 	},
@@ -24,8 +24,9 @@ var WWire = React.createClass({
 		this.draw();
 	},
 	render() {
-		var pFrom = this.props.wire.get('fromPoint').toArray();
-		var pTo = this.props.wire.get('toPoint').toArray();
+		var connection = this.props.connection;
+		var pFrom = connection.get('fromPoint').toArray();
+		var pTo = connection.get('toPoint').toArray();
 
 		// TODO: calculate boundaries in a better way (Math.max)
 		// Swap the variables if necessary
@@ -36,7 +37,7 @@ var WWire = React.createClass({
 		var width = pTo[0] - pFrom[0];
 		var height = pTo[1] - pFrom[1];
 		var xMiddle = Math.round(width / 2);
-		var halfOfLineWidth = Math.ceil(this.props.lineWidth / 2);
+		var halfOfLineWidth = Math.ceil(this.props.width / 2);
 
 		pStart = [0, halfOfLineWidth];
 		pEnd = [width, halfOfLineWidth + height];

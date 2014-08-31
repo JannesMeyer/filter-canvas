@@ -5,12 +5,18 @@ var WWire = require('./WWire.react');
 var Workbench = React.createClass({
 	render() {
 		var filters = WorkbenchStore.getAllFilters();
+		var connections = WorkbenchStore.getAllConnections();
+		var wireWidth = WorkbenchStore.getWireWidth();
+
 		return (
 			<div className="m-workbench">
-				{filters.map((filter, key) =>
+				{filters.map((_, key) =>
 					<WFilter key={key} />
 				).toArray()}
-				<WWire wire={WorkbenchStore.getWire(0)} lineWidth={WorkbenchStore.getWireWidth()} />
+
+				{connections.map(connection =>
+					<WWire connection={connection} width={wireWidth} />
+				).toArray()}
 			</div>
 		);
 	}

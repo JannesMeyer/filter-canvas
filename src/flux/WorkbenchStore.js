@@ -4,13 +4,6 @@ var merge = require('react/lib/merge');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 
-var wires = [
-	immutable.fromJS({
-		fromPoint: [258, 210],
-		toPoint: [600, 600]
-	})
-];
-
 var Store = merge(EventEmitter.prototype, {
 	CHANGE_EVENT: 'change',
 	DRAG_EVENT: 'drag',
@@ -20,8 +13,11 @@ var Store = merge(EventEmitter.prototype, {
 	getAllFilters() {
 		return filters;
 	},
-	getWire(id) {
-		return wires[id];
+	getAllConnections() {
+		return connections;
+	},
+	getConnection(id) {
+		return connections.get(id);
 	},
 	getWireWidth() {
 		return 4;
@@ -44,77 +40,97 @@ var Store = merge(EventEmitter.prototype, {
 });
 module.exports = Store;
 
+var connections = immutable.fromJS([
+	{
+		fromFilter: 1,
+		toFilter: 2,
+		outputIndex: 0,
+		inputIndex: 0,
+		fromPoint: [0, 0],
+		toPoint: [600, 400]
+	}
+]);
+
 var zCounter = 10;
 var spacing = 70;
 var filters = immutable.fromJS([
 	{
 		class: 'SourceFilterExample',
-		inputs: [],
-		outputs: [ null ],
+		inputs: immutable.Range(0, 0),
+		outputs: immutable.Range(0, 1),
+		connections: [],
 		height: 60,
 		x: 20,
 		y: 20 + 0 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: [ null ],
-		outputs: [ 2 ],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 1),
+		connections: [0],
 		height: 60,
 		x: 20,
 		y: 20 + 1 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: [ 1 ],
-		outputs: [ null ],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 1),
+		connections: [0],
 		height: 60,
 		x: 400,
 		y: 200
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: [ null ],
-		outputs: [ null ],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 1),
+		connections: [],
 		height: 60,
 		x: 20,
 		y: 20 + 3 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: [ null ],
-		outputs: [ null ],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 1),
+		connections: [],
 		height: 60,
 		x: 20,
 		y: 20 + 4 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: [ null ],
-		outputs: [ null ],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 1),
+		connections: [],
 		height: 60,
 		x: 20,
 		y: 20 + 5 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: [ null ],
-		outputs: [ null ],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 1),
+		connections: [],
 		height: 60,
 		x: 20,
 		y: 20 + 6 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: [ null ],
-		outputs: [ null ],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 1),
+		connections: [],
 		height: 60,
 		x: 20,
 		y: 20 + 7 * spacing
 	},
 	{
 		class: 'EndFilterExample',
-		inputs: [ null ],
-		outputs: [],
+		inputs: immutable.Range(0, 1),
+		outputs: immutable.Range(0, 0),
+		connections: [],
 		height: 60,
 		x: 20,
 		y: 20 + 8 * spacing
@@ -130,10 +146,21 @@ function setDragItem(sourceObj) {
 	dragItem.clientY = sourceObj.clientY;
 }
 
+function calculateConnectorPosition(filter, connectorIndex, isInput) {
+	if (isInput) {
+		return [0, 0];
+	} else {
+		return [600, 400]
+	}
+}
+
 function moveFilterTo(id, x, y) {
 	filters = filters.withMutations(filters => {
 		filters.updateIn([id, 'x'], () => x);
 		filters.updateIn([id, 'y'], () => y);
+	});
+	filters.get('connections').forEach(connection => {
+		// TODO: update connections
 	});
 }
 
@@ -148,7 +175,6 @@ Dispatcher.register(function(action) {
 		// TODO: do this smarter
 		dragItem.element.focus();
 		dragItem.element.style.zIndex = ++zCounter;
-		dragItem.element.classList.add('active');
 		Store.emit(Store.DRAG_EVENT);
 	return;
 
@@ -162,7 +188,6 @@ Dispatcher.register(function(action) {
 	return;
 
 	case Constants.END_DRAG_ON_WORKBENCH:
-		dragItem.element.classList.remove('active');
 		dragItem.dragging = false;
 	return;
 

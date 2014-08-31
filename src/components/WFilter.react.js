@@ -25,17 +25,23 @@ var WFilter = React.createClass({
 			height: filter.get('height') + 'px'
 		};
 		return (
-			<div className="m-filter-on-canvas" style={style} tabIndex="0" onMouseDown={this.handleMouseDown}>
+			<div
+				className="m-filter-on-canvas"
+				style={style}
+				tabIndex="0"
+				onMouseDown={this.handleMouseDown}
+				>
+
 				<h4>{filter.get('class')}</h4>
 
 				<div className="inputs">
-					{inputs.map((_, key) =>
+					{inputs.map(key =>
 						<WConnector key={key} type="input" />
 					).toArray()}
 				</div>
 
 				<div className="outputs">
-					{outputs.map((_, key) =>
+					{outputs.map(key =>
 						<WConnector key={key} type="output" />
 					).toArray()}
 				</div>
