@@ -22,6 +22,7 @@ var WFilter = React.createClass({
 		var style = {
 			left: filter.get('x') + 'px',
 			top: filter.get('y') + 'px',
+			width: filter.get('width') + 'px',
 			height: filter.get('height') + 'px'
 		};
 		return (

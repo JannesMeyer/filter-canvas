@@ -20,7 +20,7 @@ var Store = merge(EventEmitter.prototype, {
 		return connections.get(id);
 	},
 	getWireWidth() {
-		return 4;
+		return wireWidth;
 	},
 	getDragItem() {
 		return dragItem;
@@ -40,25 +40,23 @@ var Store = merge(EventEmitter.prototype, {
 });
 module.exports = Store;
 
-var connections = immutable.fromJS([
-	{
-		fromFilter: 1,
-		toFilter: 2,
-		outputIndex: 0,
-		inputIndex: 0,
-		fromPoint: [0, 0],
-		toPoint: [600, 400]
-	}
-]);
-
 var zCounter = 10;
 var spacing = 70;
+var connectorHeight = 8;
+var connectorMargin = 4;
+var filterPadding = 18;
+var filterMinHeight = 60;
+var wireWidth = 2;
+
+var connections = immutable.fromJS([]);
+
 var filters = immutable.fromJS([
 	{
 		class: 'SourceFilterExample',
 		inputs: immutable.Range(0, 0),
 		outputs: immutable.Range(0, 1),
 		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 0 * spacing
@@ -67,16 +65,18 @@ var filters = immutable.fromJS([
 		class: 'WorkFilterExample',
 		inputs: immutable.Range(0, 1),
 		outputs: immutable.Range(0, 1),
-		connections: [0],
+		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 1 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 1),
+		inputs: immutable.Range(0, 3),
 		outputs: immutable.Range(0, 1),
-		connections: [0],
+		connections: [],
+		width: 140,
 		height: 60,
 		x: 400,
 		y: 200
@@ -86,6 +86,7 @@ var filters = immutable.fromJS([
 		inputs: immutable.Range(0, 1),
 		outputs: immutable.Range(0, 1),
 		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 3 * spacing
@@ -95,6 +96,7 @@ var filters = immutable.fromJS([
 		inputs: immutable.Range(0, 1),
 		outputs: immutable.Range(0, 1),
 		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 4 * spacing
@@ -104,6 +106,7 @@ var filters = immutable.fromJS([
 		inputs: immutable.Range(0, 1),
 		outputs: immutable.Range(0, 1),
 		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 5 * spacing
@@ -113,6 +116,7 @@ var filters = immutable.fromJS([
 		inputs: immutable.Range(0, 1),
 		outputs: immutable.Range(0, 1),
 		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 6 * spacing
@@ -122,6 +126,7 @@ var filters = immutable.fromJS([
 		inputs: immutable.Range(0, 1),
 		outputs: immutable.Range(0, 1),
 		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 7 * spacing
@@ -131,11 +136,57 @@ var filters = immutable.fromJS([
 		inputs: immutable.Range(0, 1),
 		outputs: immutable.Range(0, 0),
 		connections: [],
+		width: 140,
 		height: 60,
 		x: 20,
 		y: 20 + 8 * spacing
 	}
 ]);
+
+function calculateConnectorPosition(filterId, connectorId, isOutput) {
+	var filter = filters.get(filterId);
+	var x = filter.get('x');
+	var y = filter.get('y');
+	var width = filter.get('width');
+	var height = filter.get('height');
+	var inputs = filter.get('inputs').length;
+	var outputs = filter.get('outputs').length;
+
+	if (isOutput) {
+		var totalHeight = (outputs + 1) * connectorMargin + outputs * connectorHeight;
+		var outX = x + width + 6;
+	} else {
+		var totalHeight = (inputs + 1) * connectorMargin + inputs * connectorHeight;
+		var outX = x - 6;
+	}
+	var outY = y + (height - totalHeight) / 2 + (connectorId + 1) * connectorMargin + connectorId * connectorHeight;
+	outY += Math.floor(Math.abs(connectorHeight - wireWidth) / 2);
+	return immutable.Vector(outX, Math.round(outY));
+}
+
+function addConnection(fromFilter, fromConnector, toFilter, toConnector) {
+	var fromPoint = calculateConnectorPosition(fromFilter, fromConnector, true);
+	var toPoint = calculateConnectorPosition(toFilter, toConnector, false);
+
+	var connection = immutable.Map({
+		fromFilter,
+		fromConnector,
+		fromPoint,
+		toFilter,
+		toConnector,
+		toPoint
+	});
+	connections = connections.push(connection);
+	var connectionId = connections.length - 1;
+
+	filters = filters.withMutations(filters => {
+		filters.updateIn([fromFilter, 'connections'], c => c.push(connectionId));
+		filters.updateIn([toFilter, 'connections'], c => c.push(connectionId));
+	});
+}
+addConnection(1, 0, 2, 0);
+addConnection(0, 0, 2, 1);
+
 // This information is very transient
 var dragItem = {};
 
@@ -146,21 +197,29 @@ function setDragItem(sourceObj) {
 	dragItem.clientY = sourceObj.clientY;
 }
 
-function calculateConnectorPosition(filter, connectorIndex, isInput) {
-	if (isInput) {
-		return [0, 0];
-	} else {
-		return [600, 400]
-	}
-}
-
-function moveFilterTo(id, x, y) {
+function moveFilterTo(filterId, x, y) {
 	filters = filters.withMutations(filters => {
-		filters.updateIn([id, 'x'], () => x);
-		filters.updateIn([id, 'y'], () => y);
+		filters.updateIn([filterId, 'x'], () => x);
+		filters.updateIn([filterId, 'y'], () => y);
 	});
-	filters.get('connections').forEach(connection => {
-		// TODO: update connections
+	connections = connections.withMutations(connections => {
+		filters.getIn([filterId, 'connections']).forEach(connectionId => {
+			var connection = connections.get(connectionId);
+
+			var fromFilter = connection.get('fromFilter'); // filterId
+			var fromConnector = connection.get('fromConnector'); // connectorId
+			if (fromFilter === filterId) {
+				var fromPoint = calculateConnectorPosition(fromFilter, fromConnector, true);
+				connections.updateIn([connectionId, 'fromPoint'], () => fromPoint);
+			}
+
+			var toFilter = connection.get('toFilter'); // filterId
+			var toConnector = connection.get('toConnector'); // connectorId
+			if (toFilter === filterId) {
+				var toPoint = calculateConnectorPosition(toFilter, toConnector, false);
+				connections.updateIn([connectionId, 'toPoint'], () => toPoint);
+			}
+		});
 	});
 }
 

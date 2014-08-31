@@ -32,7 +32,7 @@ var Store = merge(EventEmitter.prototype, {
 // Store.removeListener(Store.FILTERS_CHANGE, callback)
 module.exports = Store;
 
-var filterConnectorHeight = 12;
+var filterConnectorHeight = 16;
 var filterPadding = 18;
 var filterMinHeight = 60;
 

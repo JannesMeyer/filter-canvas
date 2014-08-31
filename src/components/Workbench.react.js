@@ -14,8 +14,8 @@ var Workbench = React.createClass({
 					<WFilter key={key} />
 				).toArray()}
 
-				{connections.map(connection =>
-					<WWire connection={connection} width={wireWidth} />
+				{connections.map((connection, key) =>
+					<WWire key={key} connection={connection} width={wireWidth} />
 				).toArray()}
 			</div>
 		);

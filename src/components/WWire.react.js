@@ -1,26 +1,28 @@
-var ctx;
-var pStart, c1, c2, pEnd;
-
 var WWire = React.createClass({
+	ctx: null,
+	pStart: null,
+	c1: null,
+	c2: null,
+	pEnd: null,
 	shouldComponentUpdate(nextProps, nextState) {
 		return (this.props.connection !== nextProps.connection ||
 		        this.props.width !== nextProps.width);
 	},
 	draw() {
-		ctx.beginPath();
-		ctx.moveTo(pStart[0], pStart[1]);
-		ctx.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], pEnd[0], pEnd[1]);
-		ctx.lineWidth = this.props.width;
-		// ctx.strokeStyle = '#f00';
-		ctx.stroke();
+		this.ctx.beginPath();
+		this.ctx.moveTo(this.pStart[0], this.pStart[1]);
+		this.ctx.bezierCurveTo(this.c1[0], this.c1[1], this.c2[0], this.c2[1], this.pEnd[0], this.pEnd[1]);
+		this.ctx.lineWidth = this.props.width;
+		// this.ctx.strokeStyle = '#f00';
+		this.ctx.stroke();
 	},
 	componentDidMount() {
 		var canvas = this.getDOMNode();
-		ctx = canvas.getContext('2d');
+		this.ctx = canvas.getContext('2d');
 		this.draw();
 	},
 	componentDidUpdate(prevProps, prevState) {
-		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+		this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 		this.draw();
 	},
 	render() {
@@ -39,14 +41,14 @@ var WWire = React.createClass({
 		var xMiddle = Math.round(width / 2);
 		var halfOfLineWidth = Math.ceil(this.props.width / 2);
 
-		pStart = [0, halfOfLineWidth];
-		pEnd = [width, halfOfLineWidth + height];
-		c1 = [xMiddle, pStart[1]];
-		c2 = [xMiddle, pEnd[1]];
+		this.pStart = [0, halfOfLineWidth];
+		this.pEnd = [width, halfOfLineWidth + height];
+		this.c1 = [xMiddle, this.pStart[1]];
+		this.c2 = [xMiddle, this.pEnd[1]];
 
 		var style = {
 			left: pFrom[0] + 'px',
-			top: (pFrom[1] - halfOfLineWidth) + 'px'
+			top: pFrom[1] + 'px'
 		};
 		return (
 			<canvas className="wire" width={width} height={height + halfOfLineWidth * 2} style={style} />
