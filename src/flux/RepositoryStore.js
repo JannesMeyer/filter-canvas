@@ -9,23 +9,32 @@ var Constants = require('./Constants');
 var Store = merge(EventEmitter.prototype, {
 	FILTERS_CHANGE: 'filters change',
 	PIPES_CHANGE: 'pipes change',
-	getFilter(id) {
-		return filters.get(id);
-	},
 	getAllFilters() {
 		return filters;
 	},
-	getPipe(id) {
-		return pipes.get(id);
+	getFilter(id) {
+		return filters.get(id);
+	},
+	getFilterHeight(filter) {
+		var connectors = Math.max(filter.get('inputs'), filter.get('outputs'));
+		var height = connectors * filterConnectorHeight + 2 * filterPadding;
+		return Math.max(filterMinHeight, height);
 	},
 	getAllPipes() {
 		return pipes;
+	},
+	getPipe(id) {
+		return pipes.get(id);
 	}
 });
 // Store.emit(Store.FILTERS_CHANGE)
 // Store.on(Store.FILTERS_CHANGE, callback)
 // Store.removeListener(Store.FILTERS_CHANGE, callback)
 module.exports = Store;
+
+var filterConnectorHeight = 12;
+var filterPadding = 18;
+var filterMinHeight = 60;
 
 var filters = immutable.fromJS({
 	SourceFilterExample: {

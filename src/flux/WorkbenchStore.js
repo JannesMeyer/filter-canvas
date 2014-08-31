@@ -44,51 +44,78 @@ var Store = merge(EventEmitter.prototype, {
 });
 module.exports = Store;
 
-var zCounter = 0;
+var zCounter = 10;
 var spacing = 70;
 var filters = immutable.fromJS([
 	{
 		class: 'SourceFilterExample',
+		inputs: [],
+		outputs: [ null ],
+		height: 60,
 		x: 20,
 		y: 20 + 0 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
+		inputs: [ null ],
+		outputs: [ 2 ],
+		height: 60,
 		x: 20,
 		y: 20 + 1 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
-		x: 20,
-		y: 20 + 2 * spacing
+		inputs: [ 1 ],
+		outputs: [ null ],
+		height: 60,
+		x: 400,
+		y: 200
 	},
 	{
 		class: 'WorkFilterExample',
+		inputs: [ null ],
+		outputs: [ null ],
+		height: 60,
 		x: 20,
 		y: 20 + 3 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
+		inputs: [ null ],
+		outputs: [ null ],
+		height: 60,
 		x: 20,
 		y: 20 + 4 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
+		inputs: [ null ],
+		outputs: [ null ],
+		height: 60,
 		x: 20,
 		y: 20 + 5 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
+		inputs: [ null ],
+		outputs: [ null ],
+		height: 60,
 		x: 20,
 		y: 20 + 6 * spacing
 	},
 	{
 		class: 'WorkFilterExample',
+		inputs: [ null ],
+		outputs: [ null ],
+		height: 60,
 		x: 20,
 		y: 20 + 7 * spacing
 	},
 	{
 		class: 'EndFilterExample',
+		inputs: [ null ],
+		outputs: [],
+		height: 60,
 		x: 20,
 		y: 20 + 8 * spacing
 	}
