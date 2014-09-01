@@ -190,15 +190,19 @@ function addConnection(fromFilterId, fromConnectorId, toFilterId, toConnectorId)
 }
 addConnection(0, 0, 2, 0);
 addConnection(1, 0, 2, 1);
+addConnection(3, 0, 2, 2);
 
 // This information is very transient
 var dragItem = {};
 
 function setDragItem(sourceObj) {
 	dragItem.id = sourceObj.id;
+	dragItem.filter = filters.get(sourceObj.id);
+	dragItem.connections = filters.getIn([sourceObj.id, 'connections']);
 	dragItem.element = sourceObj.element;
 	dragItem.clientX = sourceObj.clientX;
 	dragItem.clientY = sourceObj.clientY;
+	dragItem.dragging = true;
 }
 
 function moveFilterTo(filterId, x, y) {
@@ -206,25 +210,7 @@ function moveFilterTo(filterId, x, y) {
 		filters.updateIn([filterId, 'x'], () => x);
 		filters.updateIn([filterId, 'y'], () => y);
 	});
-	// connections = connections.withMutations(connections => {
-	// 	filters.getIn([filterId, 'connections']).forEach(connectionId => {
-	// 		var connection = connections.get(connectionId);
-
-	// 		var fromFilter = connection.get('fromFilter'); // filterId
-	// 		var fromConnector = connection.get('fromConnector'); // connectorId
-	// 		if (fromFilter === filterId) {
-	// 			var fromPoint = calculateConnectorOffset(fromFilter, fromConnector, true);
-	// 			connections.updateIn([connectionId, 'fromPoint'], () => fromPoint);
-	// 		}
-
-	// 		var toFilter = connection.get('toFilter'); // filterId
-	// 		var toConnector = connection.get('toConnector'); // connectorId
-	// 		if (toFilter === filterId) {
-	// 			var toPoint = calculateConnectorOffset(toFilter, toConnector, false);
-	// 			connections.updateIn([connectionId, 'toPoint'], () => toPoint);
-	// 		}
-	// 	});
-	// });
+	// TODO: redraw wires?
 }
 
 // Register for all actions
@@ -232,9 +218,6 @@ Dispatcher.register(function(action) {
 	switch(action.actionType) {
 	case Constants.START_DRAG_ON_WORKBENCH:
 		setDragItem(action);
-		dragItem.filter = filters.get(dragItem.id);
-		dragItem.connections = dragItem.filter.get('connections');
-		dragItem.dragging = true;
 
 		// TODO: do this smarter
 		dragItem.element.focus();
