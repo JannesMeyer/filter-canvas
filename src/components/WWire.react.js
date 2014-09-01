@@ -52,17 +52,18 @@ var WWire = React.createClass({
 		var height = Math.abs(pTo[1] - pFrom[1]) + lineWidth;
 
 		if (pFrom[1] < pTo[1]) {
-			this.pStart = [0, lineWidthHalf];
-			this.pEnd = [width, height - lineWidthHalf];
+			this.pStart = [0,     lineWidthHalf];
+			this.pEnd   = [width, height - lineWidthHalf];
 		} else {
-			this.pStart = [0, height - lineWidthHalf];
-			this.pEnd = [width, lineWidthHalf];
+			this.pStart = [0,     height - lineWidthHalf];
+			this.pEnd   = [width, lineWidthHalf];
 		}
 		this.lineWidth = lineWidth;
-		this.pContext1 = [width * 0.4, this.pStart[1]];
-		this.pContext2 = [width * 0.6, this.pEnd[1]];
+		this.pContext1 = [Math.min(150, width * 0.5), this.pStart[1]];
+		this.pContext2 = [Math.max(width - 150, width * 0.5), this.pEnd[1]];
 
-		return <canvas className="wire" width={width} height={height} style={{ left: left+'px', top: top+'px' }} />;
+		var style = { left: left+'px', top: top+'px' };
+		return <canvas className="wire" width={width} height={height} style={style} />;
 	}
 });
 module.exports = WWire;
