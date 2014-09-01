@@ -20,9 +20,10 @@ var WWire = React.createClass({
 		ctx.moveTo(this.pStart[0], this.pStart[1]);
 		ctx.bezierCurveTo(this.pContext1[0], this.pContext1[1], this.pContext2[0], this.pContext2[1], this.pEnd[0], this.pEnd[1]);
 		ctx.stroke();
+		ctx.closePath();
 	},
 	shouldComponentUpdate(nextProps, nextState) {
-		// Prevent overdraw
+		// Prevent overdrawing the canvas
 		return false;
 	},
 	componentDidUpdate(prevProps, prevState) {
@@ -42,6 +43,7 @@ var WWire = React.createClass({
 		var lineWidth = lineWidthHalf * 2;
 
 		if (pFrom[0] > pTo[0]) {
+			// TODO: draw the wire to a previous location
 			this.ctx = null;
 			return null;
 		}
@@ -50,19 +52,20 @@ var WWire = React.createClass({
 		var width = pTo[0] - pFrom[0];
 		var top = Math.min(pTo[1], pFrom[1]);
 		var height = Math.abs(pTo[1] - pFrom[1]) + lineWidth;
+		var middle = Math.min(200, width * 0.5);
 
 		if (pFrom[1] < pTo[1]) {
-			this.pStart = [0,     lineWidthHalf];
-			this.pEnd   = [width, height - lineWidthHalf];
+			this.pStart = [ 0,     0      + lineWidthHalf ];
+			this.pEnd   = [ width, height - lineWidthHalf ];
 		} else {
-			this.pStart = [0,     height - lineWidthHalf];
-			this.pEnd   = [width, lineWidthHalf];
+			this.pStart = [ 0,     height - lineWidthHalf ];
+			this.pEnd   = [ width, 0      + lineWidthHalf ];
 		}
 		this.lineWidth = lineWidth;
-		this.pContext1 = [Math.min(150, width * 0.5), this.pStart[1]];
-		this.pContext2 = [Math.max(width - 150, width * 0.5), this.pEnd[1]];
+		this.pContext1 = [middle, this.pStart[1]];
+		this.pContext2 = [middle, this.pEnd[1]];
 
-		var style = { left: left+'px', top: top+'px' };
+		var style = { left: left + 'px', top: top + 'px' };
 		return <canvas className="wire" width={width} height={height} style={style} />;
 	}
 });
