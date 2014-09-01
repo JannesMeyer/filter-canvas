@@ -3,6 +3,7 @@ var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
+var WireStore = require('./WireStore.js');
 
 var Store = merge(EventEmitter.prototype, {
 	CHANGE_EVENT: 'change',
@@ -48,7 +49,7 @@ var filterPadding = 18;
 var filterMinHeight = 60;
 var wireWidth = 2;
 
-var connections = immutable.fromJS([]);
+var connections = [];
 
 var filters = immutable.fromJS([
 	{
@@ -143,10 +144,7 @@ var filters = immutable.fromJS([
 	}
 ]);
 
-function calculateConnectorPosition(filterId, connectorId, isOutput) {
-	var filter = filters.get(filterId);
-	var x = filter.get('x');
-	var y = filter.get('y');
+function calculateConnectorOffset(filter, connectorId, isOutput) {
 	var width = filter.get('width');
 	var height = filter.get('height');
 	var inputs = filter.get('inputs').length;
@@ -154,38 +152,44 @@ function calculateConnectorPosition(filterId, connectorId, isOutput) {
 
 	if (isOutput) {
 		var totalHeight = (outputs + 1) * connectorMargin + outputs * connectorHeight;
-		var outX = x + width + 6;
+		var offsetX = width + 6;
 	} else {
 		var totalHeight = (inputs + 1) * connectorMargin + inputs * connectorHeight;
-		var outX = x - 6;
+		var offsetX = -6;
 	}
-	var outY = y + (height - totalHeight) / 2 + (connectorId + 1) * connectorMargin + connectorId * connectorHeight;
-	outY += Math.floor(Math.abs(connectorHeight - wireWidth) / 2);
-	return immutable.Vector(outX, Math.round(outY));
+	var offsetY = (height - totalHeight) / 2 + (connectorId + 1) * connectorMargin + connectorId * connectorHeight;
+	offsetY += Math.floor(Math.abs(connectorHeight - wireWidth) / 2);
+	return [offsetX, Math.round(offsetY)];
 }
 
-function addConnection(fromFilter, fromConnector, toFilter, toConnector) {
-	var fromPoint = calculateConnectorPosition(fromFilter, fromConnector, true);
-	var toPoint = calculateConnectorPosition(toFilter, toConnector, false);
+function addConnection(fromFilterId, fromConnectorId, toFilterId, toConnectorId) {
+	var fromFilter = filters.get(fromFilterId);
+	var fromOffset = calculateConnectorOffset(fromFilter, fromConnectorId, true);
+	var fromPoint = [fromFilter.get('x') + fromOffset[0], fromFilter.get('y') + fromOffset[1]];
 
-	var connection = immutable.Map({
-		fromFilter,
-		fromConnector,
+	var toFilter = filters.get(toFilterId);
+	var toOffset = calculateConnectorOffset(toFilter, toConnectorId, false);
+	var toPoint = [toFilter.get('x') + toOffset[0], toFilter.get('y') + toOffset[1]];
+
+	var connection = {
+		fromFilter: fromFilterId,
+		fromConnector: fromConnectorId,
+		fromOffset,
 		fromPoint,
-		toFilter,
-		toConnector,
+		toFilter: toFilterId,
+		toConnector: toConnectorId,
+		toOffset,
 		toPoint
-	});
-	connections = connections.push(connection);
-	var connectionId = connections.length - 1;
+	};
+	var connectionId = connections.push(connection) - 1;
 
 	filters = filters.withMutations(filters => {
-		filters.updateIn([fromFilter, 'connections'], c => c.push(connectionId));
-		filters.updateIn([toFilter, 'connections'], c => c.push(connectionId));
+		filters.updateIn([fromFilterId, 'connections'], c => c.push(connectionId));
+		filters.updateIn([toFilterId, 'connections'], c => c.push(connectionId));
 	});
 }
-addConnection(1, 0, 2, 0);
-addConnection(0, 0, 2, 1);
+addConnection(0, 0, 2, 0);
+addConnection(1, 0, 2, 1);
 
 // This information is very transient
 var dragItem = {};
@@ -202,25 +206,25 @@ function moveFilterTo(filterId, x, y) {
 		filters.updateIn([filterId, 'x'], () => x);
 		filters.updateIn([filterId, 'y'], () => y);
 	});
-	connections = connections.withMutations(connections => {
-		filters.getIn([filterId, 'connections']).forEach(connectionId => {
-			var connection = connections.get(connectionId);
+	// connections = connections.withMutations(connections => {
+	// 	filters.getIn([filterId, 'connections']).forEach(connectionId => {
+	// 		var connection = connections.get(connectionId);
 
-			var fromFilter = connection.get('fromFilter'); // filterId
-			var fromConnector = connection.get('fromConnector'); // connectorId
-			if (fromFilter === filterId) {
-				var fromPoint = calculateConnectorPosition(fromFilter, fromConnector, true);
-				connections.updateIn([connectionId, 'fromPoint'], () => fromPoint);
-			}
+	// 		var fromFilter = connection.get('fromFilter'); // filterId
+	// 		var fromConnector = connection.get('fromConnector'); // connectorId
+	// 		if (fromFilter === filterId) {
+	// 			var fromPoint = calculateConnectorOffset(fromFilter, fromConnector, true);
+	// 			connections.updateIn([connectionId, 'fromPoint'], () => fromPoint);
+	// 		}
 
-			var toFilter = connection.get('toFilter'); // filterId
-			var toConnector = connection.get('toConnector'); // connectorId
-			if (toFilter === filterId) {
-				var toPoint = calculateConnectorPosition(toFilter, toConnector, false);
-				connections.updateIn([connectionId, 'toPoint'], () => toPoint);
-			}
-		});
-	});
+	// 		var toFilter = connection.get('toFilter'); // filterId
+	// 		var toConnector = connection.get('toConnector'); // connectorId
+	// 		if (toFilter === filterId) {
+	// 			var toPoint = calculateConnectorOffset(toFilter, toConnector, false);
+	// 			connections.updateIn([connectionId, 'toPoint'], () => toPoint);
+	// 		}
+	// 	});
+	// });
 }
 
 // Register for all actions
@@ -229,6 +233,7 @@ Dispatcher.register(function(action) {
 	case Constants.START_DRAG_ON_WORKBENCH:
 		setDragItem(action);
 		dragItem.filter = filters.get(dragItem.id);
+		dragItem.connections = dragItem.filter.get('connections');
 		dragItem.dragging = true;
 
 		// TODO: do this smarter
@@ -241,9 +246,12 @@ Dispatcher.register(function(action) {
 		var {x, y} = Store.getAmountDragged(action.clientX, action.clientY);
 		x += dragItem.filter.get('x');
 		y += dragItem.filter.get('y');
+		// Update filter position
 		// dragItem.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
 		dragItem.element.style.left = x + 'px';
 		dragItem.element.style.top = y + 'px';
+		// Update wires
+		dragItem.connections.forEach(WireStore.update);
 	return;
 
 	case Constants.END_DRAG_ON_WORKBENCH:

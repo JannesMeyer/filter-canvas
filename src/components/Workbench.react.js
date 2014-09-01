@@ -16,7 +16,7 @@ var Workbench = React.createClass({
 
 				{connections.map((connection, key) =>
 					<WWire key={key} connection={connection} width={wireWidth} />
-				).toArray()}
+				)}
 			</div>
 		);
 	}
