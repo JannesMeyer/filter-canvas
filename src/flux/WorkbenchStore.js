@@ -18,7 +18,7 @@ var Store = merge(EventEmitter.prototype, {
 		return connections;
 	},
 	getConnection(id) {
-		return connections.get(id);
+		return connections[id];
 	},
 	getWireWidth() {
 		return wireWidth;
@@ -251,7 +251,16 @@ Dispatcher.register(function(action) {
 		dragItem.element.style.left = x + 'px';
 		dragItem.element.style.top = y + 'px';
 		// Update wires
-		dragItem.connections.forEach(WireStore.update);
+		dragItem.connections.forEach(id => {
+			var cnx = connections[id];
+			if (cnx.fromFilter === dragItem.id) {
+				cnx.fromPoint = [x + cnx.fromOffset[0], y + cnx.fromOffset[1]];
+			}
+			if (cnx.toFilter === dragItem.id) {
+				cnx.toPoint = [x + cnx.toOffset[0], y + cnx.toOffset[1]];
+			}
+			WireStore.update(id);
+		});
 	return;
 
 	case Constants.END_DRAG_ON_WORKBENCH:

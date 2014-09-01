@@ -1,34 +1,22 @@
 var WireStore = require('../flux/WireStore.js');
 
-var fps = 10;
-
 var WWire = React.createClass({
 	ctx: null,
 	pStart: null,
 	c1: null,
 	c2: null,
 	pEnd: null,
-	lastUpdate: null,
-	// shouldComponentUpdate(nextProps, nextState) {
-	// 	return false;
-	// },
 	draw() {
-		// Limit framerate
-		var now = Date.now();
-		if (!this.lastUpdate || (now - this.lastUpdate) > (1000 / fps)) {
-			this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-			this.ctx.moveTo(this.pStart[0], this.pStart[1]);
-			this.ctx.bezierCurveTo(this.c1[0], this.c1[1], this.c2[0], this.c2[1], this.pEnd[0], this.pEnd[1]);
-			this.ctx.stroke();
-			this.lastUpdate = now;
-		}
+		// TODO: don't clear after a width/height change
+		this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+		this.ctx.moveTo(this.pStart[0], this.pStart[1]);
+		this.ctx.bezierCurveTo(this.c1[0], this.c1[1], this.c2[0], this.c2[1], this.pEnd[0], this.pEnd[1]);
+		this.ctx.lineWidth = this.props.width;
+		this.ctx.stroke();
 	},
 	componentDidMount() {
-		var canvas = this.getDOMNode();
-		this.ctx = canvas.getContext('2d');
-		this.ctx.lineWidth = this.props.width;
+		this.ctx = this.getDOMNode().getContext('2d');
 		this.draw();
-
 		WireStore.register(this.props.key, this);
 	},
 	componentWillUnmount() {
@@ -38,9 +26,8 @@ var WWire = React.createClass({
 		this.draw();
 	},
 	render() {
-		var connection = this.props.connection;
-		var pFrom = connection.fromPoint;
-		var pTo = connection.toPoint;
+		var pFrom = this.props.connection.fromPoint;
+		var pTo = this.props.connection.toPoint;
 
 		// TODO: calculate boundaries in a better way (Math.max)
 		// Swap the variables if necessary
