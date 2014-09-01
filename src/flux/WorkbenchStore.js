@@ -5,9 +5,8 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 var WireStore = require('./WireStore.js');
 
-var Store = merge(EventEmitter.prototype, {
-	CHANGE_EVENT: 'change',
-	DRAG_EVENT: 'drag',
+var CHANGE_EVENT = 'change';
+var WorkbenchStore = merge(EventEmitter.prototype, {
 	getFilter(id) {
 		return filters.get(id);
 	},
@@ -23,23 +22,26 @@ var Store = merge(EventEmitter.prototype, {
 	getWireWidth() {
 		return wireWidth;
 	},
-	getDragItem() {
-		return dragItem;
-	},
 	isNotDragging() {
-		return !dragItem.dragging;
+		return !activeItem.dragging;
 	},
 	getAmountDragged(clientX, clientY) {
 		return {
-			x: clientX - dragItem.clientX,
-			y: clientY - dragItem.clientY
+			x: clientX - activeItem.clientX,
+			y: clientY - activeItem.clientY
 		};
+	},
+	emitChange() {
+		this.emit(CHANGE_EVENT);
+	},
+	addChangeListener(callback) {
+		this.on(CHANGE_EVENT, callback);
+	},
+	removeChangeListener(callback) {
+		this.removeListener(CHANGE_EVENT, callback);
 	}
-	// Store.emit(Store.CHANGE_EVENT)
-	// Store.on(Store.CHANGE_EVENT, callback)
-	// Store.removeListener(Store.CHANGE_EVENT, callback)
 });
-module.exports = Store;
+module.exports = WorkbenchStore;
 
 var zCounter = 10;
 var spacing = 70;
@@ -188,22 +190,13 @@ function addConnection(fromFilterId, fromConnectorId, toFilterId, toConnectorId)
 		filters.updateIn([toFilterId, 'connections'], c => c.push(connectionId));
 	});
 }
+// TODO: replace with actual interaction
 addConnection(0, 0, 2, 0);
 addConnection(1, 0, 2, 1);
 addConnection(3, 0, 2, 2);
 
 // This information is very transient
-var dragItem = {};
-
-function setDragItem(sourceObj) {
-	dragItem.id = sourceObj.id;
-	dragItem.filter = filters.get(sourceObj.id);
-	dragItem.connections = filters.getIn([sourceObj.id, 'connections']);
-	dragItem.element = sourceObj.element;
-	dragItem.clientX = sourceObj.clientX;
-	dragItem.clientY = sourceObj.clientY;
-	dragItem.dragging = true;
-}
+var activeItem = {};
 
 function moveFilterTo(filterId, x, y) {
 	filters = filters.withMutations(filters => {
@@ -217,29 +210,34 @@ function moveFilterTo(filterId, x, y) {
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
 	case Constants.START_DRAG_ON_WORKBENCH:
-		setDragItem(action);
-
+		activeItem = {
+			id: action.id,
+			filter: filters.get(action.id),
+			connections: filters.getIn([action.id, 'connections']),
+			element: action.element,
+			clientX: action.clientX,
+			clientY: action.clientY,
+			dragging: true
+		};
 		// TODO: do this smarter
-		dragItem.element.focus();
-		dragItem.element.style.zIndex = ++zCounter;
-		Store.emit(Store.DRAG_EVENT);
+		action.element.focus();
+		action.element.style.zIndex = ++zCounter;
 	return;
 
 	case Constants.DRAGGING_ON_WORKBENCH:
-		var {x, y} = Store.getAmountDragged(action.clientX, action.clientY);
-		x += dragItem.filter.get('x');
-		y += dragItem.filter.get('y');
+		var {x, y} = WorkbenchStore.getAmountDragged(action.clientX, action.clientY);
+		x += activeItem.filter.get('x');
+		y += activeItem.filter.get('y');
 		// Update filter position
-		// dragItem.element.style.transform = 'translate(' + x + 'px,' + y + 'px)';
-		dragItem.element.style.left = x + 'px';
-		dragItem.element.style.top = y + 'px';
+		activeItem.element.style.left = x + 'px';
+		activeItem.element.style.top = y + 'px';
 		// Update wires
-		dragItem.connections.forEach(id => {
+		activeItem.connections.forEach(id => {
 			var cnx = connections[id];
-			if (cnx.fromFilter === dragItem.id) {
+			if (cnx.fromFilter === activeItem.id) {
 				cnx.fromPoint = [x + cnx.fromOffset[0], y + cnx.fromOffset[1]];
 			}
-			if (cnx.toFilter === dragItem.id) {
+			if (cnx.toFilter === activeItem.id) {
 				cnx.toPoint = [x + cnx.toOffset[0], y + cnx.toOffset[1]];
 			}
 			WireStore.update(id);
@@ -247,21 +245,19 @@ Dispatcher.register(function(action) {
 	return;
 
 	case Constants.END_DRAG_ON_WORKBENCH:
-		dragItem.dragging = false;
+		activeItem.dragging = false;
 	return;
 
 	case Constants.MOVE_BY_ON_WORKBENCH:
-		var x = action.x + dragItem.filter.get('x');
-		var y = action.y + dragItem.filter.get('y');
-		moveFilterTo(dragItem.id, x, y);
-
-		Store.emit(Store.CHANGE_EVENT);
+		var x = action.x + activeItem.filter.get('x');
+		var y = action.y + activeItem.filter.get('y');
+		moveFilterTo(activeItem.id, x, y);
+		WorkbenchStore.emitChange();
 	return;
 
 	case Constants.ITEM_CLICKED_ON_WORKBENCH:
-		console.log('clicked: ' + dragItem.id);
-
-		Store.emit(Store.CHANGE_EVENT);
+		console.log('clicked: ' + activeItem.id);
+		// WorkbenchStore.emitChange();
 	return;
 	}
 });

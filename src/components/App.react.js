@@ -12,10 +12,10 @@ var App = React.createClass({
 		this.setState(this.getInitialState());
 	},
 	componentDidMount() {
-		WorkbenchStore.on(WorkbenchStore.CHANGE_EVENT, this._handleChange);
+		WorkbenchStore.addChangeListener(this._handleChange);
 	},
 	componentWillUnmount() {
-		WorkbenchStore.removeListener(WorkbenchStore.CHANGE_EVENT, this._handleChange);
+		WorkbenchStore.removeChangeListener(this._handleChange);
 	},
 	handleMouseMove(ev) {
 		if (WorkbenchStore.isNotDragging()) {
