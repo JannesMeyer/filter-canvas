@@ -9,6 +9,7 @@ var Constants = require('./Constants');
 var filterConnectorHeight = 16;
 var filterPadding = 18;
 var filterMinHeight = 60;
+var filterTextPadding = 40;
 
 // Data
 var filters = immutable.fromJS({
@@ -98,9 +99,9 @@ var RepositoryStore = merge(EventEmitter.prototype, {
 		return pipes.get(id);
 	},
 
+	// TODO: loop through all filters in the beginning and figure these values out once and for all
 	getFilterWidth(key) {
-		// TODO: implement
-		return 140;
+		return filterTextPadding + Math.round(key.length * 5.5);
 	},
 	getFilterHeight(filter) {
 		var connectors = Math.max(filter.get('inputs'), filter.get('outputs'));
@@ -109,12 +110,7 @@ var RepositoryStore = merge(EventEmitter.prototype, {
 	},
 
 	// EventEmitter things
-	FILTERS_CHANGE: 'filters change',
-	PIPES_CHANGE: 'pipes change'
+	// FILTERS_CHANGE: 'filters change',
+	// PIPES_CHANGE: 'pipes change'
 });
 module.exports = RepositoryStore;
-
-// Register for all actions
-// Dispatcher.register(function(action) {
-// 	var type = action.actionType;
-// });

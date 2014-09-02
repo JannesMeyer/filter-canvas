@@ -34,9 +34,6 @@ addFilter('WorkFilterExample',   20, 20 + 6*spacing);
 addFilter('WorkFilterExample',   20, 20 + 7*spacing);
 addFilter('EndFilterExample',    20, 20 + 8*spacing);
 
-console.log(filters.length);
-
-
 addConnection({
 	fromFilter: 0,
 	fromConnector: 0,
@@ -47,7 +44,7 @@ addConnection({
 // 	fromFilter: 1,
 // 	fromConnector: 0,
 // 	toFilter: 2,
-// 	toConnector: 1
+// 	toConnector: -1
 // });
 // addConnection({
 // 	fromFilter: 3,
@@ -59,19 +56,12 @@ addConnection({
 /**
  * Calculates the offset of a connector to the top left point of its filter
  */
-function calculateConnectorOffset(filter, connectorId, isOutput) {
-	if (isOutput) {
-		var outputs = filter.get('outputs').length;
-		var totalHeight = (outputs + 1) * connectorMargin + outputs * connectorHeight;
-		var offsetX = filter.get('width') + 6;
-	} else {
-		var inputs = filter.get('inputs').length;
-		var totalHeight = (inputs + 1) * connectorMargin + inputs * connectorHeight;
-		var offsetX = -6;
-	}
+function calculateConnectorOffset(filterWidth, filterHeight, connectors, connectorId, isOutput) {
+	var totalHeight = (connectors + 1) * connectorMargin + connectors * connectorHeight;
 
+	var offsetX = isOutput ? filterWidth + 6 : -6;
 	var offsetY = Math.round(
-			(filter.get('height') - totalHeight) / 2 +
+			(filterHeight - totalHeight) / 2 +
 			(connectorId + 1) * connectorMargin +
 			connectorId * connectorHeight +
 			Math.floor(Math.abs(connectorHeight - wireWidth) / 2));
@@ -85,13 +75,21 @@ function calculateConnectorOffset(filter, connectorId, isOutput) {
  * props: {fromFilter, fromConnector, toFilter, toConnector}
  */
 function addConnection(props) {
-	var fromFilter = filters.get(props.fromFilter);
-	var toFilter = filters.get(props.toFilter);
+	var fromFilter = filters.get(props.fromFilter).toObject();
+	var toFilter = filters.get(props.toFilter).toObject();
+	var numOutputs = fromFilter.outputs.length;
+	var numInputs = toFilter.inputs.length;
+	if (props.fromConnector < 0 || props.toConnector < 0) {
+		throw new Error('Only positive integers are valid connector keys');
+	}
+	if (props.fromConnector >= numOutputs || props.toConnector >= numInputs) {
+		throw new Error('The filter doesn\'t have sufficient connectors');
+	}
 
-	props.fromOffset = calculateConnectorOffset(fromFilter, props.fromConnector, true);
-	props.fromPoint = [fromFilter.get('x') + props.fromOffset[0], fromFilter.get('y') + props.fromOffset[1]];
-	props.toOffset = calculateConnectorOffset(toFilter, props.toConnector, false);
-	props.toPoint = [toFilter.get('x') + props.toOffset[0], toFilter.get('y') + props.toOffset[1]];
+	props.fromOffset = calculateConnectorOffset(fromFilter.width, fromFilter.height, numOutputs, props.fromConnector, true);
+	props.toOffset = calculateConnectorOffset(toFilter.width, toFilter.height, numInputs, props.toConnector, false);
+	props.fromPoint = [fromFilter.x + props.fromOffset[0], fromFilter.y + props.fromOffset[1]];
+	props.toPoint = [toFilter.x + props.toOffset[0], toFilter.y + props.toOffset[1]];
 
 	var index = connections.push(props) - 1;
 	filters = filters.withMutations(filters => {
@@ -109,7 +107,7 @@ function addFilter(key, x, y) {
 	var width = RepositoryStore.getFilterWidth(key);
 	var height = RepositoryStore.getFilterHeight(base);
 
-	filters = filters.push(immutable.Map({
+	var filter = immutable.Map({
 		class: key,
 		inputs: immutable.Range(0, base.get('inputs')),
 		outputs: immutable.Range(0, base.get('outputs')),
@@ -118,7 +116,9 @@ function addFilter(key, x, y) {
 		height,
 		x,
 		y
-	}));
+	});
+
+	filters = filters.push(filter);
 	return filters.length - 1;
 }
 
@@ -130,6 +130,7 @@ function moveFilterTo(filterId, x, y) {
 		filters.updateIn([filterId, 'x'], () => x);
 		filters.updateIn([filterId, 'y'], () => y);
 	});
+	// TODO: better updating with filters.update(filterId, ...)
 	// TODO: redraw wires?
 }
 
