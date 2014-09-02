@@ -5,37 +5,12 @@ var merge = require('react/lib/merge');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 
-// RepositoryStore single object (like a singleton)
-var Store = merge(EventEmitter.prototype, {
-	FILTERS_CHANGE: 'filters change',
-	PIPES_CHANGE: 'pipes change',
-	getAllFilters() {
-		return filters;
-	},
-	getFilter(id) {
-		return filters.get(id);
-	},
-	getFilterHeight(filter) {
-		var connectors = Math.max(filter.get('inputs'), filter.get('outputs'));
-		var height = connectors * filterConnectorHeight + 2 * filterPadding;
-		return Math.max(filterMinHeight, height);
-	},
-	getAllPipes() {
-		return pipes;
-	},
-	getPipe(id) {
-		return pipes.get(id);
-	}
-});
-// Store.emit(Store.FILTERS_CHANGE)
-// Store.on(Store.FILTERS_CHANGE, callback)
-// Store.removeListener(Store.FILTERS_CHANGE, callback)
-module.exports = Store;
-
+// Constants
 var filterConnectorHeight = 16;
 var filterPadding = 18;
 var filterMinHeight = 60;
 
+// Data
 var filters = immutable.fromJS({
 	SourceFilterExample: {
 		inputs: 0,
@@ -86,7 +61,6 @@ var filters = immutable.fromJS({
 		outputs: 0
 	}
 });
-
 var pipes = immutable.fromJS({
 	ForwardingPipe: {
 		inputs: 1,
@@ -102,11 +76,45 @@ var pipes = immutable.fromJS({
 	}
 });
 
-// Register for all actions
-Dispatcher.register(function(action) {
-	var type = action.actionType;
-	// if (type === Constants.FILTER_MOVE) {
-	// 	move(action.id, action.x, action.y);
-	// 	return;
-	// }
+/**
+ * RepositoryStore single object
+ * (like a singleton)
+ *
+ * RepositoryStore.emit(RepositoryStore.FILTERS_CHANGE)
+ * RepositoryStore.on(RepositoryStore.FILTERS_CHANGE, callback)
+ * RepositoryStore.removeListener(RepositoryStore.FILTERS_CHANGE, callback)
+ */
+var RepositoryStore = merge(EventEmitter.prototype, {
+	getAllFilters() {
+		return filters;
+	},
+	getFilter(id) {
+		return filters.get(id);
+	},
+	getAllPipes() {
+		return pipes;
+	},
+	getPipe(id) {
+		return pipes.get(id);
+	},
+
+	getFilterWidth(key) {
+		// TODO: implement
+		return 140;
+	},
+	getFilterHeight(filter) {
+		var connectors = Math.max(filter.get('inputs'), filter.get('outputs'));
+		var height = connectors * filterConnectorHeight + 2 * filterPadding;
+		return Math.max(filterMinHeight, height); // TODO: eliminate filterMinHeight
+	},
+
+	// EventEmitter things
+	FILTERS_CHANGE: 'filters change',
+	PIPES_CHANGE: 'pipes change'
 });
+module.exports = RepositoryStore;
+
+// Register for all actions
+// Dispatcher.register(function(action) {
+// 	var type = action.actionType;
+// });

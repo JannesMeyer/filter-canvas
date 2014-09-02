@@ -1,11 +1,142 @@
 var immutable = require('immutable');
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
+
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
-var WireStore = require('./WireStore.js');
+var WireStore = require('./WireStore');
+var RepositoryStore = require('./RepositoryStore');
 
+// Constants
+var spacing = 70;
+var connectorHeight = 8;
+var connectorMargin = 4;
+var filterPadding = 18;
+var filterMinHeight = 60;
+var wireWidth = 2;
 var CHANGE_EVENT = 'change';
+
+// Data
+var filters = immutable.Vector();
+var connections = [];
+// This information is very transient
+var zCounter = 10;
+var activeItem = {};
+
+// TODO: replace with actual interaction
+addFilter('SourceFilterExample', 20, 20 + 0*spacing);
+addFilter('WorkFilterExample',   20, 20 + 1*spacing);
+addFilter('WorkFilterExample',   400, 200);
+addFilter('WorkFilterExample',   20, 20 + 3*spacing);
+addFilter('WorkFilterExample',   20, 20 + 4*spacing);
+addFilter('WorkFilterExample',   20, 20 + 5*spacing);
+addFilter('WorkFilterExample',   20, 20 + 6*spacing);
+addFilter('WorkFilterExample',   20, 20 + 7*spacing);
+addFilter('EndFilterExample',    20, 20 + 8*spacing);
+
+console.log(filters.length);
+
+
+addConnection({
+	fromFilter: 0,
+	fromConnector: 0,
+	toFilter: 2,
+	toConnector: 0
+});
+// addConnection({
+// 	fromFilter: 1,
+// 	fromConnector: 0,
+// 	toFilter: 2,
+// 	toConnector: 1
+// });
+// addConnection({
+// 	fromFilter: 3,
+// 	fromConnector: 0,
+// 	toFilter: 2,
+// 	toConnector: 2
+// });
+
+/**
+ * Calculates the offset of a connector to the top left point of its filter
+ */
+function calculateConnectorOffset(filter, connectorId, isOutput) {
+	if (isOutput) {
+		var outputs = filter.get('outputs').length;
+		var totalHeight = (outputs + 1) * connectorMargin + outputs * connectorHeight;
+		var offsetX = filter.get('width') + 6;
+	} else {
+		var inputs = filter.get('inputs').length;
+		var totalHeight = (inputs + 1) * connectorMargin + inputs * connectorHeight;
+		var offsetX = -6;
+	}
+
+	var offsetY = Math.round(
+			(filter.get('height') - totalHeight) / 2 +
+			(connectorId + 1) * connectorMargin +
+			connectorId * connectorHeight +
+			Math.floor(Math.abs(connectorHeight - wireWidth) / 2));
+
+	return [offsetX, offsetY];
+}
+
+/**
+ * Adds a connection
+ *
+ * props: {fromFilter, fromConnector, toFilter, toConnector}
+ */
+function addConnection(props) {
+	var fromFilter = filters.get(props.fromFilter);
+	var toFilter = filters.get(props.toFilter);
+
+	props.fromOffset = calculateConnectorOffset(fromFilter, props.fromConnector, true);
+	props.fromPoint = [fromFilter.get('x') + props.fromOffset[0], fromFilter.get('y') + props.fromOffset[1]];
+	props.toOffset = calculateConnectorOffset(toFilter, props.toConnector, false);
+	props.toPoint = [toFilter.get('x') + props.toOffset[0], toFilter.get('y') + props.toOffset[1]];
+
+	var index = connections.push(props) - 1;
+	filters = filters.withMutations(filters => {
+		filters.updateIn([props.fromFilter, 'connections'], c => c.push(index));
+		filters.updateIn([props.toFilter, 'connections'], c => c.push(index));
+	});
+	return index;
+}
+
+/**
+ * Adds a filter
+ */
+function addFilter(key, x, y) {
+	var base = RepositoryStore.getFilter(key);
+	var width = RepositoryStore.getFilterWidth(key);
+	var height = RepositoryStore.getFilterHeight(base);
+
+	filters = filters.push(immutable.Map({
+		class: key,
+		inputs: immutable.Range(0, base.get('inputs')),
+		outputs: immutable.Range(0, base.get('outputs')),
+		connections: immutable.Vector(),
+		width,
+		height,
+		x,
+		y
+	}));
+	return filters.length - 1;
+}
+
+/**
+ * Action: Moves the filter to a new position
+ */
+function moveFilterTo(filterId, x, y) {
+	filters = filters.withMutations(filters => {
+		filters.updateIn([filterId, 'x'], () => x);
+		filters.updateIn([filterId, 'y'], () => y);
+	});
+	// TODO: redraw wires?
+}
+
+/**
+ * WorkbenchStore single object
+ * (like a singleton)
+ */
 var WorkbenchStore = merge(EventEmitter.prototype, {
 	getFilter(id) {
 		return filters.get(id);
@@ -19,6 +150,7 @@ var WorkbenchStore = merge(EventEmitter.prototype, {
 	getConnection(id) {
 		return connections[id];
 	},
+
 	getWireWidth() {
 		return wireWidth;
 	},
@@ -26,11 +158,12 @@ var WorkbenchStore = merge(EventEmitter.prototype, {
 		return !activeItem.dragging;
 	},
 	getAmountDragged(clientX, clientY) {
-		return {
-			x: clientX - activeItem.clientX,
-			y: clientY - activeItem.clientY
-		};
+		var x = clientX - activeItem.clientX;
+		var y = clientY - activeItem.clientY;
+		return {x, y};
 	},
+
+	// EventEmitter things
 	emitChange() {
 		this.emit(CHANGE_EVENT);
 	},
@@ -43,173 +176,13 @@ var WorkbenchStore = merge(EventEmitter.prototype, {
 });
 module.exports = WorkbenchStore;
 
-var zCounter = 10;
-var spacing = 70;
-var connectorHeight = 8;
-var connectorMargin = 4;
-var filterPadding = 18;
-var filterMinHeight = 60;
-var wireWidth = 2;
-
-var connections = [];
-
-var filters = immutable.fromJS([
-	{
-		class: 'SourceFilterExample',
-		inputs: immutable.Range(0, 0),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 0 * spacing
-	},
-	{
-		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 1),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 1 * spacing
-	},
-	{
-		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 3),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 400,
-		y: 200
-	},
-	{
-		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 1),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 3 * spacing
-	},
-	{
-		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 1),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 4 * spacing
-	},
-	{
-		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 1),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 5 * spacing
-	},
-	{
-		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 1),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 6 * spacing
-	},
-	{
-		class: 'WorkFilterExample',
-		inputs: immutable.Range(0, 1),
-		outputs: immutable.Range(0, 1),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 7 * spacing
-	},
-	{
-		class: 'EndFilterExample',
-		inputs: immutable.Range(0, 1),
-		outputs: immutable.Range(0, 0),
-		connections: [],
-		width: 140,
-		height: 60,
-		x: 20,
-		y: 20 + 8 * spacing
-	}
-]);
-
-function calculateConnectorOffset(filter, connectorId, isOutput) {
-	var width = filter.get('width');
-	var height = filter.get('height');
-	var inputs = filter.get('inputs').length;
-	var outputs = filter.get('outputs').length;
-
-	if (isOutput) {
-		var totalHeight = (outputs + 1) * connectorMargin + outputs * connectorHeight;
-		var offsetX = width + 6;
-	} else {
-		var totalHeight = (inputs + 1) * connectorMargin + inputs * connectorHeight;
-		var offsetX = -6;
-	}
-	var offsetY = (height - totalHeight) / 2 + (connectorId + 1) * connectorMargin + connectorId * connectorHeight;
-	offsetY += Math.floor(Math.abs(connectorHeight - wireWidth) / 2);
-	return [offsetX, Math.round(offsetY)];
-}
-
-function addConnection(fromFilterId, fromConnectorId, toFilterId, toConnectorId) {
-	var fromFilter = filters.get(fromFilterId);
-	var fromOffset = calculateConnectorOffset(fromFilter, fromConnectorId, true);
-	var fromPoint = [fromFilter.get('x') + fromOffset[0], fromFilter.get('y') + fromOffset[1]];
-
-	var toFilter = filters.get(toFilterId);
-	var toOffset = calculateConnectorOffset(toFilter, toConnectorId, false);
-	var toPoint = [toFilter.get('x') + toOffset[0], toFilter.get('y') + toOffset[1]];
-
-	var connection = {
-		fromFilter: fromFilterId,
-		fromConnector: fromConnectorId,
-		fromOffset,
-		fromPoint,
-		toFilter: toFilterId,
-		toConnector: toConnectorId,
-		toOffset,
-		toPoint
-	};
-	var connectionId = connections.push(connection) - 1;
-
-	filters = filters.withMutations(filters => {
-		filters.updateIn([fromFilterId, 'connections'], c => c.push(connectionId));
-		filters.updateIn([toFilterId, 'connections'], c => c.push(connectionId));
-	});
-}
-// TODO: replace with actual interaction
-addConnection(0, 0, 2, 0);
-addConnection(1, 0, 2, 1);
-addConnection(3, 0, 2, 2);
-
-// This information is very transient
-var activeItem = {};
-
-function moveFilterTo(filterId, x, y) {
-	filters = filters.withMutations(filters => {
-		filters.updateIn([filterId, 'x'], () => x);
-		filters.updateIn([filterId, 'y'], () => y);
-	});
-	// TODO: redraw wires?
-}
-
-// Register for all actions
+// Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
-	case Constants.START_DRAG_ON_WORKBENCH:
+		/**
+		 * The user pushes the left mouse button on a filter
+		 */
+		case Constants.START_DRAG_ON_WORKBENCH:
 		activeItem = {
 			id: action.id,
 			filter: filters.get(action.id),
@@ -222,9 +195,12 @@ Dispatcher.register(function(action) {
 		// TODO: do this smarter
 		action.element.focus();
 		action.element.style.zIndex = ++zCounter;
-	return;
+		return;
 
-	case Constants.DRAGGING_ON_WORKBENCH:
+		/**
+		 * The user is moving a filter
+		 */
+		case Constants.DRAGGING_ON_WORKBENCH:
 		var {x, y} = WorkbenchStore.getAmountDragged(action.clientX, action.clientY);
 		x += activeItem.filter.get('x');
 		y += activeItem.filter.get('y');
@@ -242,22 +218,30 @@ Dispatcher.register(function(action) {
 			}
 			WireStore.update(id);
 		});
-	return;
+		return;
 
-	case Constants.END_DRAG_ON_WORKBENCH:
+		/**
+		 * The user releases the left mouse button on a filter
+		 */
+		case Constants.END_DRAG_ON_WORKBENCH:
 		activeItem.dragging = false;
-	return;
+		return;
 
-	case Constants.MOVE_BY_ON_WORKBENCH:
-		var x = action.x + activeItem.filter.get('x');
-		var y = action.y + activeItem.filter.get('y');
+		/**
+		 * Move a filter (modifies the data)
+		 */
+		case Constants.MOVE_BY_ON_WORKBENCH:
+		var x = activeItem.filter.get('x') + action.x;
+		var y = activeItem.filter.get('y') + action.y;
 		moveFilterTo(activeItem.id, x, y);
 		WorkbenchStore.emitChange();
-	return;
+		return;
 
-	case Constants.ITEM_CLICKED_ON_WORKBENCH:
+		/**
+		 * The use clicked a filter without moving it
+		 */
+		case Constants.ITEM_CLICKED_ON_WORKBENCH:
 		console.log('clicked: ' + activeItem.id);
-		// WorkbenchStore.emitChange();
-	return;
+		return;
 	}
 });
