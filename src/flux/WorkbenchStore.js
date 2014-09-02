@@ -13,7 +13,7 @@ var connectorHeight = 8;
 var connectorMargin = 4;
 var filterPadding = 18;
 var filterMinHeight = 60;
-var wireWidth = 2;
+var wireWidth = 6;
 var CHANGE_EVENT = 'change';
 
 // Data
@@ -26,7 +26,7 @@ var activeItem = {};
 // TODO: replace with actual interaction
 addFilter('SourceFilterExample', 20, 20 + 0*spacing);
 addFilter('WorkFilterExample',   20, 20 + 1*spacing);
-addFilter('EndFilter', 600, 300);
+addFilter('EndFilter', 508, 123);
 addFilter('WorkFilterExample',   20, 20 + 3*spacing);
 addFilter('WorkFilterExample',   20, 20 + 4*spacing);
 addFilter('WorkFilterExample',   20, 20 + 5*spacing);

@@ -1,6 +1,9 @@
 var elements = {};
 var lastUpdates = {};
-var fps = 30;
+var fps = 60;
+
+// TODO: use requestAnimationFrame()
+// TODO: rename to DragManager
 
 var WireStore = {
 	update(id) {

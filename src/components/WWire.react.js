@@ -15,12 +15,17 @@ var WWire = React.createClass({
 		if (!ctx) {
 			ctx = this.ctx = this.getDOMNode().getContext('2d');
 		}
-		ctx.lineWidth = this.lineWidth;
 		ctx.beginPath();
 		ctx.moveTo(this.pStart[0], this.pStart[1]);
 		ctx.bezierCurveTo(this.pContext1[0], this.pContext1[1], this.pContext2[0], this.pContext2[1], this.pEnd[0], this.pEnd[1]);
+
+		ctx.strokeStyle = '#3faefc';
+		ctx.lineWidth = this.lineWidth;
 		ctx.stroke();
-		ctx.closePath();
+
+		ctx.strokeStyle = '#63e4ff';
+		ctx.lineWidth = this.lineWidth - 2;
+		ctx.stroke();
 	},
 	shouldComponentUpdate(nextProps, nextState) {
 		// Prevent overdrawing the canvas
