@@ -9,6 +9,7 @@ var Constants = require('./Constants');
 var filterConnectorHeight = 16;
 var filterPadding = 18;
 var filterMinHeight = 60;
+var filterMinWidth = 140;
 var filterTextPadding = 40;
 
 // Data
@@ -36,6 +37,10 @@ var filters = immutable.fromJS({
 			waitMin: 10,
 			waitMax: 500000
 		}
+	},
+	EndFilter: {
+		inputs: 3,
+		outputs: 0
 	},
 	OpenCVImageSource: {
 		inputs: 1,
@@ -101,7 +106,8 @@ var RepositoryStore = merge(EventEmitter.prototype, {
 
 	// TODO: loop through all filters in the beginning and figure these values out once and for all
 	getFilterWidth(key) {
-		return filterTextPadding + Math.round(key.length * 5.5);
+		var width = filterTextPadding + Math.round(key.length * 5.5);
+		return Math.max(width, filterMinWidth);
 	},
 	getFilterHeight(filter) {
 		var connectors = Math.max(filter.get('inputs'), filter.get('outputs'));

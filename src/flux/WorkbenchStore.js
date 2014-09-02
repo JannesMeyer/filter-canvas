@@ -26,7 +26,7 @@ var activeItem = {};
 // TODO: replace with actual interaction
 addFilter('SourceFilterExample', 20, 20 + 0*spacing);
 addFilter('WorkFilterExample',   20, 20 + 1*spacing);
-addFilter('WorkFilterExample',   400, 200);
+addFilter('EndFilter', 600, 300);
 addFilter('WorkFilterExample',   20, 20 + 3*spacing);
 addFilter('WorkFilterExample',   20, 20 + 4*spacing);
 addFilter('WorkFilterExample',   20, 20 + 5*spacing);
@@ -40,18 +40,18 @@ addConnection({
 	toFilter: 2,
 	toConnector: 0
 });
-// addConnection({
-// 	fromFilter: 1,
-// 	fromConnector: 0,
-// 	toFilter: 2,
-// 	toConnector: -1
-// });
-// addConnection({
-// 	fromFilter: 3,
-// 	fromConnector: 0,
-// 	toFilter: 2,
-// 	toConnector: 2
-// });
+addConnection({
+	fromFilter: 1,
+	fromConnector: 0,
+	toFilter: 2,
+	toConnector: 1
+});
+addConnection({
+	fromFilter: 3,
+	fromConnector: 0,
+	toFilter: 2,
+	toConnector: 2
+});
 
 /**
  * Calculates the offset of a connector to the top left point of its filter
@@ -77,6 +77,7 @@ function calculateConnectorOffset(filterWidth, filterHeight, connectors, connect
 function addConnection(props) {
 	var fromFilter = filters.get(props.fromFilter).toObject();
 	var toFilter = filters.get(props.toFilter).toObject();
+
 	var numOutputs = fromFilter.outputs.length;
 	var numInputs = toFilter.inputs.length;
 	if (props.fromConnector < 0 || props.toConnector < 0) {
