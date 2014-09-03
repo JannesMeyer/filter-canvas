@@ -1,19 +1,24 @@
-var WireStore = require('../flux/WireStore.js');
+var DragManager = require('../flux/DragManager.js');
 
 // TODO: don't clear after a width/height change
-// this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+// this.context.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 
 var WWire = React.createClass({
-	ctx: null,
+	context: null,
 	lineWidth: null,
 	pStart: null,
 	pContext1: null,
 	pContext2: null,
 	pEnd: null,
+
 	draw() {
-		var ctx = this.ctx;
+		var ctx = this.context;
 		if (!ctx) {
-			ctx = this.ctx = this.getDOMNode().getContext('2d');
+			var canvas = this.getDOMNode();
+			if (!canvas) {
+				return;
+			}
+			ctx = this.context = canvas.getContext('2d');
 		}
 		ctx.beginPath();
 		ctx.moveTo(this.pStart[0], this.pStart[1]);
@@ -36,10 +41,10 @@ var WWire = React.createClass({
 	},
 	componentDidMount() {
 		this.draw();
-		WireStore.register(this.props.key, this);
+		DragManager.registerWire(this.props.key, this);
 	},
 	componentWillUnmount() {
-		WireStore.unregister(this.props.key);
+		DragManager.unregisterWire(this.props.key);
 	},
 	render() {
 		var pFrom = this.props.connection.fromPoint;
@@ -49,7 +54,7 @@ var WWire = React.createClass({
 
 		if (pFrom[0] > pTo[0]) {
 			// TODO: draw the wire to a previous location
-			this.ctx = null;
+			this.context = null;
 			return null;
 		}
 

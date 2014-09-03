@@ -1,5 +1,6 @@
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
+var	DragManager = require('./DragManager');
 var WorkbenchStore = require('./WorkbenchStore');
 
 /**
@@ -18,12 +19,14 @@ var AppActions = {
 	endDragOnWorkbench(clientX, clientY) {
 		Dispatcher.dispatch({ actionType: Constants.END_DRAG_ON_WORKBENCH });
 
-		var {x, y} = WorkbenchStore.getAmountDragged(clientX, clientY);
-		var distance = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+		var id = DragManager.getDragItemId();
+		var {x, y} = DragManager.getAmountDragged(clientX, clientY);
+		var distance = Math.sqrt(x * x + y * y);
+
 		if (distance < 1) {
-			Dispatcher.dispatch({ actionType: Constants.ITEM_CLICKED_ON_WORKBENCH });
+			Dispatcher.dispatch({ actionType: Constants.ITEM_CLICKED_ON_WORKBENCH, id });
 		} else {
-			Dispatcher.dispatch({ actionType: Constants.MOVE_BY_ON_WORKBENCH, x, y });
+			Dispatcher.dispatch({ actionType: Constants.MOVE_BY_ON_WORKBENCH, id, x, y });
 		}
 	}
 };
