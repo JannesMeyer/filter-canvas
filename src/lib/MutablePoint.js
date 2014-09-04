@@ -5,17 +5,22 @@ class MutablePoint {
 		this.x = x;
 		this.y = y;
 	}
-	addPoint(point) {
+	addPoint(p) {
+		return new MutablePoint(this.x + p.x, this.y + p.y);
+	}
+	add(x, y) {
+		return new MutablePoint(this.x + x, this.y + y);
+	}
+	addPointToThis(point) {
 		this.x += point.x;
 		this.y += point.y;
 	}
-	add(x, y) {
+	addToThis(x, y) {
 		this.x += x;
 		this.y += y;
 	}
 	distance() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
-	// TODO asImmutable
 }
 module.exports = MutablePoint;
