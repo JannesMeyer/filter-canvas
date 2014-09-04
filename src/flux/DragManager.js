@@ -4,27 +4,42 @@ var Constants = require('./Constants');
 
 var requestAnimationFrame = window.requestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
-                            window.webkitRequestAnimationFrame ||
-                            window.oRequestAnimationFrame;
+                            window.webkitRequestAnimationFrame;
+var updateFunctions = {
+	RepoItem: updateNewItem,
+	WFilter: updateFilter
+};
 
 // Data
 var wires = {};
-var activeItem = { dragging: false };
+var selectedItem = { dragging: false };
 var zCounter = 10;
 var requestId;
 
-function handleDragStart(action) {
-	var filter = WorkbenchStore.getFilter(action.id);
-
-	activeItem = {
+function handleDragStartFromRepo(action) {
+	console.log('handleDragStartFromRepo', action);
+	selectedItem = {
+		type: 'RepoItem',
 		id: action.id,
-		x: filter.get('x'),
-		y: filter.get('y'),
-		connections: filter.get('connections'),
 		element: action.element,
 		clientX: action.clientX,
 		clientY: action.clientY,
 		dragging: true
+	};
+}
+
+function handleDragStart(action) {
+	var filter = WorkbenchStore.getFilter(action.id);
+	selectedItem = {
+		type: 'WFilter',
+		id: action.id,
+		element: action.element,
+		clientX: action.clientX,
+		clientY: action.clientY,
+		dragging: true,
+		x: filter.get('x'),
+		y: filter.get('y'),
+		connections: filter.get('connections')
 	};
 
 	// Update filter
@@ -33,26 +48,32 @@ function handleDragStart(action) {
 }
 
 function handleDragMove(action) {
-	activeItem.deltaX = action.clientX - activeItem.clientX;
-	activeItem.deltaY = action.clientY - activeItem.clientY;
+	selectedItem.deltaX = action.clientX - selectedItem.clientX;
+	selectedItem.deltaY = action.clientY - selectedItem.clientY;
 
 	if (!requestId) {
-		requestId = requestAnimationFrame(updatePositions);
+		requestId = requestAnimationFrame(updateFunctions[selectedItem.type]);
 	}
 }
 
-function updatePositions(time) {
-	var x = activeItem.x + activeItem.deltaX;
-	var y = activeItem.y + activeItem.deltaY;
+function updateNewItem() {
+	console.log('updateNewItem');
+
+	requestId = null;
+}
+
+function updateFilter() {
+	var x = selectedItem.x + selectedItem.deltaX;
+	var y = selectedItem.y + selectedItem.deltaY;
 
 	// Re-draw wires
-	activeItem.connections.forEach(id => {
+	selectedItem.connections.forEach(id => {
 		// Mutate the connection data
 		var cnx = WorkbenchStore.getConnection(id);
-		if (activeItem.id === cnx.fromFilter) {
+		if (selectedItem.id === cnx.fromFilter) {
 			cnx.fromPoint = addToPoint(cnx.fromOffset, x, y);
 		}
-		if (activeItem.id === cnx.toFilter) {
+		if (selectedItem.id === cnx.toFilter) {
 			cnx.toPoint = addToPoint(cnx.toOffset, x, y);
 		}
 
@@ -60,8 +81,8 @@ function updatePositions(time) {
 	});
 
 	// Re-draw filter position
-	activeItem.element.style.left = x + 'px';
-	activeItem.element.style.top = y + 'px';
+	selectedItem.element.style.left = x + 'px';
+	selectedItem.element.style.top = y + 'px';
 
 	// Reset
 	requestId = null;
@@ -72,7 +93,7 @@ function addToPoint(p, a, b) {
 }
 
 function handleDragEnd() {
-	activeItem.dragging = false;
+	selectedItem.dragging = false;
 }
 
 /**
@@ -80,15 +101,18 @@ function handleDragEnd() {
  */
 var DragManager = {
 	getAmountDragged(clientX, clientY) {
-		var x = clientX - activeItem.clientX;
-		var y = clientY - activeItem.clientY;
+		var x = clientX - selectedItem.clientX;
+		var y = clientY - selectedItem.clientY;
 		return {x, y};
 	},
-	getDragItemId() {
-		return activeItem.id;
+	getSelectedItemId() {
+		return selectedItem.id;
+	},
+	getSelectedItemType() {
+		return selectedItem.type;
 	},
 	isDragging() {
-		return !!activeItem.dragging;
+		return !!selectedItem.dragging;
 	},
 	registerWire(id, wire) {
 		wires[id] = wire;
@@ -102,6 +126,10 @@ module.exports = DragManager;
 // Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
+		case Constants.START_DRAG_FROM_REPO:
+		handleDragStartFromRepo(action);
+		return;
+
 		case Constants.START_DRAG_ON_WORKBENCH:
 		handleDragStart(action);
 		return;

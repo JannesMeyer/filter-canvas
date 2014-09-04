@@ -22,15 +22,15 @@ var App = React.createClass({
 		if (!DragManager.isDragging()) {
 			return;
 		}
-		ev.preventDefault();
 		AppActions.draggingOnWorkbench(ev.clientX, ev.clientY);
+		ev.preventDefault();
 	},
 	handleMouseUp(ev) {
 		if (ev.button !== 0 || !DragManager.isDragging()) {
 			return;
 		}
-		ev.preventDefault();
 		AppActions.endDragOnWorkbench(ev.clientX, ev.clientY);
+		ev.preventDefault();
 	},
 	render() {
 		console.log('App: render');

@@ -1,8 +1,5 @@
 var DragManager = require('../flux/DragManager.js');
 
-// TODO: don't clear after a width/height change
-// this.context.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-
 var WWire = React.createClass({
 	context: null,
 	lineWidth: null,
@@ -18,11 +15,14 @@ var WWire = React.createClass({
 			if (!canvas) {
 				return;
 			}
-			ctx = this.context = canvas.getContext('2d');
+			this.context = canvas.getContext('2d');
+			ctx = this.context;
 		}
 		ctx.beginPath();
 		ctx.moveTo(this.pStart[0], this.pStart[1]);
 		ctx.bezierCurveTo(this.pContext1[0], this.pContext1[1], this.pContext2[0], this.pContext2[1], this.pEnd[0], this.pEnd[1]);
+		// ctx.closePath();
+		// ctx.lineTo(this.pEnd[0], this.pEnd[1]);
 
 		ctx.strokeStyle = '#3faefc';
 		ctx.lineWidth = this.lineWidth;
@@ -33,7 +33,7 @@ var WWire = React.createClass({
 		ctx.stroke();
 	},
 	shouldComponentUpdate(nextProps, nextState) {
-		// Prevent overdrawing the canvas
+		// Prevent overdrawing the canvas, we manually draw through forceUpdate()
 		return false;
 	},
 	componentDidUpdate(prevProps, prevState) {
@@ -62,18 +62,17 @@ var WWire = React.createClass({
 		var width = pTo[0] - pFrom[0];
 		var top = Math.min(pTo[1], pFrom[1]);
 		var height = Math.abs(pTo[1] - pFrom[1]) + lineWidth;
-		var middle = Math.min(200, width * 0.5);
 
 		if (pFrom[1] < pTo[1]) {
-			this.pStart = [ 0,     0      + lineWidthHalf ];
+			this.pStart = [ 0,              lineWidthHalf ];
 			this.pEnd   = [ width, height - lineWidthHalf ];
 		} else {
 			this.pStart = [ 0,     height - lineWidthHalf ];
-			this.pEnd   = [ width, 0      + lineWidthHalf ];
+			this.pEnd   = [ width,          lineWidthHalf ];
 		}
 		this.lineWidth = lineWidth;
-		this.pContext1 = [middle, this.pStart[1]];
-		this.pContext2 = [middle, this.pEnd[1]];
+		this.pContext1 = [Math.min(0.5 * width, 200), this.pStart[1]];
+		this.pContext2 = [Math.min(0.5 * width, 200), this.pEnd[1]];
 
 		var style = { left: left + 'px', top: top + 'px' };
 		return <canvas className="wire" width={width} height={height} style={style} />;

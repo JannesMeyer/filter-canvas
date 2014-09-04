@@ -7,8 +7,8 @@ var WorkbenchStore = require('./WorkbenchStore');
  * AppActions single object (like a singleton)
  */
 var AppActions = {
-	startDragFromRepo(id, x, y) {
-		Dispatcher.dispatch({ actionType: Constants.START_DRAG_FROM_REPO, id, x, y });
+	startDragFromRepo(id, element, clientX, clientY) {
+		Dispatcher.dispatch({ actionType: Constants.START_DRAG_FROM_REPO, id, element, clientX, clientY });
 	},
 	startDragOnWorkbench(id, element, clientX, clientY) {
 		Dispatcher.dispatch({ actionType: Constants.START_DRAG_ON_WORKBENCH, id, element, clientX, clientY });
@@ -19,15 +19,21 @@ var AppActions = {
 	endDragOnWorkbench(clientX, clientY) {
 		Dispatcher.dispatch({ actionType: Constants.END_DRAG_ON_WORKBENCH });
 
-		var id = DragManager.getDragItemId();
-		var {x, y} = DragManager.getAmountDragged(clientX, clientY);
-		var distance = Math.sqrt(x * x + y * y);
+		var id = DragManager.getSelectedItemId();
+		var type = DragManager.getSelectedItemType();
 
+		if (type !== 'WFilter') {
+			return;
+		}
+
+		var {x, y} = DragManager.getAmountDragged(clientX, clientY);
+
+		var distance = Math.sqrt(x * x + y * y);
 		if (distance < 1) {
 			Dispatcher.dispatch({ actionType: Constants.ITEM_CLICKED_ON_WORKBENCH, id });
 		} else {
 			Dispatcher.dispatch({ actionType: Constants.MOVE_BY_ON_WORKBENCH, id, x, y });
 		}
-	}
+	},
 };
 module.exports = AppActions;
