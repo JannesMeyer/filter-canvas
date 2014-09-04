@@ -21,11 +21,11 @@ addFilter('SourceFilterExample', 20, 20 + 0 * 70);
 addFilter('WorkFilterExample',   20, 20 + 1 * 70);
 addFilter('EndFilter', 508, 123);
 addFilter('WorkFilterExample',   20, 20 + 3 * 70);
-addFilter('WorkFilterExample',   20, 20 + 4 * 70);
-addFilter('WorkFilterExample',   20, 20 + 5 * 70);
-addFilter('WorkFilterExample',   20, 20 + 6 * 70);
-addFilter('WorkFilterExample',   20, 20 + 7 * 70);
-addFilter('EndFilterExample',    20, 20 + 8 * 70);
+// addFilter('WorkFilterExample',   20, 20 + 4 * 70);
+// addFilter('WorkFilterExample',   20, 20 + 5 * 70);
+// addFilter('WorkFilterExample',   20, 20 + 6 * 70);
+// addFilter('WorkFilterExample',   20, 20 + 7 * 70);
+// addFilter('EndFilterExample',    20, 20 + 8 * 70);
 
 addConnection({
 	fromFilter: 0,
@@ -68,8 +68,18 @@ function calculateConnectorOffset(filterWidth, filterHeight, connectors, connect
  * props: {fromFilter, fromConnector, toFilter, toConnector}
  */
 function addConnection(props) {
-	var fromFilter = filters.get(props.fromFilter).toObject();
-	var toFilter = filters.get(props.toFilter).toObject();
+	var fromFilter = filters.get(props.fromFilter);
+	var toFilter = filters.get(props.toFilter);
+
+	if (!fromFilter) {
+		throw new Error('The source filter doesn\'t exist');
+	}
+	if (!toFilter) {
+		throw new Error('The target filter doesn\'t exist');
+	}
+
+	fromFilter = fromFilter.toObject();
+	toFilter = toFilter.toObject();
 
 	var numOutputs = fromFilter.outputs.length;
 	var numInputs = toFilter.inputs.length;

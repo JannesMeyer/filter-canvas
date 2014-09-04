@@ -71,6 +71,10 @@ function addToPoint(p, a, b) {
 	return [p[0] + a, p[1] + b];
 }
 
+function handleDragEnd() {
+	activeItem.dragging = false;
+}
+
 /**
  * DragManager single object
  */
@@ -107,7 +111,7 @@ Dispatcher.register(function(action) {
 		return;
 
 		case Constants.END_DRAG_ON_WORKBENCH:
-		activeItem.dragging = false;
+		handleDragEnd();
 		return;
 	}
 });
