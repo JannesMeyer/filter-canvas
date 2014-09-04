@@ -5,10 +5,6 @@ var Constants = require('./Constants');
 var requestAnimationFrame = window.requestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
                             window.webkitRequestAnimationFrame;
-var updateFunctions = {
-	RepoItem: updateNewItem,
-	WFilter: updateFilter
-};
 
 // Data
 var wires = {};
@@ -17,7 +13,7 @@ var zCounter = 10;
 var requestId;
 
 function handleDragStartFromRepo(action) {
-	console.log('handleDragStartFromRepo', action);
+	console.log('Create new item');
 	selectedItem = {
 		type: 'RepoItem',
 		id: action.id,
@@ -52,7 +48,14 @@ function handleDragMove(action) {
 	selectedItem.deltaY = action.clientY - selectedItem.clientY;
 
 	if (!requestId) {
-		requestId = requestAnimationFrame(updateFunctions[selectedItem.type]);
+		var type = selectedItem.type;
+		var update;
+		if (type === 'RepoItem') {
+			update = updateNewItem;
+		} else if (type === 'WFilter') {
+			update = updateFilter;
+		}
+		requestId = requestAnimationFrame(update);
 	}
 }
 
