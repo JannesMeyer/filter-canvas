@@ -9,8 +9,8 @@ var requestAnimationFrame = window.requestAnimationFrame ||
 
 // Data
 var wires = {};
-var zCounter = 10;
 var activeItem = { dragging: false };
+var zCounter = 10;
 var requestId;
 
 function handleDragStart(action) {
@@ -29,7 +29,7 @@ function handleDragStart(action) {
 
 	// Update filter
 	action.element.focus();
-	// action.element.style.zIndex = ++zCounter;
+	action.element.style.zIndex = ++zCounter;
 }
 
 function handleDragMove(action) {
@@ -37,11 +37,11 @@ function handleDragMove(action) {
 	activeItem.deltaY = action.clientY - activeItem.clientY;
 
 	if (!requestId) {
-		requestId = requestAnimationFrame(update);
+		requestId = requestAnimationFrame(updatePositions);
 	}
 }
 
-function update(time) {
+function updatePositions(time) {
 	var x = activeItem.x + activeItem.deltaX;
 	var y = activeItem.y + activeItem.deltaY;
 
@@ -63,7 +63,7 @@ function update(time) {
 	activeItem.element.style.left = x + 'px';
 	activeItem.element.style.top = y + 'px';
 
-	// Reset requestId
+	// Reset
 	requestId = null;
 }
 
