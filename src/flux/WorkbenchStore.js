@@ -106,24 +106,10 @@ function addConnection(props) {
 /**
  * Adds a filter
  */
-function addFilter(key, x, y) {
-	var base = RepositoryStore.getFilter(key);
-	var width = RepositoryStore.getFilterWidth(key);
-	var height = RepositoryStore.getFilterHeight(base);
-
-	var filter = immutable.Map({
-		class: key,
-		inputs: immutable.Range(0, base.get('inputs')),
-		outputs: immutable.Range(0, base.get('outputs')),
-		connections: immutable.Vector(),
-		width,
-		height,
-		x,
-		y
-	});
-
-	filters = filters.push(filter);
-	return filters.length - 1;
+function addFilter(id, x, y) {
+	var next = filters.push(RepositoryStore.createFilterObject(id, x, y));
+	filters = next;
+	return next.length - 1;
 }
 
 /**
@@ -175,6 +161,12 @@ module.exports = WorkbenchStore;
 // Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
+		case Constants.CREATE_FILTER:
+		console.log(action);
+		addFilter(action.id, action.x, action.y);
+		WorkbenchStore.emitChange();
+		return;
+
 		case Constants.MOVE_BY_ON_WORKBENCH:
 		var filter = filters.get(action.id);
 		var x = filter.get('x') + action.x;

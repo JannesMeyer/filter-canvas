@@ -12,18 +12,6 @@ var selectedItem = { dragging: false };
 var zCounter = 10;
 var requestId;
 
-function handleDragStartFromRepo(action) {
-	console.log('Create new item');
-	selectedItem = {
-		type: 'RepoItem',
-		id: action.id,
-		element: action.element,
-		clientX: action.clientX,
-		clientY: action.clientY,
-		dragging: true
-	};
-}
-
 function handleDragStart(action) {
 	var filter = WorkbenchStore.getFilter(action.id);
 	selectedItem = {
@@ -33,8 +21,8 @@ function handleDragStart(action) {
 		clientX: action.clientX,
 		clientY: action.clientY,
 		dragging: true,
-		x: filter.get('x'),
-		y: filter.get('y'),
+		currentX: filter.get('x'),
+		currentY: filter.get('y'),
 		connections: filter.get('connections')
 	};
 
@@ -48,26 +36,13 @@ function handleDragMove(action) {
 	selectedItem.deltaY = action.clientY - selectedItem.clientY;
 
 	if (!requestId) {
-		var type = selectedItem.type;
-		var update;
-		if (type === 'RepoItem') {
-			update = updateNewItem;
-		} else if (type === 'WFilter') {
-			update = updateFilter;
-		}
-		requestId = requestAnimationFrame(update);
+		requestId = requestAnimationFrame(updateFilter);
 	}
 }
 
-function updateNewItem() {
-	console.log('updateNewItem');
-
-	requestId = null;
-}
-
 function updateFilter() {
-	var x = selectedItem.x + selectedItem.deltaX;
-	var y = selectedItem.y + selectedItem.deltaY;
+	var x = selectedItem.currentX + selectedItem.deltaX;
+	var y = selectedItem.currentY + selectedItem.deltaY;
 
 	// Re-draw wires
 	selectedItem.connections.forEach(id => {
@@ -97,6 +72,7 @@ function addToPoint(p, a, b) {
 
 function handleDragEnd() {
 	selectedItem.dragging = false;
+	requestId = null;
 }
 
 /**
@@ -129,10 +105,6 @@ module.exports = DragManager;
 // Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
-		case Constants.START_DRAG_FROM_REPO:
-		handleDragStartFromRepo(action);
-		return;
-
 		case Constants.START_DRAG_ON_WORKBENCH:
 		handleDragStart(action);
 		return;

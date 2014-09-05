@@ -103,10 +103,30 @@ var RepositoryStore = merge(EventEmitter.prototype, {
 	getPipe(id) {
 		return pipes.get(id);
 	},
+	createFilterObject(id, x, y) {
+		var type = filters.get(id);
+		if (!type) {
+			throw new Error('The filter type doesn\'t exist');
+		}
+
+		return immutable.Map({
+			class: id,
+			inputs: immutable.Range(0, type.get('inputs')),
+			outputs: immutable.Range(0, type.get('outputs')),
+			connections: immutable.Vector(),
+			width: this.getFilterWidth(id),
+			height: this.getFilterHeight(type),
+			x: x || 0,
+			y: y || 0
+		});
+	},
+	createPipeObject(id, x, y) {
+		return immutable.Map();
+	},
 
 	// TODO: loop through all filters in the beginning and figure these values out once and for all
-	getFilterWidth(key) {
-		var width = filterTextPadding + Math.round(key.length * 5.5);
+	getFilterWidth(id) {
+		var width = filterTextPadding + Math.round(id.length * 5.5);
 		return Math.max(width, filterMinWidth);
 	},
 	getFilterHeight(filter) {

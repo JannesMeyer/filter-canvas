@@ -1,17 +1,18 @@
-var AppActions = require('../flux/AppActions');
-var RepositoryStore = require('../flux/RepositoryStore');
-
 var RFilter = React.createClass({
-	handleMouseDown(ev) {
-		if (ev.button !== 0) { return; }
-		AppActions.startDragFromRepo(this.props.key, ev.currentTarget, ev.clientX, ev.clientY);
-		ev.preventDefault();
+	handleDragStart: function(ev) {
+		var bounds = ev.currentTarget.getBoundingClientRect();
+		var data = {
+			id: this.props.key,
+			clickX: Math.floor(ev.clientX - bounds.left),
+			clickY: Math.floor(ev.clientY - bounds.top),
+			width: Math.floor(bounds.width),
+			height: Math.floor(bounds.height)
+		};
+		ev.dataTransfer.setData('application/json', JSON.stringify(data));
+		ev.dataTransfer.effectAllowed = 'copy';
 	},
 	render() {
-		var filter = RepositoryStore.getFilter(this.props.key);
-		return (
-			<div className="m-filter" onMouseDown={this.handleMouseDown}>{this.props.key}</div>
-		);
+		return <div className="m-filter" draggable onDragStart={this.handleDragStart}>{this.props.key}</div>;
 	}
 });
 module.exports = RFilter;
