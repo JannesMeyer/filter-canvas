@@ -15,7 +15,10 @@ var Workbench = React.createClass({
 		var data = JSON.parse(ev.dataTransfer.getData('application/json'));
 
 		// Create filter
-		AppActions.createFilter(data.id, ev.clientX - data.clickX, ev.clientY - data.clickY);
+		var containerBounds = this.refs.itemsContainer.getDOMNode().getBoundingClientRect();
+		var x = ev.clientX - data.clickX - containerBounds.left;
+		var y = ev.clientY - data.clickY - containerBounds.top;
+		AppActions.createFilter(data.id, x, y);
 	},
 	render() {
 		var filters = WorkbenchStore.getAllFilters();
@@ -24,13 +27,15 @@ var Workbench = React.createClass({
 
 		return (
 			<div className="m-workbench" onDragOver={this.handleDragOver} onDrop={this.handleDrop}>
-				{filters.map((_, key) =>
-					<WFilter key={key} />
-				).toArray()}
+				<div className="m-workbench-items" ref="itemsContainer">
+					{filters.map((_, key) =>
+						<WFilter key={key} />
+					).toArray()}
 
-				{connections.map((connection, key) =>
-					<WWire key={key} connection={connection} width={wireWidth} />
-				)}
+					{connections.map((connection, key) =>
+						<WWire key={key} connection={connection} width={wireWidth} />
+					)}
+				</div>
 			</div>
 		);
 	}

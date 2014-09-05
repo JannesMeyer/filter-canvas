@@ -162,7 +162,6 @@ module.exports = WorkbenchStore;
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.CREATE_FILTER:
-		console.log(action);
 		addFilter(action.id, action.x, action.y);
 		WorkbenchStore.emitChange();
 		return;
