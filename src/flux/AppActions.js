@@ -43,8 +43,8 @@ var AppActions = {
 			Dispatcher.dispatch({ actionType: Constants.MOVE_BY_ON_WORKBENCH, id, x, y });
 		}
 	},
-	startSelection(clientX, clientY) {
-		Dispatcher.dispatch({ actionType: Constants.START_SELECTION, clientX, clientY });
+	startSelection(scrollLeft, scrollTop, clientX, clientY) {
+		Dispatcher.dispatch({ actionType: Constants.START_SELECTION, scrollLeft, scrollTop, clientX, clientY });
 	}
 };
 module.exports = AppActions;

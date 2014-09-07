@@ -18,13 +18,15 @@ var requestId;
 
 function handleSelectionStart(action) {
 	selection.active = true;
-	selection.startX = action.clientX;
-	selection.startY = action.clientY;
+	selection.startX = action.scrollLeft + action.clientX;
+	selection.startY = action.scrollTop + action.clientY;
+	selection.startScrollX = action.scrollLeft;
+	selection.startScrollY = action.scrollTop;
 }
 
 function handleSelectionMove(action) {
-	selection.currentX = action.clientX;
-	selection.currentY = action.clientY;
+	selection.currentX = selection.startScrollX + action.clientX;
+	selection.currentY = selection.startScrollY + action.clientY;
 }
 
 function handleSelectionEnd() {
