@@ -16,15 +16,22 @@ var Workbench = React.createClass({
 		var data = JSON.parse(ev.dataTransfer.getData('application/json'));
 
 		// Create filter
-		var containerBounds = this.refs.itemsContainer.getDOMNode().getBoundingClientRect();
-		var x = ev.clientX - data.clickX - containerBounds.left;
-		var y = ev.clientY - data.clickY - containerBounds.top;
+		var workbenchBounds = this.refs.innerWorkbench.getDOMNode().getBoundingClientRect();
+		var x = ev.clientX - data.clickX - workbenchBounds.left;
+		var y = ev.clientY - data.clickY - workbenchBounds.top;
 		AppActions.createFilter(data.id, x, y);
 	},
 	handleMouseDown(ev) {
+		AppActions.startSelection(ev.clientX, ev.clientY);
 		ev.stopPropagation();
 		ev.preventDefault();
-		AppActions.startSelection(ev.clientX, ev.clientY);
+	},
+	handleMouseUp(ev) {
+		var workbenchBounds = this.refs.innerWorkbench.getDOMNode().getBoundingClientRect();
+		console.log('x:', ev.clientX);
+		console.log('y:', ev.clientY);
+		// ev.stopPropagation();
+		// ev.preventDefault();
 	},
 	render() {
 		var filters = WorkbenchStore.getAllFilters();
@@ -32,8 +39,8 @@ var Workbench = React.createClass({
 		var wireWidth = WorkbenchStore.getWireWidth();
 
 		return (
-			<div className="m-workbench" onDragOver={this.handleDragOver} onDrop={this.handleDrop} onMouseDown={this.handleMouseDown}>
-				<div className="m-workbench-items" ref="itemsContainer">
+			<div className="m-workbench" onDragOver={this.handleDragOver} onDrop={this.handleDrop} onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp}>
+				<div className="m-workbench-items" ref="innerWorkbench">
 					{filters.map((_, key) =>
 						<WFilter key={key} />
 					).toArray()}
