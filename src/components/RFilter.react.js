@@ -1,5 +1,5 @@
 var RFilter = React.createClass({
-	handleDragStart: function(ev) {
+	handleDragStart(ev) {
 		var bounds = ev.currentTarget.getBoundingClientRect();
 		var data = {
 			id: this.props.key,

@@ -8,6 +8,7 @@ var WFilter = React.createClass({
 		if (ev.button !== 0) { return; }
 		AppActions.startDragOnWorkbench(this.props.key, ev.currentTarget, ev.clientX, ev.clientY);
 		ev.preventDefault();
+		ev.stopPropagation();
 	},
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.filter !== WorkbenchStore.getFilter(nextProps.key);

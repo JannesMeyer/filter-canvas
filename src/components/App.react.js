@@ -1,6 +1,5 @@
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var AppActions = require('../flux/AppActions');
-var DragManager = require('../flux/DragManager');
 
 var Workbench = require('./Workbench.react');
 var Repository = require('./Repository.react');
@@ -19,14 +18,11 @@ var App = React.createClass({
 		WorkbenchStore.removeChangeListener(this._handleChange);
 	},
 	handleMouseMove(ev) {
-		if (!DragManager.isDragging()) {
-			return;
-		}
 		AppActions.draggingOnWorkbench(ev.clientX, ev.clientY);
 		ev.preventDefault();
 	},
 	handleMouseUp(ev) {
-		if (ev.button !== 0 || !DragManager.isDragging()) {
+		if (ev.button !== 0) {
 			return;
 		}
 		AppActions.endDragOnWorkbench(ev.clientX, ev.clientY);

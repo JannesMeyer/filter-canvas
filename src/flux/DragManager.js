@@ -1,16 +1,36 @@
 var WorkbenchStore = require('./WorkbenchStore');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
+var merge = require('react/lib/merge');
+var EventEmitter = require('events').EventEmitter;
 
+var CHANGE_EVENT = 'change';
 var requestAnimationFrame = window.requestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
                             window.webkitRequestAnimationFrame;
 
 // Data
 var wires = {};
+var selection = { active: false };
 var selectedItem = { dragging: false };
 var zCounter = 10;
 var requestId;
+
+function handleSelectionStart(action) {
+	selection.active = true;
+	selection.startX = action.clientX;
+	selection.startY = action.clientY;
+}
+
+function handleSelectionMove(action) {
+	selection.currentX = action.clientX;
+	selection.currentY = action.clientY;
+}
+
+function handleSelectionEnd() {
+	selection = {};
+	selection.active = false;
+}
 
 function handleDragStart(action) {
 	var filter = WorkbenchStore.getFilter(action.id);
@@ -78,7 +98,8 @@ function handleDragEnd() {
 /**
  * DragManager single object
  */
-var DragManager = {
+var DragManager = merge(EventEmitter.prototype, {
+	// Filter drag and drop
 	getAmountDragged(clientX, clientY) {
 		var x = clientX - selectedItem.clientX;
 		var y = clientY - selectedItem.clientY;
@@ -91,15 +112,47 @@ var DragManager = {
 		return selectedItem.type;
 	},
 	isDragging() {
-		return !!selectedItem.dragging;
+		return selectedItem.dragging;
 	},
 	registerWire(id, wire) {
 		wires[id] = wire;
 	},
 	unregisterWire(id) {
 		delete wires[id];
+	},
+
+	// Selection
+	getSelectionBounds() {
+		if (!selection.active) {
+			return { visible: false };
+		}
+		var minX = Math.min(selection.currentX, selection.startX);
+		var minY = Math.min(selection.currentY, selection.startY);
+		var maxX = Math.max(selection.currentX, selection.startX);
+		var maxY = Math.max(selection.currentY, selection.startY);
+		return {
+			left: minX,
+			top: minY,
+			width: maxX - minX,
+			height: maxY - minY,
+			visible: true
+		};
+	},
+	isSelecting() {
+		return selection.startX !== undefined;
+	},
+
+	// EventEmitter things
+	emitChange() {
+		this.emit(CHANGE_EVENT);
+	},
+	addChangeListener(callback) {
+		this.on(CHANGE_EVENT, callback);
+	},
+	removeChangeListener(callback) {
+		this.removeListener(CHANGE_EVENT, callback);
 	}
-};
+});
 module.exports = DragManager;
 
 // Register for all actions with the Dispatcher
@@ -115,6 +168,20 @@ Dispatcher.register(function(action) {
 
 		case Constants.END_DRAG_ON_WORKBENCH:
 		handleDragEnd();
+		return;
+
+		case Constants.START_SELECTION:
+		handleSelectionStart(action);
+		return;
+
+		case Constants.MOVE_SELECTION:
+		handleSelectionMove(action);
+		DragManager.emitChange();
+		return;
+
+		case Constants.END_SELECTION:
+		handleSelectionEnd();
+		DragManager.emitChange();
 		return;
 	}
 });
