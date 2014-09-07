@@ -11,7 +11,7 @@ var App = React.createClass({
 		return WorkbenchStore.getAllFilters();
 	},
 	_handleChange() {
-		this.setState(WorkbenchStore.getAllFilters());
+		this.replaceState(WorkbenchStore.getAllFilters());
 	},
 	componentDidMount() {
 		WorkbenchStore.addChangeListener(this._handleChange);
@@ -20,15 +20,15 @@ var App = React.createClass({
 		WorkbenchStore.removeChangeListener(this._handleChange);
 	},
 	handleMouseMove(ev) {
+		// TODO: check if a drag is happening
 		AppActions.draggingOnWorkbench(ev.clientX, ev.clientY);
-		ev.preventDefault();
 	},
 	handleMouseUp(ev) {
+		// TODO: check if a drag is happening
 		if (ev.button !== 0) {
 			return;
 		}
 		AppActions.endDragOnWorkbench(ev.clientX, ev.clientY);
-		ev.preventDefault();
 	},
 	render() {
 		console.log('App: render');
