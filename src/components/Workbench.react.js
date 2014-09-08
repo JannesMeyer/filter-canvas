@@ -22,7 +22,7 @@ var Workbench = React.createClass({
 	},
 	handleMouseDown(ev) {
 		var wb = this.getDOMNode();
-		AppActions.startSelection(wb.scrollLeft, wb.scrollTop, ev.clientX, ev.clientY);
+		AppActions.startSelection(wb.scrollLeft, wb.scrollTop, ev.clientX, ev.clientY, ev.button, ev.shiftKey, ev.ctrlKey, ev.altKey, ev.metaKey);
 		ev.stopPropagation();
 		ev.preventDefault();
 	},

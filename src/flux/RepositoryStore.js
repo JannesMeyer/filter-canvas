@@ -1,6 +1,7 @@
 var immutable = require('immutable');
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
+var ImmutableRect = require('../lib/ImmutableRect');
 
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
@@ -114,10 +115,7 @@ var RepositoryStore = merge(EventEmitter.prototype, {
 			inputs: immutable.Range(0, type.get('inputs')),
 			outputs: immutable.Range(0, type.get('outputs')),
 			connections: immutable.Vector(),
-			width: this.getFilterWidth(id),
-			height: this.getFilterHeight(type),
-			x: x || 0,
-			y: y || 0
+			rect: new ImmutableRect(x, y, this.getFilterWidth(id), this.getFilterHeight(type))
 		});
 	},
 	createPipeObject(id, x, y) {

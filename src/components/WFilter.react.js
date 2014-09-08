@@ -15,17 +15,15 @@ var WFilter = React.createClass({
 	},
 	render() {
 		var filter = this.filter = WorkbenchStore.getFilter(this.props.key);
+		var rect = filter.get('rect');
 		var inputs = filter.get('inputs');
 		var outputs = filter.get('outputs');
 
-		// var style = {
-		// 	transform: 'translate(' + filter.get('x') + 'px,' + filter.get('y') + 'px)'
-		// };
 		var style = {
-			left: filter.get('x') + 'px',
-			top: filter.get('y') + 'px',
-			width: filter.get('width') + 'px',
-			height: filter.get('height') + 'px'
+			left: rect.x + 'px',
+			top: rect.y + 'px',
+			width: rect.width + 'px',
+			height: rect.height + 'px'
 		};
 		return (
 			<div

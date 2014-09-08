@@ -1,9 +1,9 @@
-var	DragManager = require('../flux/DragManager');
+var	SelectionStore = require('../flux/SelectionStore');
 
 function getState() {
 	return {
-		rect: DragManager.getSelectionRect(),
-		active: DragManager.isSelecting()
+		rect: SelectionStore.getSelectionRect(),
+		active: SelectionStore.isSelecting()
 	};
 }
 
@@ -13,10 +13,10 @@ var Selection = React.createClass({
 		this.setState(getState());
 	},
 	componentDidMount() {
-		DragManager.addChangeListener(this._handleChange);
+		SelectionStore.addChangeListener(this._handleChange);
 	},
 	componentWillUnmount() {
-		DragManager.removeChangeListener(this._handleChange);
+		SelectionStore.removeChangeListener(this._handleChange);
 	},
 	render() {
 		var rect = this.state.rect;

@@ -3,7 +3,7 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 var merge = require('react/lib/merge');
 var EventEmitter = require('events').EventEmitter;
-var MutableRect = require('../lib/MutableRect');
+var ImmutableRect = require('../lib/ImmutableRect');
 
 var CHANGE_EVENT = 'change';
 var requestAnimationFrame = window.requestAnimationFrame ||
@@ -36,6 +36,7 @@ function handleSelectionEnd() {
 
 function handleDragStart(action) {
 	var filter = WorkbenchStore.getFilter(action.id);
+	var rect = filter.get('rect');
 	selectedItem = {
 		type: 'WFilter',
 		id: action.id,
@@ -43,8 +44,8 @@ function handleDragStart(action) {
 		clientX: action.clientX,
 		clientY: action.clientY,
 		dragging: true,
-		currentX: filter.get('x'),
-		currentY: filter.get('y'),
+		currentX: rect.x,
+		currentY: rect.y,
 		connections: filter.get('connections')
 	};
 
@@ -98,9 +99,9 @@ function handleDragEnd() {
 }
 
 /**
- * DragManager single object
+ * SelectionStore single object
  */
-var DragManager = merge(EventEmitter.prototype, {
+var SelectionStore = merge(EventEmitter.prototype, {
 	// Filter drag and drop
 	getAmountDragged(clientX, clientY) {
 		var x = clientX - selectedItem.clientX;
@@ -129,7 +130,7 @@ var DragManager = merge(EventEmitter.prototype, {
 		var y = Math.min(selection.currentY, selection.startY);
 		var maxX = Math.max(selection.currentX, selection.startX);
 		var maxY = Math.max(selection.currentY, selection.startY);
-		return new MutableRect(x, y, maxX - x, maxY - y);
+		return new ImmutableRect(x, y, maxX - x, maxY - y);
 	},
 	isSelecting() {
 		return selection.active;
@@ -146,7 +147,7 @@ var DragManager = merge(EventEmitter.prototype, {
 		this.removeListener(CHANGE_EVENT, callback);
 	}
 });
-module.exports = DragManager;
+module.exports = SelectionStore;
 
 // Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
@@ -169,12 +170,12 @@ Dispatcher.register(function(action) {
 
 		case Constants.MOVE_SELECTION:
 		handleSelectionMove(action);
-		DragManager.emitChange();
+		SelectionStore.emitChange();
 		return;
 
 		case Constants.END_SELECTION:
 		handleSelectionEnd();
-		DragManager.emitChange();
+		SelectionStore.emitChange();
 		return;
 	}
 });

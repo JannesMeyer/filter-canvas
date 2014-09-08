@@ -1,4 +1,4 @@
-var DragManager = require('../flux/DragManager.js');
+var SelectionStore = require('../flux/SelectionStore.js');
 
 var WWire = React.createClass({
 	context: null,
@@ -41,10 +41,10 @@ var WWire = React.createClass({
 	},
 	componentDidMount() {
 		this.draw();
-		DragManager.registerWire(this.props.key, this);
+		SelectionStore.registerWire(this.props.key, this);
 	},
 	componentWillUnmount() {
-		DragManager.unregisterWire(this.props.key);
+		SelectionStore.unregisterWire(this.props.key);
 	},
 	render() {
 		var pFrom = this.props.connection.fromPoint;
