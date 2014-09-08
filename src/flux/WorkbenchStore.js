@@ -1,6 +1,7 @@
 var immutable = require('immutable');
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
+var MutableRect = require('../lib/MutableRect');
 
 var RepositoryStore = require('./RepositoryStore');
 var Dispatcher = require('./Dispatcher');
@@ -124,6 +125,17 @@ function moveFilterTo(filterId, x, y) {
 	// TODO: redraw wires?
 }
 
+// TODO: eliminate this function
+function filterToRect(filter) {
+	return new MutableRect(filter.get('x'), filter.get('y'), filter.get('width'), filter.get('height'));
+}
+
+function getFiltersCoveredBy(rect) {
+	return filters.toArray().map(filterToRect).filter(filterRect => {
+		return rect.intersects(filterRect);
+	});
+}
+
 /**
  * WorkbenchStore single object
  * (like a singleton)
@@ -176,6 +188,17 @@ Dispatcher.register(function(action) {
 
 		case Constants.ITEM_CLICKED_ON_WORKBENCH:
 		console.log('item clicked:', action.id);
+		return;
+
+		case Constants.END_SELECTION:
+		var selection = action.selection;
+		if (selection.getDiagonalLength() === 0) {
+			console.log('Click');
+			return;
+		}
+
+		var selectedFilters = getFiltersCoveredBy(selection);
+		console.log(selectedFilters);
 		return;
 	}
 });

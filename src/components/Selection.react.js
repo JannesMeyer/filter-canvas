@@ -1,11 +1,16 @@
 var	DragManager = require('../flux/DragManager');
 
+function getState() {
+	return {
+		rect: DragManager.getSelectionRect(),
+		active: DragManager.isSelecting()
+	};
+}
+
 var Selection = React.createClass({
-	getInitialState() {
-		return DragManager.getSelectionBounds();
-	},
+	getInitialState: getState,
 	_handleChange() {
-		this.setState(DragManager.getSelectionBounds());
+		this.setState(getState());
 	},
 	componentDidMount() {
 		DragManager.addChangeListener(this._handleChange);
@@ -14,13 +19,15 @@ var Selection = React.createClass({
 		DragManager.removeChangeListener(this._handleChange);
 	},
 	render() {
-		var state = this.state;
-		var style = {};
-		style.left = state.left + 'px';
-		style.top = state.top + 'px';
-		style.width = state.width + 'px';
-		style.height = state.height + 'px';
-		if (!state.visible) {
+		var rect = this.state.rect;
+		var style = {
+			left: rect.x + 'px',
+			top: rect.y + 'px',
+			width: rect.width + 'px',
+			height: rect.height + 'px'
+		};
+
+		if (!this.state.active) {
 			style.opacity = '0';
 		}
 		return <div className="m-selection" style={style} />;

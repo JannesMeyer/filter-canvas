@@ -3,6 +3,7 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 var merge = require('react/lib/merge');
 var EventEmitter = require('events').EventEmitter;
+var MutableRect = require('../lib/MutableRect');
 
 var CHANGE_EVENT = 'change';
 var requestAnimationFrame = window.requestAnimationFrame ||
@@ -17,11 +18,11 @@ var zCounter = 10;
 var requestId;
 
 function handleSelectionStart(action) {
-	selection.active = true;
-	selection.startX = action.scrollLeft + action.clientX;
-	selection.startY = action.scrollTop + action.clientY;
 	selection.startScrollX = action.scrollLeft;
 	selection.startScrollY = action.scrollTop;
+	selection.startX = selection.currentX = (action.scrollLeft + action.clientX);
+	selection.startY = selection.currentY = (action.scrollTop + action.clientY);
+	selection.active = true;
 }
 
 function handleSelectionMove(action) {
@@ -30,7 +31,6 @@ function handleSelectionMove(action) {
 }
 
 function handleSelectionEnd() {
-	selection = {};
 	selection.active = false;
 }
 
@@ -124,24 +124,15 @@ var DragManager = merge(EventEmitter.prototype, {
 	},
 
 	// Selection
-	getSelectionBounds() {
-		if (!selection.active) {
-			return { visible: false };
-		}
-		var minX = Math.min(selection.currentX, selection.startX);
-		var minY = Math.min(selection.currentY, selection.startY);
+	getSelectionRect() {
+		var x = Math.min(selection.currentX, selection.startX);
+		var y = Math.min(selection.currentY, selection.startY);
 		var maxX = Math.max(selection.currentX, selection.startX);
 		var maxY = Math.max(selection.currentY, selection.startY);
-		return {
-			left: minX,
-			top: minY,
-			width: maxX - minX,
-			height: maxY - minY,
-			visible: true
-		};
+		return new MutableRect(x, y, maxX - x, maxY - y);
 	},
 	isSelecting() {
-		return selection.startX !== undefined;
+		return selection.active;
 	},
 
 	// EventEmitter things

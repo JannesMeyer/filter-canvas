@@ -22,7 +22,10 @@ var AppActions = {
 	},
 	endDragOnWorkbench(clientX, clientY) {
 		if (DragManager.isSelecting()) {
-			Dispatcher.dispatch({ actionType: Constants.END_SELECTION });
+			Dispatcher.dispatch({
+				actionType: Constants.END_SELECTION,
+				selection: DragManager.getSelectionRect()
+			});
 		}
 		if (!DragManager.isDragging()) {
 			return;
