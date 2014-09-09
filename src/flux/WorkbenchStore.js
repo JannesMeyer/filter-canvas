@@ -1,8 +1,7 @@
 var immutable = require('immutable');
 var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
-var ImmutableRect = require('../lib/ImmutableRect');
-var ImmutablePoint = require('../lib/ImmutablePoint');
+var Point = require('../lib/ImmutablePoint');
 
 var RepositoryStore = require('./RepositoryStore');
 var Dispatcher = require('./Dispatcher');
@@ -58,7 +57,7 @@ function calculateConnectorOffset(filterFrame, connectors, connectorId, isOutput
 			(connectorId + 1) * connectorMargin +
 			connectorId * connectorHeight +
 			Math.floor(Math.abs(connectorHeight - wireWidth) / 2));
-	return new ImmutablePoint(x, y);
+	return new Point(x, y);
 }
 
 /**

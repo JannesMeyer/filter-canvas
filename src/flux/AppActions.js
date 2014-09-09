@@ -2,7 +2,6 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 var	SelectionStore = require('./SelectionStore');
 var WorkbenchStore = require('./WorkbenchStore');
-var Rect = require('../lib/ImmutableRect');
 var Point = require('../lib/ImmutablePoint');
 
 /**

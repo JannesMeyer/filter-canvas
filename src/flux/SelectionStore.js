@@ -4,7 +4,6 @@ var Constants = require('./Constants');
 var merge = require('react/lib/merge');
 var EventEmitter = require('events').EventEmitter;
 var Rect = require('../lib/ImmutableRect');
-var Point = require('../lib/ImmutablePoint');
 
 var CHANGE_EVENT = 'change';
 var requestAnimationFrame = window.requestAnimationFrame ||
