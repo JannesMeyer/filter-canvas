@@ -1,7 +1,8 @@
 var keyMirror = require('react/lib/keyMirror');
 
 module.exports = keyMirror({
-	SAVE: null,
+	IMPORT_FILE: null,
+	EXPORT_FILE: null,
 	UNDO: null,
 	REDO: null,
 	CREATE_FILTER: null,
