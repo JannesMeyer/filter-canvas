@@ -5,23 +5,20 @@ class Rect {
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		// TODO: freeze only in dev mode
+		// Freeze only in dev mode
 		// Object.freeze(this);
-		// console.log('Rect()');
 	}
+	/**
+	 * Creates a string-representation of this Rect
+	 */
 	toString() {
 		return 'Rect [ ' + this.x + ', ' + this.y + ' ] [ ' + this.width + ', ' + this.height + ' ]';
 	}
-	moveTo(x, y) {
-		return new Rect(x, y, this.width, this.height);
-	}
-	moveBy(point) {
-		return new Rect(this.x + point.x, this.y + point.y, this.width, this.height);
-	}
 	/**
-	 * Can use an ImmutablePoint or anything point-like (i.e. that has an `x` and a `y`)
+	 * Add the point (or anything point-like) to the current position while keeping the
+	 * width and height
 	 */
-	addPoint(point) {
+	moveBy(point) {
 		return new Rect(
 			this.x + point.x,
 			this.y + point.y,
@@ -29,12 +26,15 @@ class Rect {
 			this.height
 		);
 	}
+	/**
+	 * Add these values to the current values
+	 * All parameters default to zero
+	 */
 	addValues(x, y, width, height) {
 		x = x || 0;
 		y = y || 0;
 		width = width || 0;
 		height = height || 0;
-
 		return new Rect(
 			this.x + x,
 			this.y + y,
@@ -42,24 +42,33 @@ class Rect {
 			this.height + height
 		);
 	}
+	/**
+	 * Test whether two Rects intersect each other
+	 */
 	intersectsRect(other) {
 		return this.x               < other.x + other.width  &&
 		       this.x + this.width  > other.x                &&
 		       this.y               < other.y + other.height &&
 		       this.y + this.height > other.y;
 	}
+	/**
+	 * Calculates the length of the diagonal
+	 */
 	getDiagonalLength() {
 		if (this.width === 0) { return this.height; }
 		if (this.height === 0) { return this.width; }
 		return Math.sqrt(this.width * this.width + this.height * this.height);
 	}
-	getDiagonalSquare() {
-		return this.width * this.width + this.height * this.height;
+	/**
+	 * Calculates the area of a square with the side length of the diagonal
+	 */
+	isDiagonalLengthZero() {
+		return this.width === 0 && this.height === 0;
 	}
 
 }
 Rect.Zero = new Rect(0, 0, 0, 0);
-Rect.createFromTwoPoints = function createWithPoints(a, b) {
+Rect.fromTwoPoints = function createWithPoints(a, b) {
 	if (!a || !b) {
 		return Rect.Zero;
 	}

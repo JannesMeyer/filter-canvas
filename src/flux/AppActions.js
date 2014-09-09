@@ -42,7 +42,7 @@ var AppActions = {
 			Dispatcher.dispatch({ actionType: Constants.END_SELECTION });
 
 			var selection = SelectionStore.getSelectionRect();
-			if (selection.getDiagonalLength() === 0) {
+			if (selection.isDiagonalLengthZero()) {
 				// TODO: deselect happens on mousedown
 				console.log('Click on workbench background');
 				return;
@@ -62,7 +62,7 @@ var AppActions = {
 		var mousePos = new Point(clientX, clientY);
 		var id = SelectionStore.getSelectedItemId();
 		var delta = SelectionStore.getAmountDragged(mousePos);
-		if (delta.distanceFromOrigin() === 0) {
+		if (delta.getDistanceFromOrigin() === 0) {
 			Dispatcher.dispatch({ actionType: Constants.ITEM_CLICKED_ON_WORKBENCH, id });
 		} else {
 			Dispatcher.dispatch({ actionType: Constants.MOVE_BY_ON_WORKBENCH, id, delta });

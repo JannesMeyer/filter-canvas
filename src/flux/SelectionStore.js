@@ -13,12 +13,13 @@ var requestAnimationFrame = window.requestAnimationFrame ||
 // Data
 var wires = {};
 var selection = { active: false };
+var isDragging = false;
 var selectedItem = { dragging: false };
-var zCounter = 10;
 var requestId;
+var zCounter = 10;
 
 function updateFilter() {
-	var delta = selectedItem.lastMousePos.substract(selectedItem.startMousePos);
+	var delta = selectedItem.lastMousePos.subtract(selectedItem.startMousePos);
 	var frame = selectedItem.filterFrame.moveBy(delta);
 
 	// Re-draw wires
@@ -49,7 +50,7 @@ function updateFilter() {
 var SelectionStore = merge(EventEmitter.prototype, {
 	// Filter drag and drop
 	getAmountDragged(mousePos) {
-		return mousePos.substract(selectedItem.startMousePos);
+		return mousePos.subtract(selectedItem.startMousePos);
 	},
 	getSelectedItemId() {
 		return selectedItem.id;
@@ -69,7 +70,7 @@ var SelectionStore = merge(EventEmitter.prototype, {
 
 	// Selection
 	getSelectionRect() {
-		return Rect.createFromTwoPoints(selection.startPos, selection.currentPos);
+		return Rect.fromTwoPoints(selection.startPos, selection.currentPos);
 	},
 	isSelecting() {
 		return selection.active;
@@ -103,7 +104,6 @@ Dispatcher.register(function(action) {
 			connections: filter.get('connections'),
 			dragging: true
 		};
-
 		// Focus filter element
 		action.element.focus();
 		action.element.style.zIndex = ++zCounter;
