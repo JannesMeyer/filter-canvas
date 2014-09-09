@@ -1,12 +1,10 @@
 var WConnector = React.createClass({
 	handleMouseDown(ev) {
-		if (ev.button !== 0) {
-			return;
+		if (ev.button === 0) {
+			ev.stopPropagation();
+			ev.preventDefault();
+			console.log('connection drag');
 		}
-		ev.stopPropagation();
-		ev.preventDefault();
-
-		console.log('connection drag');
 	},
 	render() {
 		return (

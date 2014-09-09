@@ -3,6 +3,7 @@ var AppActions = require('../flux/AppActions');
 
 var Workbench = require('./Workbench.react');
 var Repository = require('./Repository.react');
+var Actions = require('./Actions.react');
 
 // Attach event listeners for global mouse events. It's more accurate
 // to do it on the `window` object rather than on a DOM node like React is doing.
@@ -39,6 +40,7 @@ var App = React.createClass({
 			<div className="m-container" onMouseMove={this.handleMouseMove}>
 				<Workbench />
 				<Repository />
+				<Actions />
 			</div>
 		);
 	}

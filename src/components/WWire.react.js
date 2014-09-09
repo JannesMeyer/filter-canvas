@@ -1,4 +1,4 @@
-var SelectionStore = require('../flux/SelectionStore.js');
+var SelectionStore = require('../flux/SelectionStore');
 var Point = require('../lib/ImmutablePoint');
 
 var WWire = React.createClass({
