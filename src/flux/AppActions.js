@@ -2,6 +2,8 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 var	SelectionStore = require('./SelectionStore');
 var WorkbenchStore = require('./WorkbenchStore');
+var Rect = require('../lib/ImmutableRect');
+var Point = require('../lib/ImmutablePoint');
 
 /**
  * Usually user agent checking is a bad practice. But in this case we're using it to determine
@@ -16,32 +18,38 @@ var isMacSystem = !!(typeof navigator !== 'undefined' && navigator.platform && n
  * AppActions single object (like a singleton)
  */
 var AppActions = {
+
 	createFilter(id, x, y) {
 		Dispatcher.dispatch({ actionType: Constants.CREATE_FILTER, id, x, y });
 	},
+
 	startDragOnWorkbench(id, element, clientX, clientY) {
-		Dispatcher.dispatch({ actionType: Constants.START_DRAG_ON_WORKBENCH, id, element, clientX, clientY });
+		var mousePos = new Point(clientX, clientY);
+		Dispatcher.dispatch({ actionType: Constants.START_DRAG_ON_WORKBENCH, id, element, mousePos });
 	},
+
 	draggingOnWorkbench(clientX, clientY) {
+		var mousePos = new Point(clientX, clientY);
 		if (SelectionStore.isDragging()) {
-			Dispatcher.dispatch({ actionType: Constants.DRAGGING_ON_WORKBENCH, clientX, clientY });
+			Dispatcher.dispatch({ actionType: Constants.DRAGGING_ON_WORKBENCH, mousePos });
 		} else if (SelectionStore.isSelecting()) {
-			Dispatcher.dispatch({ actionType: Constants.MOVE_SELECTION, clientX, clientY });
+			Dispatcher.dispatch({ actionType: Constants.MOVE_SELECTION, mousePos });
 		}
 	},
-	endDragOnWorkbench(clientX, clientY) {
-		if (SelectionStore.isSelecting()) {
-			var selection = SelectionStore.getSelectionRect();
-			Dispatcher.dispatch({ actionType: Constants.END_SELECTION, selection });
 
+	endDragOnWorkbench(clientX, clientY) {
+
+		if (SelectionStore.isSelecting()) {
+			Dispatcher.dispatch({ actionType: Constants.END_SELECTION });
+
+			var selection = SelectionStore.getSelectionRect();
 			if (selection.getDiagonalLength() === 0) {
 				// TODO: deselect happens on mousedown
-				console.log('Click');
+				console.log('Click on workbench background');
 				return;
 			}
-
 			var selectedFilters = WorkbenchStore.getFiltersCoveredBy(selection);
-			console.log(selectedFilters.toArray().length);
+			console.log('Number of filters selected:', selectedFilters.toArray().length);
 		}
 		if (!SelectionStore.isDragging()) {
 			return;
@@ -52,25 +60,28 @@ var AppActions = {
 			return;
 		}
 
+		var mousePos = new Point(clientX, clientY);
 		var id = SelectionStore.getSelectedItemId();
-		var {x, y} = SelectionStore.getAmountDragged(clientX, clientY);
-
-		var distance = Math.sqrt(x * x + y * y);
-		if (distance < 1) {
+		var delta = SelectionStore.getAmountDragged(mousePos);
+		if (delta.distanceFromOrigin() === 0) {
 			Dispatcher.dispatch({ actionType: Constants.ITEM_CLICKED_ON_WORKBENCH, id });
 		} else {
-			Dispatcher.dispatch({ actionType: Constants.MOVE_BY_ON_WORKBENCH, id, x, y });
+			Dispatcher.dispatch({ actionType: Constants.MOVE_BY_ON_WORKBENCH, id, delta });
 		}
 	},
+
 	startSelection(scrollLeft, scrollTop, clientX, clientY, button, shiftKey, ctrlKey, altKey, metaKey) {
 		// Right clicks shouldn't start a selection
 		if (button !== 0 || isMacSystem && ctrlKey) {
 			return;
 		}
+
 		if (isMacSystem && metaKey || !isMacSystem && ctrlKey) {
 			console.log('Extend selection if exists');
 		}
-		Dispatcher.dispatch({ actionType: Constants.START_SELECTION, scrollLeft, scrollTop, clientX, clientY });
+		var scrollPos = new Point(scrollLeft, scrollTop);
+		var mousePos = new Point(clientX, clientY);
+		Dispatcher.dispatch({ actionType: Constants.START_SELECTION, scrollPos, mousePos });
 	}
 };
 module.exports = AppActions;

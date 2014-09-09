@@ -3,7 +3,8 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 var merge = require('react/lib/merge');
 var EventEmitter = require('events').EventEmitter;
-var ImmutableRect = require('../lib/ImmutableRect');
+var Rect = require('../lib/ImmutableRect');
+var Point = require('../lib/ImmutablePoint');
 
 var CHANGE_EVENT = 'change';
 var requestAnimationFrame = window.requestAnimationFrame ||
@@ -17,84 +18,29 @@ var selectedItem = { dragging: false };
 var zCounter = 10;
 var requestId;
 
-function handleSelectionStart(action) {
-	selection.startScrollX = action.scrollLeft;
-	selection.startScrollY = action.scrollTop;
-	selection.startX = selection.currentX = (action.scrollLeft + action.clientX);
-	selection.startY = selection.currentY = (action.scrollTop + action.clientY);
-	selection.active = true;
-}
-
-function handleSelectionMove(action) {
-	selection.currentX = selection.startScrollX + action.clientX;
-	selection.currentY = selection.startScrollY + action.clientY;
-}
-
-function handleSelectionEnd() {
-	selection.active = false;
-}
-
-function handleDragStart(action) {
-	var filter = WorkbenchStore.getFilter(action.id);
-	var rect = filter.get('rect');
-	selectedItem = {
-		type: 'WFilter',
-		id: action.id,
-		element: action.element,
-		clientX: action.clientX,
-		clientY: action.clientY,
-		dragging: true,
-		currentX: rect.x,
-		currentY: rect.y,
-		connections: filter.get('connections')
-	};
-
-	// Update filter
-	action.element.focus();
-	action.element.style.zIndex = ++zCounter;
-}
-
-function handleDragMove(action) {
-	selectedItem.deltaX = action.clientX - selectedItem.clientX;
-	selectedItem.deltaY = action.clientY - selectedItem.clientY;
-
-	if (!requestId) {
-		requestId = requestAnimationFrame(updateFilter);
-	}
-}
-
 function updateFilter() {
-	var x = selectedItem.currentX + selectedItem.deltaX;
-	var y = selectedItem.currentY + selectedItem.deltaY;
+	var delta = selectedItem.lastMousePos.substract(selectedItem.startMousePos);
+	var frame = selectedItem.filterFrame.moveBy(delta);
 
 	// Re-draw wires
 	selectedItem.connections.forEach(id => {
 		// Mutate the connection data
 		var cnx = WorkbenchStore.getConnection(id);
 		if (selectedItem.id === cnx.fromFilter) {
-			cnx.fromPoint = addToPoint(cnx.fromOffset, x, y);
+			cnx.fromPoint = cnx.fromOffset.add(frame);
 		}
 		if (selectedItem.id === cnx.toFilter) {
-			cnx.toPoint = addToPoint(cnx.toOffset, x, y);
+			cnx.toPoint = cnx.toOffset.add(frame);
 		}
 
 		wires[id].forceUpdate();
 	});
 
 	// Re-draw filter position
-	selectedItem.element.style.left = x + 'px';
-	selectedItem.element.style.top = y + 'px';
+	selectedItem.element.style.left = frame.x + 'px';
+	selectedItem.element.style.top = frame.y + 'px';
 
 	// Reset
-	requestId = null;
-}
-
-function addToPoint(p, a, b) {
-	return [p[0] + a, p[1] + b];
-}
-
-function handleDragEnd() {
-	selectedItem.dragging = false;
 	requestId = null;
 }
 
@@ -103,10 +49,8 @@ function handleDragEnd() {
  */
 var SelectionStore = merge(EventEmitter.prototype, {
 	// Filter drag and drop
-	getAmountDragged(clientX, clientY) {
-		var x = clientX - selectedItem.clientX;
-		var y = clientY - selectedItem.clientY;
-		return {x, y};
+	getAmountDragged(mousePos) {
+		return mousePos.substract(selectedItem.startMousePos);
 	},
 	getSelectedItemId() {
 		return selectedItem.id;
@@ -126,11 +70,7 @@ var SelectionStore = merge(EventEmitter.prototype, {
 
 	// Selection
 	getSelectionRect() {
-		var x = Math.min(selection.currentX, selection.startX);
-		var y = Math.min(selection.currentY, selection.startY);
-		var maxX = Math.max(selection.currentX, selection.startX);
-		var maxY = Math.max(selection.currentY, selection.startY);
-		return new ImmutableRect(x, y, maxX - x, maxY - y);
+		return Rect.createFromTwoPoints(selection.startPos, selection.currentPos);
 	},
 	isSelecting() {
 		return selection.active;
@@ -153,28 +93,49 @@ module.exports = SelectionStore;
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.START_DRAG_ON_WORKBENCH:
-		handleDragStart(action);
+		// Set selectedItem
+		var filter = WorkbenchStore.getFilter(action.id);
+		selectedItem = {
+			type: 'WFilter',
+			id: action.id,
+			element: action.element,
+			startMousePos: action.mousePos,
+			filterFrame: filter.get('rect'),
+			connections: filter.get('connections'),
+			dragging: true
+		};
+
+		// Focus filter element
+		action.element.focus();
+		action.element.style.zIndex = ++zCounter;
 		return;
 
 		case Constants.DRAGGING_ON_WORKBENCH:
-		handleDragMove(action);
+		// Update selectedItem
+		selectedItem.lastMousePos = action.mousePos;
+		if (!requestId) {
+			requestId = requestAnimationFrame(updateFilter);
+		}
 		return;
 
 		case Constants.END_DRAG_ON_WORKBENCH:
-		handleDragEnd();
+		selectedItem.dragging = false;
+		requestId = null;
 		return;
 
 		case Constants.START_SELECTION:
-		handleSelectionStart(action);
+		selection.startScrollPos = action.scrollPos;
+		selection.currentPos = selection.startPos = action.scrollPos.add(action.mousePos);
+		selection.active = true;
 		return;
 
 		case Constants.MOVE_SELECTION:
-		handleSelectionMove(action);
+		selection.currentPos = selection.startScrollPos.add(action.mousePos);
 		SelectionStore.emitChange();
 		return;
 
 		case Constants.END_SELECTION:
-		handleSelectionEnd();
+		selection.active = false;
 		SelectionStore.emitChange();
 		return;
 	}

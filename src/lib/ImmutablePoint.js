@@ -1,19 +1,30 @@
-class ImmutablePoint {
+class Point {
+
 	constructor(x, y) {
-		console.log('create ImmutablePoint');
-		this.x = x || 0;
-		this.y = y || 0;
+		this.x = x;
+		this.y = y;
 		// TODO: freeze only in dev mode
-		Object.freeze(this);
+		// Object.freeze(this);
+		// console.log('Point()');
 	}
-	addPoint(p) {
-		return new ImmutablePoint(this.x + p.x, this.y + p.y);
+	toString() {
+		return 'Point [ ' + this.x + ', ' + this.y + ' ]';
 	}
-	add(x, y) {
-		return new ImmutablePoint(this.x + x, this.y + y);
+	add(point) {
+		return new Point(this.x + point.x, this.y + point.y);
 	}
-	distance() {
+	addValues(x, y) {
+		return new Point(this.x + x, this.y + y);
+	}
+	substract(point) {
+		return new Point(this.x - point.x, this.y - point.y);
+	}
+	substractValues(x, y) {
+		return new Point(this.x - x, this.y - y);
+	}
+	distanceFromOrigin() {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
+
 }
-module.exports = ImmutablePoint;
+module.exports = Point;

@@ -24,12 +24,9 @@ var Selection = React.createClass({
 			left: rect.x + 'px',
 			top: rect.y + 'px',
 			width: rect.width + 'px',
-			height: rect.height + 'px'
+			height: rect.height + 'px',
+			opacity: this.state.active ? '1' : '0'
 		};
-
-		if (!this.state.active) {
-			style.opacity = '0';
-		}
 		return <div className="m-selection" style={style} />;
 	}
 });
