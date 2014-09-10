@@ -2,16 +2,16 @@ var AppActions = require('../flux/AppActions');
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var WConnector = require('./WConnector.react');
 
+var itemType = 'ITEM_TYPE_FILTER';
+
 var WFilter = React.createClass({
 	filter: null,
 	handleMouseDown(ev) {
-		if (ev.button !== 0) { return; }
-		AppActions.startDragOnWorkbench(this.props.key, ev.currentTarget, ev.clientX, ev.clientY);
-		ev.preventDefault();
-		ev.stopPropagation();
+		AppActions.startMoveSelectedItems(itemType, this.props.key, ev.currentTarget, ev);
 	},
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.filter !== WorkbenchStore.getFilter(nextProps.key);
+		// || this.state !== nextState;
 	},
 	render() {
 		var filter = this.filter = WorkbenchStore.getFilter(this.props.key);
@@ -25,11 +25,11 @@ var WFilter = React.createClass({
 			width: rect.width + 'px',
 			height: rect.height + 'px'
 		};
+		// tabIndex="0"
 		return (
 			<div
 				className="m-filter-on-canvas"
 				style={style}
-				tabIndex="0"
 				onMouseDown={this.handleMouseDown}
 				>
 

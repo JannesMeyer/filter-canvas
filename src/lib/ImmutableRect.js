@@ -1,3 +1,6 @@
+// TODO: check if point arguments are of the right type (in dev mode)
+// TODO: freeze the object (in dev mode)
+
 class Rect {
 
 	constructor(x, y, width, height) {
@@ -5,8 +8,6 @@ class Rect {
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		// Freeze only in dev mode
-		// Object.freeze(this);
 	}
 	/**
 	 * Creates a string-representation of this Rect
@@ -41,6 +42,15 @@ class Rect {
 			this.width + width,
 			this.height + height
 		);
+	}
+	/**
+	 * Checks if another Rect or anything rect-like equals to this Rect
+	 */
+	equals(other) {
+		return this.x      === other.x &&
+		       this.y      === other.y &&
+		       this.width  === other.width &&
+		       this.height === other.height;
 	}
 	/**
 	 * Test whether two Rects intersect each other

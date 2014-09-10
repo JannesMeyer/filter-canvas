@@ -21,10 +21,8 @@ var Workbench = React.createClass({
 		ev.preventDefault();
 	},
 	handleMouseDown(ev) {
-		var wb = this.getDOMNode();
-		AppActions.startSelection(wb.scrollLeft, wb.scrollTop, ev.clientX, ev.clientY, ev.button, ev.shiftKey, ev.ctrlKey, ev.altKey, ev.metaKey);
-		ev.stopPropagation();
-		ev.preventDefault();
+		var node = this.getDOMNode();
+		AppActions.startSelection(node.scrollLeft, node.scrollTop, ev);
 	},
 	render() {
 		var filters = WorkbenchStore.getAllFilters();

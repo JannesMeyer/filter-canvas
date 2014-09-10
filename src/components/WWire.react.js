@@ -1,4 +1,4 @@
-var SelectionStore = require('../flux/SelectionStore');
+var EtherMovementStore = require('../flux/EtherMovementStore');
 var Point = require('../lib/ImmutablePoint');
 
 var WWire = React.createClass({
@@ -42,10 +42,10 @@ var WWire = React.createClass({
 	},
 	componentDidMount() {
 		this.draw();
-		SelectionStore.registerWire(this.props.key, this);
+		EtherMovementStore.registerWire(this.props.key, this);
 	},
 	componentWillUnmount() {
-		SelectionStore.unregisterWire(this.props.key);
+		EtherMovementStore.unregisterWire(this.props.key);
 	},
 	render() {
 		var pFrom = this.props.connection.fromPoint;

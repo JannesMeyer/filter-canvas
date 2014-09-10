@@ -146,7 +146,7 @@ Dispatcher.register(function(action) {
 		WorkbenchStore.emitChange();
 		return;
 
-		case Constants.MOVE_BY_ON_WORKBENCH:
+		case Constants.MOVE_SELECTED_ITEMS:
 		filters = filters.updateIn([action.id, 'rect'], r => r.moveBy(action.delta));
 		WorkbenchStore.emitChange();
 		// TODO: redraw wires?

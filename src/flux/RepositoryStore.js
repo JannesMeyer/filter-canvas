@@ -110,13 +110,14 @@ var RepositoryStore = merge(EventEmitter.prototype, {
 			throw new Error('The filter type doesn\'t exist');
 		}
 
-		return immutable.Map({
+		var filter = immutable.Map({
 			class: id,
 			inputs: immutable.Range(0, type.get('inputs')),
 			outputs: immutable.Range(0, type.get('outputs')),
 			connections: immutable.Vector(),
 			rect: new Rect(x, y, this.getFilterWidth(id), this.getFilterHeight(type))
 		});
+		return filter;
 	},
 	createPipeObject(id, x, y) {
 		return immutable.Map();

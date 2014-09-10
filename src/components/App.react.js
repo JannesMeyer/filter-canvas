@@ -1,4 +1,6 @@
 var WorkbenchStore = require('../flux/WorkbenchStore');
+var SelectionStore = require('../flux/SelectionStore');
+var EtherMovementStore = require('../flux/EtherMovementStore');
 var AppActions = require('../flux/AppActions');
 
 var Workbench = require('./Workbench.react');
@@ -9,14 +11,26 @@ var Actions = require('./Actions.react');
 // to do it on the `window` object rather than on a DOM node like React is doing.
 if (addEventListener) {
 	addEventListener('mousemove', function(ev) {
-		AppActions.draggingOnWorkbench(ev.clientX, ev.clientY);
-		// TODO: check if a drag is even happening
+		if (EtherMovementStore.isDragging()) {
+			return AppActions.moveSelectedItems(ev.clientX, ev.clientY);
+		}
+		if (SelectionStore.isSelecting()) {
+			return AppActions.resizeSelection(ev.clientX, ev.clientY);
+		}
 	});
 
 	addEventListener('mouseup', function(ev) {
-		if (ev.button !== 0) { return; }
-		AppActions.endDragOnWorkbench(ev.clientX, ev.clientY);
-		// TODO: check if a drag is even happening
+		if (ev.button !== 0) {
+			return;
+		}
+		if (EtherMovementStore.isDragging()) {
+			AppActions.finishMovingSelectedItems(ev);
+			return;
+		}
+		if (SelectionStore.isSelecting()) {
+			AppActions.finishSelection(ev);
+			return;
+		}
 	});
 }
 

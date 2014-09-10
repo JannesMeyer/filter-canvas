@@ -1,90 +1,31 @@
-var WorkbenchStore = require('./WorkbenchStore');
+var immutable = require('immutable');
+var Rect = require('../lib/ImmutableRect');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
-var merge = require('react/lib/merge');
-var EventEmitter = require('events').EventEmitter;
-var Rect = require('../lib/ImmutableRect');
-
-var CHANGE_EVENT = 'change';
-var requestAnimationFrame = window.requestAnimationFrame ||
-                            window.mozRequestAnimationFrame ||
-                            window.webkitRequestAnimationFrame;
+var BaseStore = require('../lib/BaseStore');
+var WorkbenchStore = require('./WorkbenchStore');
 
 // Data
-var wires = {};
-var selection = { active: false };
-var isDragging = false;
-var selectedItem = { dragging: false };
-var requestId;
-var zCounter = 10;
+var selectedItems = immutable.Set();
 
-function updateFilter() {
-	var delta = selectedItem.lastMousePos.subtract(selectedItem.startMousePos);
-	var frame = selectedItem.filterFrame.moveBy(delta);
-
-	// Re-draw wires
-	selectedItem.connections.forEach(id => {
-		// Mutate the connection data
-		var cnx = WorkbenchStore.getConnection(id);
-		if (selectedItem.id === cnx.fromFilter) {
-			cnx.fromPoint = cnx.fromOffset.add(frame);
-		}
-		if (selectedItem.id === cnx.toFilter) {
-			cnx.toPoint = cnx.toOffset.add(frame);
-		}
-
-		wires[id].forceUpdate();
-	});
-
-	// Re-draw filter position
-	selectedItem.element.style.left = frame.x + 'px';
-	selectedItem.element.style.top = frame.y + 'px';
-
-	// Reset
-	requestId = null;
-}
+var isSelecting = false;
+var startScrollPos;
+var startPos;
+var lastPos;
+var itemsInsideSelection = immutable.Vector();
 
 /**
  * SelectionStore single object
  */
-var SelectionStore = merge(EventEmitter.prototype, {
-	// Filter drag and drop
-	getAmountDragged(mousePos) {
-		return mousePos.subtract(selectedItem.startMousePos);
-	},
-	getSelectedItemId() {
-		return selectedItem.id;
-	},
-	getSelectedItemType() {
-		return selectedItem.type;
-	},
-	isDragging() {
-		return selectedItem.dragging;
-	},
-	registerWire(id, wire) {
-		wires[id] = wire;
-	},
-	unregisterWire(id) {
-		delete wires[id];
-	},
-
-	// Selection
+var SelectionStore = BaseStore.createStore({
 	getSelectionRect() {
-		return Rect.fromTwoPoints(selection.startPos, selection.currentPos);
+		return Rect.fromTwoPoints(startPos, lastPos);
+	},
+	isClick() {
+		return startPos.equals(lastPos);
 	},
 	isSelecting() {
-		return selection.active;
-	},
-
-	// EventEmitter things
-	emitChange() {
-		this.emit(CHANGE_EVENT);
-	},
-	addChangeListener(callback) {
-		this.on(CHANGE_EVENT, callback);
-	},
-	removeChangeListener(callback) {
-		this.removeListener(CHANGE_EVENT, callback);
+		return isSelecting;
 	}
 });
 module.exports = SelectionStore;
@@ -92,49 +33,43 @@ module.exports = SelectionStore;
 // Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
-		case Constants.START_DRAG_ON_WORKBENCH:
-		// Set selectedItem
-		var filter = WorkbenchStore.getFilter(action.id);
-		selectedItem = {
-			type: 'WFilter',
-			id: action.id,
-			element: action.element,
-			startMousePos: action.mousePos,
-			filterFrame: filter.get('rect'),
-			connections: filter.get('connections'),
-			dragging: true
-		};
-		// Focus filter element
-		action.element.focus();
-		action.element.style.zIndex = ++zCounter;
-		return;
 
-		case Constants.DRAGGING_ON_WORKBENCH:
-		// Update selectedItem
-		selectedItem.lastMousePos = action.mousePos;
-		if (!requestId) {
-			requestId = requestAnimationFrame(updateFilter);
+		case Constants.START_MOVING_SELECTED_ITEMS:
+		if (action.type === Constants.ITEM_TYPE_FILTER) {
+			var item = WorkbenchStore.getFilter(action.id);
+			// TODO: do this differently
+			item.hashCode = function() {
+				return 'Filter#' + action.id;
+			};
+			selectedItems = selectedItems.add(item);
+			return;
+		}
+		if (action.type === Constants.ITEM_TYPE_PIPE) {
+			var item = WorkbenchStore.getPipe(action.id);
+			selectedItems = selectedItems.add(item);
+			return;
 		}
 		return;
 
-		case Constants.END_DRAG_ON_WORKBENCH:
-		selectedItem.dragging = false;
-		requestId = null;
-		return;
-
 		case Constants.START_SELECTION:
-		selection.startScrollPos = action.scrollPos;
-		selection.currentPos = selection.startPos = action.scrollPos.add(action.mousePos);
-		selection.active = true;
+		startScrollPos = action.scrollPos;
+		lastPos = startPos = startScrollPos.add(action.mousePos);
+		isSelecting = true;
 		return;
 
 		case Constants.MOVE_SELECTION:
-		selection.currentPos = selection.startScrollPos.add(action.mousePos);
+		lastPos = startScrollPos.add(action.mousePos);
+		// TODO: update itemsInsideSelection
 		SelectionStore.emitChange();
 		return;
 
-		case Constants.END_SELECTION:
-		selection.active = false;
+		case Constants.FINISH_SELECTION:
+		isSelecting = false;
+		SelectionStore.emitChange();
+		return;
+
+		case Constants.CLEAR_SELECTED_ITEMS:
+		selectedItems = selectedItems.clear();
 		SelectionStore.emitChange();
 		return;
 	}
