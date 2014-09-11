@@ -13,10 +13,16 @@ var Point = require('../lib/ImmutablePoint');
  */
 var isMacSystem = !!(typeof navigator !== 'undefined' && navigator.platform && navigator.platform.indexOf('Mac') !== -1);
 
-function getSelectionType(ev) {
+function getSelectionType(ev, isItemSelected) {
 	// Only let left-clicks through
 	if (ev.button !== 0 || isMacSystem && ev.ctrlKey) {
 		return null;
+	}
+
+	// Keep the existing selection if the user is
+	// going to drag a part of it
+	if (isItemSelected) {
+		return Constants.SELECTION_TYPE_EXTEND;
 	}
 
 	// Continue with the existing selection if the user is
@@ -39,11 +45,12 @@ var AppActions = {
 	},
 
 	startMovingSelectedItems(type, id, element, event) {
-		var selectionType = getSelectionType(event);
+		var isItemSelected = SelectionStore.isItemSelected(type, id);
+
+		var selectionType = getSelectionType(event, isItemSelected);
 		if (selectionType === null) {
 			return;
 		}
-
 		if (selectionType === Constants.SELECTION_TYPE_NEW) {
 			Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 		}
