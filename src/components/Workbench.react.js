@@ -32,8 +32,8 @@ var Workbench = React.createClass({
 		return (
 			<div className="m-workbench" onDragOver={this.handleDragOver} onDrop={this.handleDrop} onMouseDown={this.handleMouseDown}>
 				<div className="m-workbench-items">
-					{filters.map((_, key) =>
-						<WFilter key={key} />
+					{filters.map((filter, key) =>
+						<WFilter key={key} filter={filter} />
 					).toArray()}
 					{connections.map((connection, key) =>
 						<WWire key={key} connection={connection} width={wireWidth} />

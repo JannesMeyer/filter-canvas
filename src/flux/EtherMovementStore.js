@@ -3,8 +3,9 @@ var Rect = require('../lib/ImmutableRect');
 
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore = require('./WorkbenchStore');
-var Dispatcher = require('./Dispatcher');
-var Constants = require('./Constants');
+var SelectionStore = require('./SelectionStore');
+var Dispatcher = require('./dispatcher');
+var Constants = require('./constants');
 
 var requestAnimationFrame = window.requestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
@@ -19,26 +20,28 @@ var requestId;
 
 function update() {
 	var delta = lastMousePos.subtract(startMousePos);
-	// console.log(delta.toString());
-	// var frame = currentFrame.moveBy(delta);
 
-	// Re-draw wires
-	// selectedItem.connections.forEach(id => {
-	// 	// Mutate the connection data
-	// 	var cnx = WorkbenchStore.getConnection(id);
-	// 	if (selectedItem.id === cnx.fromFilter) {
-	// 		cnx.fromPoint = cnx.fromOffset.add(frame);
-	// 	}
-	// 	if (selectedItem.id === cnx.toFilter) {
-	// 		cnx.toPoint = cnx.toOffset.add(frame);
-	// 	}
+	SelectionStore.getSelectedItems().forEach((item, id) => {
+		var currentFrame = item.get('rect');
+		var connections = item.get('connections');
+		var frame = currentFrame.moveBy(delta);
 
-	// 	wires[id].forceUpdate();
-	// });
+		// TODO: only update each wire once
+		connections.forEach(cId => {
+			var connection = WorkbenchStore.getConnection(cId);
+			if (id === connection.fromFilter) {
+				connection.fromPoint = connection.fromOffset.add(frame);
+			}
+			if (id === connection.toFilter) {
+				connection.toPoint = connection.toOffset.add(frame);
+			}
+			wires[cId].forceUpdate();
+		});
 
-	// Re-draw filter position
-	// selectedItem.element.style.left = frame.x + 'px';
-	// selectedItem.element.style.top = frame.y + 'px';
+		// Re-draw filter position
+		// element.style.left = frame.x + 'px';
+		// element.style.top = frame.y + 'px';
+	});
 
 	// Reset
 	requestId = null;

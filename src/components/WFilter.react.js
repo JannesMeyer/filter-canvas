@@ -1,8 +1,9 @@
 var AppActions = require('../flux/AppActions');
+var Constants = require('../flux/constants');
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var SelectionStore = require('../flux/SelectionStore');
-var WConnector = require('./WConnector.react');
-var Constants = require('../flux/constants');
+var EtherMovementStore = require('../flux/EtherMovementStore');
+var WFilterConnectors = require('./WFilterConnectors.react');
 
 function getState() {
 	return {
@@ -11,10 +12,9 @@ function getState() {
 }
 
 var WFilter = React.createClass({
-	filter: null,
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.filter !== WorkbenchStore.getFilter(nextProps.key) ||
-		       this.state.selected !== nextState.selected;
+		return this.state.selected !== nextState.selected ||
+		       this.props.filter !== nextProps.filter;
 	},
 	getInitialState: getState,
 	_handleChange() {
@@ -31,12 +31,13 @@ var WFilter = React.createClass({
 	},
 	render() {
 		// console.log('WFilter: render');
-		var filter = this.filter = WorkbenchStore.getFilter(this.props.key);
+		var filter = this.props.filter;
 		var rect = filter.get('rect');
-		var inputs = filter.get('inputs');
-		var outputs = filter.get('outputs');
 
-		var className = 'm-filter-on-canvas' + (this.state.selected ? ' selected' : '');
+		var className = 'm-filter-on-canvas';
+		if (this.state.selected) {
+			className += ' selected';
+		}
 		var style = {
 			left: rect.x + 'px',
 			top: rect.y + 'px',
@@ -46,18 +47,8 @@ var WFilter = React.createClass({
 		return (
 			<div className={className} style={style} onMouseDown={this.handleMouseDown}>
 				<h4>{filter.get('class')}</h4>
-
-				<div className="inputs">
-					{inputs.map(key =>
-						<WConnector key={key} type="input" />
-					).toArray()}
-				</div>
-
-				<div className="outputs">
-					{outputs.map(key =>
-						<WConnector key={key} type="output" />
-					).toArray()}
-				</div>
+				<WFilterConnectors type="inputs" connectors={filter.get('inputs')} />
+				<WFilterConnectors type="outputs" connectors={filter.get('outputs')} />
 			</div>
 		);
 	}

@@ -3,8 +3,8 @@ var Rect = require('../lib/ImmutableRect');
 
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore = require('./WorkbenchStore');
-var Dispatcher = require('./Dispatcher');
-var Constants = require('./Constants');
+var Dispatcher = require('./dispatcher');
+var Constants = require('./constants');
 
 // Data
 var selectedItems = immutable.Map();
@@ -72,6 +72,7 @@ Dispatcher.register(function(action) {
 		return;
 
 		case Constants.FINISH_SELECTION:
+		// TODO: store references instead of copies
 		// Transfer itemsInsideSelection to selectedItems
 		selectedItems = selectedItems.withMutations(selectedItems => {
 			itemsInsideSelection.forEach((item, id) => {

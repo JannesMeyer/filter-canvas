@@ -3,8 +3,8 @@ var Point = require('../lib/ImmutablePoint');
 
 var BaseStore = require('../lib/BaseStore');
 var RepositoryStore = require('./RepositoryStore');
-var Dispatcher = require('./Dispatcher');
-var Constants = require('./Constants');
+var Dispatcher = require('./dispatcher');
+var Constants = require('./constants');
 
 // Constants
 var connectorHeight = 8;

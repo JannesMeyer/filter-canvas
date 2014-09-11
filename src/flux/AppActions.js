@@ -1,8 +1,8 @@
-var Dispatcher = require('./Dispatcher');
-var Constants = require('./Constants');
 var	SelectionStore = require('./SelectionStore');
 var EtherMovementStore = require('./EtherMovementStore');
 var Point = require('../lib/ImmutablePoint');
+var Dispatcher = require('./dispatcher');
+var Constants = require('./constants');
 
 /**
  * Usually user agent checking is a bad practice. But in this case we're using it to determine
@@ -45,9 +45,8 @@ var AppActions = {
 	},
 
 	startMovingSelectedItems(type, id, element, event) {
-		var isItemSelected = SelectionStore.isItemSelected(type, id);
-
-		var selectionType = getSelectionType(event, isItemSelected);
+		var selected = SelectionStore.isItemSelected(type, id);
+		var selectionType = getSelectionType(event, selected);
 		if (selectionType === null) {
 			return;
 		}

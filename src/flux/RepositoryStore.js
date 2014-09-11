@@ -2,8 +2,8 @@ var immutable = require('immutable');
 var Rect = require('../lib/ImmutableRect');
 
 var BaseStore = require('../lib/BaseStore');
-var Dispatcher = require('./Dispatcher');
-var Constants = require('./Constants');
+var Dispatcher = require('./dispatcher');
+var Constants = require('./constants');
 
 // Constants
 var filterConnectorHeight = 16;
