@@ -17,9 +17,9 @@ var startMousePos;
 var lastMousePos;
 var requestId;
 
-function updateFilter() {
+function update() {
 	var delta = lastMousePos.subtract(startMousePos);
-	// console.log(delta);
+	// console.log(delta.toString());
 	// var frame = currentFrame.moveBy(delta);
 
 	// Re-draw wires
@@ -74,11 +74,11 @@ Dispatcher.register(function(action) {
 		case Constants.MOVING_SELECTED_ITEMS:
 		lastMousePos = action.mousePos;
 		if (!requestId) {
-			requestId = requestAnimationFrame(updateFilter);
+			requestId = requestAnimationFrame(update);
 		}
 		return;
 
-		case Constants.END_DRAG_ON_WORKBENCH:
+		case Constants.FINISH_MOVING_SELECTED_ITEMS:
 		isDragging = false;
 		requestId = null;
 		return;

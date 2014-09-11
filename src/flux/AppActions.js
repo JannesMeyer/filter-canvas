@@ -2,7 +2,6 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 var	SelectionStore = require('./SelectionStore');
 var EtherMovementStore = require('./EtherMovementStore');
-var WorkbenchStore = require('./WorkbenchStore');
 var Point = require('../lib/ImmutablePoint');
 
 /**
@@ -39,7 +38,7 @@ var AppActions = {
 		Dispatcher.dispatch({ actionType: Constants.CREATE_FILTER, id, x, y });
 	},
 
-	startMoveSelectedItems(itemType, itemId, itemElement, event) {
+	startMovingSelectedItems(type, id, element, event) {
 		var selectionType = getSelectionType(event);
 		if (selectionType === null) {
 			return;
@@ -49,13 +48,10 @@ var AppActions = {
 			Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 		}
 
-		// Add item to selected items
 		Dispatcher.dispatch({
 			actionType: Constants.START_MOVING_SELECTED_ITEMS,
-			type: itemType,
-			id: itemId,
-			element: itemElement,
-			mousePos: new Point(event.clientX, event.clientY)
+			mousePos: new Point(event.clientX, event.clientY),
+			type, id, element
 		});
 
 		event.preventDefault();
@@ -70,7 +66,7 @@ var AppActions = {
 	},
 
 	finishMovingSelectedItems(event) {
-		Dispatcher.dispatch({ actionType: Constants.END_DRAG_ON_WORKBENCH });
+		Dispatcher.dispatch({ actionType: Constants.FINISH_MOVING_SELECTED_ITEMS });
 
 		var mousePos = new Point(event.clientX, event.clientY);
 		var delta = EtherMovementStore.getAmountDragged(mousePos);
@@ -78,13 +74,13 @@ var AppActions = {
 		if (delta.isZero()) {
 			// TODO: make sure this is correct
 			Dispatcher.dispatch({
-				actionType: Constants.ITEM_CLICKED_ON_WORKBENCH,
+				actionType: Constants.ITEM_CLICKED,
 				// items: SelectionStore.getSelectedItems()
 			});
 		} else {
 			Dispatcher.dispatch({
-				actionType: Constants.MOVE_SELECTED_ITEMS,
-				// items: SelectionStore.getSelectedItems(),
+				actionType: Constants.MOVE_SELECTED_ITEMS_BY,
+				selectedItems: SelectionStore.getSelectedItems(),
 				delta: delta
 			});
 		}
@@ -115,7 +111,7 @@ var AppActions = {
 
 	resizeSelection(clientX, clientY) {
 		Dispatcher.dispatch({
-			actionType: Constants.MOVE_SELECTION,
+			actionType: Constants.RESIZE_SELECTION,
 			mousePos: new Point(clientX, clientY)
 		});
 	},

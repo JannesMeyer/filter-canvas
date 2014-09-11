@@ -2,6 +2,7 @@ var AppActions = require('../flux/AppActions');
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var SelectionStore = require('../flux/SelectionStore');
 var WConnector = require('./WConnector.react');
+var Constants = require('../flux/constants');
 
 function getState() {
 	return {
@@ -26,16 +27,16 @@ var WFilter = React.createClass({
 		SelectionStore.removeChangeListener(this._handleChange);
 	},
 	handleMouseDown(ev) {
-		AppActions.startMoveSelectedItems(itemType, this.props.key, ev.currentTarget, ev);
+		AppActions.startMovingSelectedItems(Constants.ITEM_TYPE_FILTER, this.props.key, ev.currentTarget, ev);
 	},
 	render() {
+		// console.log('WFilter: render');
 		var filter = this.filter = WorkbenchStore.getFilter(this.props.key);
 		var rect = filter.get('rect');
 		var inputs = filter.get('inputs');
 		var outputs = filter.get('outputs');
-		var selected = this.state.selected;
 
-		var className = 'm-filter-on-canvas' + (selected ? ' selected' : '');
+		var className = 'm-filter-on-canvas' + (this.state.selected ? ' selected' : '');
 		var style = {
 			left: rect.x + 'px',
 			top: rect.y + 'px',

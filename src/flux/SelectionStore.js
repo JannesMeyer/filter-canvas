@@ -29,26 +29,31 @@ var SelectionStore = BaseStore.createStore({
 		return isSelecting;
 	},
 	isItemSelected(type, id) {
-		var key = type + '#' + id;
-		// TODO: make the second condition work for all types
-		return selectedItems.has(key) || itemsInsideSelection.has(id);
+		// var key = type + '#' + id;
+		// TODO: make it work with pipes as well
+		return selectedItems.has(id) || itemsInsideSelection.has(id);
+	},
+	getSelectedItems() {
+		return selectedItems;
 	}
 });
 module.exports = SelectionStore;
 
 // Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
-	// console.log(action.actionType);
 	switch(action.actionType) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
 		if (action.type === Constants.ITEM_TYPE_FILTER) {
-			var key = 'Filter#' + action.id;
+			// var key = 'Filter#' + action.id;
 			var item = WorkbenchStore.getFilter(action.id);
 		} else if (action.type === Constants.ITEM_TYPE_PIPE) {
-			var key = 'Pipe#' + action.id;
+			// var key = 'Pipe#' + action.id;
 			var item = WorkbenchStore.getPipe(action.id);
+		} else {
+			throw new Error('Unknown item type');
 		}
-		selectedItems = selectedItems.set(key, item);
+		// TODO: make it work with pipes as well
+		selectedItems = selectedItems.set(action.id, item);
 		SelectionStore.emitChange();
 		return;
 
@@ -58,9 +63,8 @@ Dispatcher.register(function(action) {
 		isSelecting = true;
 		return;
 
-		case Constants.MOVE_SELECTION:
+		case Constants.RESIZE_SELECTION:
 		lastPos = startScrollPos.add(action.mousePos);
-
 		// Update items inside selection
 		var selectionRect = SelectionStore.getSelectionRect();
 		itemsInsideSelection = WorkbenchStore.getFiltersCoveredBy(selectionRect).toMap();
@@ -71,8 +75,9 @@ Dispatcher.register(function(action) {
 		// Transfer itemsInsideSelection to selectedItems
 		selectedItems = selectedItems.withMutations(selectedItems => {
 			itemsInsideSelection.forEach((item, id) => {
-				var key = 'Filter#' + id;
-				selectedItems = selectedItems.set(key, item);
+				// TODO: make it work with pipes as well
+				// var key = 'Filter#' + id;
+				selectedItems = selectedItems.set(id, item);
 			});
 			return selectedItems;
 		});

@@ -134,13 +134,20 @@ Dispatcher.register(function(action) {
 		WorkbenchStore.emitChange();
 		return;
 
-		case Constants.MOVE_SELECTED_ITEMS:
-		filters = filters.updateIn([action.id, 'rect'], r => r.moveBy(action.delta));
+		case Constants.MOVE_SELECTED_ITEMS_BY:
+		// TODO: make it work with pipes as well
+		var selectedFilters = action.selectedItems;
+		// item.get('type') === Constants.ITEM_TYPE_FILTER
+		filters = filters.withMutations(filters => {
+			selectedFilters.forEach((filter, id) => {
+				filters.updateIn([id, 'rect'], rect => rect.moveBy(action.delta));
+			});
+		});
 		WorkbenchStore.emitChange();
 		// TODO: redraw wires?
 		return;
 
-		case Constants.ITEM_CLICKED_ON_WORKBENCH:
+		case Constants.ITEM_CLICKED:
 		console.log('item clicked:', action.id);
 		return;
 	}

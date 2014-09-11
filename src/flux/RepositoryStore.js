@@ -110,6 +110,7 @@ var RepositoryStore = BaseStore.createStore({
 		}
 
 		var filter = immutable.Map({
+			type: Constants.ITEM_TYPE_FILTER,
 			class: id,
 			inputs: immutable.Range(0, type.get('inputs')),
 			outputs: immutable.Range(0, type.get('outputs')),
