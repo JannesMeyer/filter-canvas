@@ -1,8 +1,7 @@
 var immutable = require('immutable');
-var EventEmitter = require('events').EventEmitter;
-var merge = require('react/lib/merge');
 var Point = require('../lib/ImmutablePoint');
 
+var BaseStore = require('../lib/BaseStore');
 var RepositoryStore = require('./RepositoryStore');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
@@ -105,7 +104,7 @@ function addConnection(props) {
  * WorkbenchStore single object
  * (like a singleton)
  */
-var WorkbenchStore = merge(EventEmitter.prototype, {
+var WorkbenchStore = BaseStore.createStore({
 	getFilter(id) {
 		return filters.get(id);
 	},
@@ -113,7 +112,7 @@ var WorkbenchStore = merge(EventEmitter.prototype, {
 		return filters;
 	},
 	getFiltersCoveredBy(rect) {
-		return filters.filter(f => rect.intersectsRect(f.get('rect')));
+		return filters.toMap().filter(f => rect.intersectsRect(f.get('rect')));
 	},
 	getAllConnections() {
 		return connections;
@@ -123,17 +122,6 @@ var WorkbenchStore = merge(EventEmitter.prototype, {
 	},
 	getWireWidth() {
 		return wireWidth;
-	},
-
-	// EventEmitter things
-	emitChange() {
-		this.emit(CHANGE_EVENT);
-	},
-	addChangeListener(callback) {
-		this.on(CHANGE_EVENT, callback);
-	},
-	removeChangeListener(callback) {
-		this.removeListener(CHANGE_EVENT, callback);
 	}
 });
 module.exports = WorkbenchStore;

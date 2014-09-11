@@ -45,9 +45,6 @@ var AppActions = {
 			return;
 		}
 
-		event.preventDefault();
-		event.stopPropagation();
-
 		if (selectionType === Constants.SELECTION_TYPE_NEW) {
 			Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 		}
@@ -60,6 +57,9 @@ var AppActions = {
 			element: itemElement,
 			mousePos: new Point(event.clientX, event.clientY)
 		});
+
+		event.preventDefault();
+		event.stopPropagation();
 	},
 
 	moveSelectedItems(clientX, clientY) {
@@ -123,7 +123,6 @@ var AppActions = {
 	finishSelection(event) {
 		if (SelectionStore.isClick()) {
 			Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
-			Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 		} else {
 			Dispatcher.dispatch({ actionType: Constants.FINISH_SELECTION });
 		}

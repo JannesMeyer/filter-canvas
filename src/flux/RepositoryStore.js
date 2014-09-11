@@ -1,8 +1,7 @@
 var immutable = require('immutable');
-var EventEmitter = require('events').EventEmitter;
-var merge = require('react/lib/merge');
 var Rect = require('../lib/ImmutableRect');
 
+var BaseStore = require('../lib/BaseStore');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 
@@ -91,7 +90,7 @@ var pipes = immutable.fromJS({
  * RepositoryStore.on(RepositoryStore.FILTERS_CHANGE, callback)
  * RepositoryStore.removeListener(RepositoryStore.FILTERS_CHANGE, callback)
  */
-var RepositoryStore = merge(EventEmitter.prototype, {
+var RepositoryStore = BaseStore.createStore({
 	getAllFilters() {
 		return filters;
 	},
@@ -132,10 +131,6 @@ var RepositoryStore = merge(EventEmitter.prototype, {
 		var connectors = Math.max(filter.get('inputs'), filter.get('outputs'));
 		var height = connectors * filterConnectorHeight + 2 * filterPadding;
 		return Math.max(filterMinHeight, height); // TODO: eliminate filterMinHeight
-	},
-
-	// EventEmitter things
-	// FILTERS_CHANGE: 'filters change',
-	// PIPES_CHANGE: 'pipes change'
+	}
 });
 module.exports = RepositoryStore;

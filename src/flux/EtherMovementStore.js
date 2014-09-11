@@ -1,14 +1,11 @@
 var immutable = require('immutable');
-var EventEmitter = require('events').EventEmitter;
-var merge = require('react/lib/merge');
+var Rect = require('../lib/ImmutableRect');
 
+var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore = require('./WorkbenchStore');
 var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 
-var Rect = require('../lib/ImmutableRect');
-
-var CHANGE_EVENT = 'change';
 var requestAnimationFrame = window.requestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
                             window.webkitRequestAnimationFrame;
@@ -50,7 +47,7 @@ function updateFilter() {
 /**
  * EtherMovementStore single object
  */
-var EtherMovementStore = merge(EventEmitter.prototype, {
+var EtherMovementStore = BaseStore.createStore({
 	registerWire(id, wire) {
 		wires[id] = wire;
 	},
@@ -62,17 +59,6 @@ var EtherMovementStore = merge(EventEmitter.prototype, {
 	},
 	isDragging() {
 		return isDragging;
-	},
-
-	// TODO: remove EventEmitter things
-	emitChange() {
-		this.emit(CHANGE_EVENT);
-	},
-	addChangeListener(callback) {
-		this.on(CHANGE_EVENT, callback);
-	},
-	removeChangeListener(callback) {
-		this.removeListener(CHANGE_EVENT, callback);
 	}
 });
 module.exports = EtherMovementStore;
