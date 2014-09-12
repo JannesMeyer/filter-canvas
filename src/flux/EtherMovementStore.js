@@ -21,35 +21,41 @@ var startMousePos;
 var lastMousePos;
 var requestId;
 
+// TODO: don't use forceUpdate and manual element updating anymore.
+// Make the dragging part of the state instead and ask EtherMovementStore
+// for position information instead of the WorkbenchStore.
+
 function update() {
 	var delta = lastMousePos.subtract(startMousePos);
-	// console.log(delta.toString());
-
-	// var updateSet = immutable.Set();
+	var wiresToBeRedrawn = {};
 
 	SelectionStore.getSelectedItemIds().forEach(id => {
 		// TODO: use getItem()
 		var item = WorkbenchStore.getFilter(id);
-		var connections = item.get('connections');
 		var frame = item.get('rect').moveBy(delta);
 
-		// TODO: only update each wire once
-		// connections.forEach(cId => {
-		// 	var connection = WorkbenchStore.getConnection(cId);
-
-		// 	if (id === connection.fromFilter) {
-		// 		connection.fromPoint = connection.fromOffset.add(frame);
-		// 	}
-		// 	if (id === connection.toFilter) {
-		// 		connection.toPoint = connection.toOffset.add(frame);
-		// 	}
-		// 	wires[cId].forceUpdate();
-		// });
+		item.get('connections').forEach(cId => {
+			var connection = WorkbenchStore.getConnection(cId);
+			if (id === connection.fromFilter) {
+				connection.fromPoint = connection.fromOffset.add(frame);
+			}
+			if (id === connection.toFilter) {
+				connection.toPoint = connection.toOffset.add(frame);
+			}
+			wiresToBeRedrawn[cId] = null;
+			// wires[cId].forceUpdate();
+		});
 
 		// Re-draw filter position
 		var element = items[id].getDOMNode();
 		element.style.left = frame.x + 'px';
 		element.style.top = frame.y + 'px';
+	});
+
+	// Re-draw wires
+	// TODO: don't re-draw if only the position changed, but not the size
+	Object.keys(wiresToBeRedrawn).forEach(id => {
+		wires[id].forceUpdate();
 	});
 
 	requestId = null;

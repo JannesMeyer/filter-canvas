@@ -10,6 +10,7 @@ var WWire = React.createClass({
 	pEnd: null,
 
 	draw() {
+		console.log('draw');
 		var ctx = this.context;
 		if (!ctx) {
 			var canvas = this.getDOMNode();
