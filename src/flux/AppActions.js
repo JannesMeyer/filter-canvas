@@ -44,7 +44,7 @@ var AppActions = {
 		Dispatcher.dispatch({ actionType: Constants.CREATE_FILTER, id, x, y });
 	},
 
-	startMovingSelectedItems(type, id, element, event) {
+	startMovingSelectedItems(type, id, event) {
 		var selected = SelectionStore.isItemSelected(type, id);
 		var selectionType = getSelectionType(event, selected);
 		if (selectionType === null) {
@@ -56,8 +56,9 @@ var AppActions = {
 
 		Dispatcher.dispatch({
 			actionType: Constants.START_MOVING_SELECTED_ITEMS,
-			mousePos: new Point(event.clientX, event.clientY),
-			type, id, element
+			type,
+			id,
+			mousePos: new Point(event.clientX, event.clientY)
 		});
 
 		event.preventDefault();
@@ -80,13 +81,13 @@ var AppActions = {
 		if (delta.isZero()) {
 			// TODO: make sure this is correct
 			Dispatcher.dispatch({
-				actionType: Constants.ITEM_CLICKED,
-				// items: SelectionStore.getSelectedItems()
+				actionType: Constants.ITEM_CLICKED
+				// id: SelectionStore.getSelectedItemIds().first()
 			});
 		} else {
 			Dispatcher.dispatch({
 				actionType: Constants.MOVE_SELECTED_ITEMS_BY,
-				selectedItems: SelectionStore.getSelectedItems(),
+				selectedItems: SelectionStore.getSelectedItemIds(),
 				delta: delta
 			});
 		}

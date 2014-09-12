@@ -7,8 +7,8 @@ var Dispatcher = require('./dispatcher');
 var Constants = require('./constants');
 
 // Data
-var selectedItems = immutable.Map();
-var itemsInsideSelection = immutable.Map();
+var selectedItems = immutable.Set();
+var itemsInsideSelection = immutable.Set();
 
 var isSelecting = false;
 var startScrollPos;
@@ -29,11 +29,10 @@ var SelectionStore = BaseStore.createStore({
 		return isSelecting;
 	},
 	isItemSelected(type, id) {
-		// var key = type + '#' + id;
-		// TODO: make it work with pipes as well
-		return selectedItems.has(id) || itemsInsideSelection.has(id);
+		// TODO: remove type and make ids unique
+		return selectedItems.contains(id) || itemsInsideSelection.contains(id);
 	},
-	getSelectedItems() {
+	getSelectedItemIds() {
 		return selectedItems;
 	}
 });
@@ -43,17 +42,11 @@ module.exports = SelectionStore;
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
-		if (action.type === Constants.ITEM_TYPE_FILTER) {
-			// var key = 'Filter#' + action.id;
-			var item = WorkbenchStore.getFilter(action.id);
-		} else if (action.type === Constants.ITEM_TYPE_PIPE) {
-			// var key = 'Pipe#' + action.id;
-			var item = WorkbenchStore.getPipe(action.id);
-		} else {
+		if (action.type !== Constants.ITEM_TYPE_FILTER) {
 			throw new Error('Unknown item type');
 		}
-		// TODO: make it work with pipes as well
-		selectedItems = selectedItems.set(action.id, item);
+		selectedItems = selectedItems.add(action.id);
+
 		SelectionStore.emitChange();
 		return;
 
@@ -64,26 +57,20 @@ Dispatcher.register(function(action) {
 		return;
 
 		case Constants.RESIZE_SELECTION:
+		// Find itemsInsideSelection
 		lastPos = startScrollPos.add(action.mousePos);
-		// Update items inside selection
-		var selectionRect = SelectionStore.getSelectionRect();
-		itemsInsideSelection = WorkbenchStore.getFiltersCoveredBy(selectionRect).toMap();
+		var rect = SelectionStore.getSelectionRect();
+		itemsInsideSelection = WorkbenchStore.getFiltersCoveredBy(rect).keys().toSet();
+
 		SelectionStore.emitChange();
 		return;
 
 		case Constants.FINISH_SELECTION:
-		// TODO: store references instead of copies
-		// Transfer itemsInsideSelection to selectedItems
-		selectedItems = selectedItems.withMutations(selectedItems => {
-			itemsInsideSelection.forEach((item, id) => {
-				// TODO: make it work with pipes as well
-				// var key = 'Filter#' + id;
-				selectedItems = selectedItems.set(id, item);
-			});
-			return selectedItems;
-		});
-		itemsInsideSelection = immutable.Map();
+		// Transfer itemsInsideSelection
+		selectedItems = selectedItems.union(itemsInsideSelection);
+		itemsInsideSelection = itemsInsideSelection.clear();
 		isSelecting = false;
+
 		SelectionStore.emitChange();
 		return;
 
@@ -93,6 +80,7 @@ Dispatcher.register(function(action) {
 
 		case Constants.CLEAR_SELECTED_ITEMS:
 		selectedItems = selectedItems.clear();
+
 		SelectionStore.emitChange();
 		return;
 	}

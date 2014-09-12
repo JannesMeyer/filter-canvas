@@ -11,8 +11,11 @@ var requestAnimationFrame = window.requestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
                             window.webkitRequestAnimationFrame;
 
-// Data
+// React components
 var wires = {};
+var items = {};
+
+// Data
 var isDragging = false;
 var startMousePos;
 var lastMousePos;
@@ -20,30 +23,35 @@ var requestId;
 
 function update() {
 	var delta = lastMousePos.subtract(startMousePos);
+	// console.log(delta.toString());
 
-	SelectionStore.getSelectedItems().forEach((item, id) => {
-		var currentFrame = item.get('rect');
+	// var updateSet = immutable.Set();
+
+	SelectionStore.getSelectedItemIds().forEach(id => {
+		// TODO: use getItem()
+		var item = WorkbenchStore.getFilter(id);
 		var connections = item.get('connections');
-		var frame = currentFrame.moveBy(delta);
+		var frame = item.get('rect').moveBy(delta);
 
 		// TODO: only update each wire once
-		connections.forEach(cId => {
-			var connection = WorkbenchStore.getConnection(cId);
-			if (id === connection.fromFilter) {
-				connection.fromPoint = connection.fromOffset.add(frame);
-			}
-			if (id === connection.toFilter) {
-				connection.toPoint = connection.toOffset.add(frame);
-			}
-			wires[cId].forceUpdate();
-		});
+		// connections.forEach(cId => {
+		// 	var connection = WorkbenchStore.getConnection(cId);
+
+		// 	if (id === connection.fromFilter) {
+		// 		connection.fromPoint = connection.fromOffset.add(frame);
+		// 	}
+		// 	if (id === connection.toFilter) {
+		// 		connection.toPoint = connection.toOffset.add(frame);
+		// 	}
+		// 	wires[cId].forceUpdate();
+		// });
 
 		// Re-draw filter position
-		// element.style.left = frame.x + 'px';
-		// element.style.top = frame.y + 'px';
+		var element = items[id].getDOMNode();
+		element.style.left = frame.x + 'px';
+		element.style.top = frame.y + 'px';
 	});
 
-	// Reset
 	requestId = null;
 }
 
@@ -51,11 +59,17 @@ function update() {
  * EtherMovementStore single object
  */
 var EtherMovementStore = BaseStore.createStore({
-	registerWire(id, wire) {
-		wires[id] = wire;
+	registerWire(id, component) {
+		wires[id] = component;
 	},
 	unregisterWire(id) {
 		delete wires[id];
+	},
+	registerItem(id, component) {
+		items[id] = component;
+	},
+	unregisterItem(id, component) {
+		delete items[id];
 	},
 	getAmountDragged(mousePos) {
 		return mousePos.subtract(startMousePos);

@@ -5,6 +5,8 @@ var SelectionStore = require('../flux/SelectionStore');
 var EtherMovementStore = require('../flux/EtherMovementStore');
 var WFilterConnectors = require('./WFilterConnectors.react');
 
+// TODO: make dragging/not draggin part of the state and use it to decide
+// when to override the position data
 function getState() {
 	return {
 		selected: SelectionStore.isItemSelected('Filter', this.props.key)
@@ -21,13 +23,15 @@ var WFilter = React.createClass({
 		this.setState(getState.call(this));
 	},
 	componentDidMount() {
+		EtherMovementStore.registerItem(this.props.key, this);
 		SelectionStore.addChangeListener(this._handleChange);
 	},
 	componentWillUnmount() {
 		SelectionStore.removeChangeListener(this._handleChange);
+		EtherMovementStore.unregisterItem(this.props.key);
 	},
 	handleMouseDown(ev) {
-		AppActions.startMovingSelectedItems(Constants.ITEM_TYPE_FILTER, this.props.key, ev.currentTarget, ev);
+		AppActions.startMovingSelectedItems(Constants.ITEM_TYPE_FILTER, this.props.key, ev);
 	},
 	render() {
 		// console.log('WFilter: render');
