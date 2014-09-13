@@ -19,6 +19,7 @@ var Selection = React.createClass({
 		SelectionStore.removeChangeListener(this._handleChange);
 	},
 	render() {
+		// console.log('Selection: render');
 		var rect = this.state.rect;
 		var style = {
 			left: rect.x + 'px',

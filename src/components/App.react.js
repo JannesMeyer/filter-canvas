@@ -1,7 +1,6 @@
-var WorkbenchStore = require('../flux/WorkbenchStore');
+var AppActions = require('../flux/AppActions');
 var SelectionStore = require('../flux/SelectionStore');
 var EtherMovementStore = require('../flux/EtherMovementStore');
-var AppActions = require('../flux/AppActions');
 
 var Workbench = require('./Workbench.react');
 var Repository = require('./Repository.react');
@@ -35,18 +34,6 @@ if (addEventListener) {
 }
 
 var App = React.createClass({
-	getInitialState() {
-		return WorkbenchStore.getAllFilters();
-	},
-	_handleChange() {
-		this.replaceState(WorkbenchStore.getAllFilters());
-	},
-	componentDidMount() {
-		WorkbenchStore.addChangeListener(this._handleChange);
-	},
-	componentWillUnmount() {
-		WorkbenchStore.removeChangeListener(this._handleChange);
-	},
 	render() {
 		console.log('App: render');
 		return (

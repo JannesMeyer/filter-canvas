@@ -114,6 +114,9 @@ var WorkbenchStore = BaseStore.createStore({
 	getFiltersCoveredBy(rect) {
 		return filters.toMap().filter(f => rect.intersectsRect(f.get('rect')));
 	},
+	getItemPosition(id) {
+		return filters.getIn([id, 'rect']);
+	},
 	getAllConnections() {
 		return connections;
 	},

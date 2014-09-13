@@ -12,71 +12,24 @@ var requestAnimationFrame = window.requestAnimationFrame ||
                             window.webkitRequestAnimationFrame;
 
 // React components
-var wires = {};
-var items = {};
+// var wires = {};
+// var items = {};
 
 // Data
+var itemPositions = {};
 var isDragging = false;
 var startMousePos;
-var lastMousePos;
+var deltaPos;
 var requestId;
-
-// TODO: don't use forceUpdate and manual element updating anymore.
-// Make the dragging part of the state instead and ask EtherMovementStore
-// for position information instead of the WorkbenchStore.
-
-function update() {
-	console.log('\nanimation frame');
-	var delta = lastMousePos.subtract(startMousePos);
-	var wiresToBeRedrawn = {};
-
-	SelectionStore.getSelectedItemIds().forEach(id => {
-		// TODO: use getItem()
-		var item = WorkbenchStore.getFilter(id);
-		var frame = item.get('rect').moveBy(delta);
-
-		item.get('connections').forEach(cId => {
-			var connection = WorkbenchStore.getConnection(cId);
-			if (id === connection.fromFilter) {
-				connection.fromPoint = connection.fromOffset.add(frame);
-			}
-			if (id === connection.toFilter) {
-				connection.toPoint = connection.toOffset.add(frame);
-			}
-			wiresToBeRedrawn[cId] = null;
-		});
-
-		// Re-draw filter position
-		var element = items[id].getDOMNode();
-		element.style.left = frame.x + 'px';
-		element.style.top = frame.y + 'px';
-	});
-
-	// Re-draw wires
-	// TODO: don't re-draw if only the position changed, but not the size
-	Object.keys(wiresToBeRedrawn).forEach(id => {
-		wires[id].forceUpdate();
-	});
-
-	requestId = null;
-}
 
 /**
  * EtherMovementStore single object
  */
 var EtherMovementStore = BaseStore.createStore({
-	registerWire(id, component) {
-		wires[id] = component;
+	getItemPosition(id) {
+		return itemPositions[id];
 	},
-	unregisterWire(id) {
-		delete wires[id];
-	},
-	registerItem(id, component) {
-		items[id] = component;
-	},
-	unregisterItem(id, component) {
-		delete items[id];
-	},
+	// TODO: why not use deltaPos?
 	getAmountDragged(mousePos) {
 		return mousePos.subtract(startMousePos);
 	},
@@ -91,14 +44,27 @@ Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
 		startMousePos = action.mousePos;
+
+		var filters = WorkbenchStore.getAllFilters();
+		SelectionStore.getSelectedItemIds().forEach(id => {
+			itemPositions[id] = filters.getIn([id, 'rect']);
+		});
 		isDragging = true;
 		return;
 
 		case Constants.MOVING_SELECTED_ITEMS:
-		lastMousePos = action.mousePos;
-		if (!requestId) {
-			requestId = requestAnimationFrame(update);
-		}
+		var delta = action.mousePos.subtract(startMousePos);
+		// TODO: use getAllItems()
+		var filters = WorkbenchStore.getAllFilters();
+		SelectionStore.getSelectedItemIds().forEach(id => {
+			itemPositions[id] = filters.getIn([id, 'rect']).moveBy(delta);
+		});
+
+		// if (requestId) {
+		// 	return;
+		// }
+		// requestId = requestAnimationFrame(function() {
+		EtherMovementStore.emitChange();
 		return;
 
 		case Constants.FINISH_MOVING_SELECTED_ITEMS:
