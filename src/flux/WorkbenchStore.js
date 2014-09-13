@@ -9,7 +9,7 @@ var Constants = require('./constants');
 // Constants
 var connectorHeight = 8;
 var connectorMargin = 4;
-var wireWidth = 6;
+var wireWidth = 5;
 var CHANGE_EVENT = 'change';
 
 // Data

@@ -1,16 +1,60 @@
 var EtherMovementStore = require('../flux/EtherMovementStore');
 var Point = require('../lib/ImmutablePoint');
+var Rect = require('../lib/ImmutableRect');
+
+function calculateFrame(startPoint, endPoint, lineWidth) {
+	var orderedX = startPoint.x < endPoint.x;
+	var orderedY = startPoint.y < endPoint.y;
+	if (!orderedX) {
+		// TODO: draw the wire to a previous location
+		return null;
+	}
+	if (orderedY) {
+		return new Rect(
+			startPoint.x, startPoint.y,
+			endPoint.x - startPoint.x, endPoint.y - startPoint.y + lineWidth
+		);
+	} else {
+		return new Rect(
+			startPoint.x, endPoint.y,
+			endPoint.x - startPoint.x, startPoint.y - endPoint.y + lineWidth
+		);
+	}
+}
+
+function calculateBezierPoints(frame, startPoint, endPoint, lineWidth) {
+	if (frame === null) {
+		return null;
+	}
+	var orderedX = startPoint.x < endPoint.x;
+	var orderedY = startPoint.y < endPoint.y;
+	if (!orderedX) {
+		// TODO: draw the wire to a previous location
+		return null;
+	}
+	var upperY = lineWidth / 2;
+	var lowerY = frame.height - lineWidth / 2;
+	var middleX = Math.min(0.5 * frame.width, 200);
+	var p0, p1, p2, p3;
+	if (orderedY) {
+		p0 = new Point(0, upperY);
+		p1 = new Point(middleX, upperY);
+		p2 = new Point(middleX, lowerY);
+		p3 = new Point(frame.width, lowerY);
+	} else {
+		p0 = new Point(0, lowerY);
+		p1 = new Point(middleX, lowerY);
+		p2 = new Point(middleX, upperY);
+		p3 = new Point(frame.width, upperY);
+	}
+	return [p0, p1, p2, p3];
+}
 
 var WWire = React.createClass({
 	context: null,
-	lineWidth: null,
-	pStart: null,
-	pContext1: null,
-	pContext2: null,
-	pEnd: null,
+	bezier: null,
 
 	draw() {
-		console.log('draw');
 		var ctx = this.context;
 		if (!ctx) {
 			var canvas = this.getDOMNode();
@@ -20,18 +64,20 @@ var WWire = React.createClass({
 			this.context = canvas.getContext('2d');
 			ctx = this.context;
 		}
+		var bez = this.bezier;
+
 		ctx.beginPath();
-		ctx.moveTo(this.pStart.x, this.pStart.y);
-		ctx.bezierCurveTo(this.pContext1.x, this.pContext1.y, this.pContext2.x, this.pContext2.y, this.pEnd.x, this.pEnd.y);
+		ctx.moveTo(bez[0].x, bez[0].y);
+		ctx.bezierCurveTo(bez[1].x, bez[1].y, bez[2].x, bez[2].y, bez[3].x, bez[3].y);
 		// ctx.closePath();
 		// ctx.lineTo(this.pEnd[0], this.pEnd[1]);
 
 		ctx.strokeStyle = '#3faefc';
-		ctx.lineWidth = this.lineWidth;
+		ctx.lineWidth = this.props.width;
 		ctx.stroke();
 
 		ctx.strokeStyle = '#63e4ff';
-		ctx.lineWidth = this.lineWidth - 2;
+		ctx.lineWidth = this.props.width - 2;
 		ctx.stroke();
 	},
 	shouldComponentUpdate(nextProps, nextState) {
@@ -49,35 +95,17 @@ var WWire = React.createClass({
 		EtherMovementStore.unregisterWire(this.props.key);
 	},
 	render() {
-		var pFrom = this.props.connection.fromPoint;
-		var pTo = this.props.connection.toPoint;
-		var lineWidthHalf = Math.ceil(this.props.width / 2);
-		var lineWidth = lineWidthHalf * 2;
+		console.log('WWire ' + this.props.key);
+		var cn = this.props.connection;
+		var frame = calculateFrame(cn.fromPoint, cn.toPoint, this.props.width);
+		this.bezier = calculateBezierPoints(frame, cn.fromPoint, cn.toPoint, this.props.width);
 
-		if (pFrom.x > pTo.x) {
-			// TODO: draw the wire to a previous location
+		if (this.bezier === null) {
 			this.context = null;
 			return null;
 		}
 
-		var left = pFrom.x;
-		var width = pTo.x - pFrom.x;
-		var top = Math.min(pTo.y, pFrom.y);
-		var height = Math.abs(pTo.y - pFrom.y) + lineWidth;
-
-		if (pFrom.y < pTo.y) {
-			this.pStart = new Point(0,              lineWidthHalf);
-			this.pEnd   = new Point(width, height - lineWidthHalf);
-		} else {
-			this.pStart = new Point(0,     height - lineWidthHalf);
-			this.pEnd   = new Point(width,          lineWidthHalf);
-		}
-		this.lineWidth = lineWidth;
-		this.pContext1 = new Point(Math.min(0.5 * width, 200), this.pStart.y);
-		this.pContext2 = new Point(Math.min(0.5 * width, 200), this.pEnd.y);
-
-		var style = { left: left + 'px', top: top + 'px' };
-		return <canvas className="wire" width={width} height={height} style={style} />;
+		return <canvas className="wire" width={frame.width} height={frame.height} style={{left:frame.x+'px', top:frame.y+'px'}} />;
 	}
 });
 module.exports = WWire;

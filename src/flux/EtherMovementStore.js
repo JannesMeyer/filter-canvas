@@ -26,6 +26,7 @@ var requestId;
 // for position information instead of the WorkbenchStore.
 
 function update() {
+	console.log('\nanimation frame');
 	var delta = lastMousePos.subtract(startMousePos);
 	var wiresToBeRedrawn = {};
 
@@ -43,7 +44,6 @@ function update() {
 				connection.toPoint = connection.toOffset.add(frame);
 			}
 			wiresToBeRedrawn[cId] = null;
-			// wires[cId].forceUpdate();
 		});
 
 		// Re-draw filter position
