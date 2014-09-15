@@ -28,12 +28,13 @@ var SelectionStore = BaseStore.createStore({
 	isSelecting() {
 		return isSelecting;
 	},
-	isItemSelected(type, id) {
+	isItemSelected(id) {
 		// TODO: remove type and make ids unique
 		return selectedItems.contains(id) || itemsInsideSelection.contains(id);
 	},
 	getSelectedItemIds() {
-		return selectedItems;
+		// TODO: don't recalculate this union everytime
+		return selectedItems.union(itemsInsideSelection);
 	}
 });
 module.exports = SelectionStore;

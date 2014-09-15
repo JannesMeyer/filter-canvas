@@ -6,10 +6,16 @@ var Workbench = require('./Workbench.react');
 var Repository = require('./Repository.react');
 var Actions = require('./Actions.react');
 
+function confirmPageUnload(ev) {
+	var message = 'You are leaving the page with unsaved changes.'
+	ev.returnValue = message;
+	return message;
+}
+
 // Attach event listeners for global mouse events. It's more accurate
 // to do it on the `window` object rather than on a DOM node like React is doing.
 if (addEventListener) {
-	addEventListener('mousemove', function(ev) {
+	addEventListener('mousemove', ev => {
 		if (EtherMovementStore.isDragging()) {
 			return AppActions.moveSelectedItems(ev.clientX, ev.clientY);
 		}
@@ -18,7 +24,7 @@ if (addEventListener) {
 		}
 	});
 
-	addEventListener('mouseup', function(ev) {
+	addEventListener('mouseup', ev => {
 		if (ev.button !== 0) {
 			return;
 		}
@@ -31,6 +37,25 @@ if (addEventListener) {
 			return;
 		}
 	});
+
+	// TODO: catch backspace, del, cmd+a, ctrl+a, ctrl+z, ctrl+shift+z
+	addEventListener('keydown', ev => {
+		var code = ev.keyCode;
+		if (code === 8) {
+			// backspace
+			AppActions.deleteSelectedItems();
+			ev.preventDefault();
+		} else if (code === 46) {
+			// delete
+			AppActions.deleteSelectedItems();
+			ev.preventDefault();
+		}
+	});
+
+	// TODO: save architecture in localstorage
+	// TODO: check for unsaved changes
+	// addEventListener('beforeunload', confirmPageUnload);
+	// removeEventListener('beforeunload', confirmPageUnload);
 }
 
 var App = React.createClass({

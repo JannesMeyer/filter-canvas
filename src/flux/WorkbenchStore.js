@@ -150,6 +150,23 @@ Dispatcher.register(function(action) {
 		// TODO: redraw wires?
 		return;
 
+		case Constants.DELETE_SELECTED_ITEMS:
+		var connectionDeleteList = immutable.Set().asMutable();
+		filters = filters.withMutations(filters => {
+			action.selectedItems.forEach(id => {
+				// Collect connections to delete
+				connectionDeleteList.union(filters.getIn([id, 'connections']));
+
+				// Delete filter
+				filters.delete(id);
+			});
+		});
+		connectionDeleteList.forEach(id => {
+			delete connections[id];
+		});
+		WorkbenchStore.emitChange();
+		return;
+
 		case Constants.ITEM_CLICKED:
 		console.log('item clicked:', action.id);
 		return;

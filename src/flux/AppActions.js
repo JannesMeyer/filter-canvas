@@ -40,12 +40,35 @@ function getSelectionType(ev, isItemSelected) {
  */
 var AppActions = {
 
+	importFile(contents) {
+		console.log('TODO: import file');
+	},
+
+	exportFile() {
+		console.log('TODO: export file');
+	},
+
+	undo() {
+		console.log('TODO: undo');
+	},
+
+	redo() {
+		console.log('TODO: redo');
+	},
+
 	createFilter(id, x, y) {
 		Dispatcher.dispatch({ actionType: Constants.CREATE_FILTER, id, x, y });
 	},
 
+	deleteSelectedItems() {
+		Dispatcher.dispatch({
+			actionType: Constants.DELETE_SELECTED_ITEMS,
+			selectedItems: SelectionStore.getSelectedItemIds()
+		});
+	},
+
 	startMovingSelectedItems(type, id, event) {
-		var selected = SelectionStore.isItemSelected(type, id);
+		var selected = SelectionStore.isItemSelected(id);
 		var selectionType = getSelectionType(event, selected);
 		if (selectionType === null) {
 			return;

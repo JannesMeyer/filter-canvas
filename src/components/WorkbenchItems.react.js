@@ -6,6 +6,63 @@ var WWire = require('./WWire.react');
 var Point = require('../lib/ImmutablePoint');
 var Rect = require('../lib/ImmutableRect');
 
+var WorkbenchItems = React.createClass({
+	_handleChange() {
+		this.forceUpdate();
+	},
+	componentDidMount() {
+		WorkbenchStore.addChangeListener(this._handleChange);
+		EtherMovementStore.addChangeListener(this._handleChange);
+		SelectionStore.addChangeListener(this._handleChange);
+	},
+	componentWillUnmount() {
+		WorkbenchStore.removeChangeListener(this._handleChange);
+		EtherMovementStore.removeChangeListener(this._handleChange);
+		SelectionStore.removeChangeListener(this._handleChange);
+	},
+	render() {
+		var filters = WorkbenchStore.getAllFilters();
+		var connections = WorkbenchStore.getAllConnections();
+		var lineWidth = WorkbenchStore.getWireWidth();
+		var isDragging = EtherMovementStore.isDragging();
+
+		return (
+			<div className="m-workbench-items">
+				{filters.map((filter, id) => {
+					var frame = null;
+					var isSelected = SelectionStore.isItemSelected(id);
+					if (isSelected && isDragging) {
+						frame = EtherMovementStore.getItemPosition(id);
+					}
+					return <WFilter key={id} filter={filter} frame={frame} isSelected={isSelected} />;
+				}).toArray()}
+
+				{connections.map((con, id) => {
+					var isSelected1 = SelectionStore.isItemSelected(con.fromFilter);
+					var isSelected2 = SelectionStore.isItemSelected(con.toFilter);
+
+					// TODO: Remove EtherMovementStore
+					if (isSelected1 && isDragging) {
+						var startPoint = EtherMovementStore.getItemPosition(con.fromFilter).moveBy(con.fromOffset);
+					} else {
+						var startPoint = filters.getIn([con.fromFilter, 'rect']).moveBy(con.fromOffset);
+					}
+					if (isSelected2 && isDragging) {
+						var endPoint = EtherMovementStore.getItemPosition(con.toFilter).moveBy(con.toOffset);
+					} else {
+						var endPoint = filters.getIn([con.toFilter, 'rect']).moveBy(con.toOffset);
+					}
+					var frame = calculateFrame(startPoint, endPoint, lineWidth);
+					var bezier = calculateBezierPoints(frame, startPoint, endPoint, lineWidth);
+
+					return <WWire key={id} frame={frame} bezier={bezier} width={lineWidth} />;
+				})}
+			</div>
+		);
+	}
+});
+module.exports = WorkbenchItems;
+
 function calculateFrame(startPoint, endPoint, lineWidth) {
 	var orderedX = startPoint.x < endPoint.x;
 	var orderedY = startPoint.y < endPoint.y;
@@ -53,59 +110,3 @@ function calculateBezierPoints(frame, startPoint, endPoint, lineWidth) {
 	}
 	return [p0, p1, p2, p3];
 }
-
-var WorkbenchItems = React.createClass({
-	_handleChange() {
-		this.forceUpdate();
-	},
-	componentDidMount() {
-		WorkbenchStore.addChangeListener(this._handleChange);
-		EtherMovementStore.addChangeListener(this._handleChange);
-		SelectionStore.addChangeListener(this._handleChange);
-	},
-	componentWillUnmount() {
-		WorkbenchStore.removeChangeListener(this._handleChange);
-		EtherMovementStore.removeChangeListener(this._handleChange);
-		SelectionStore.removeChangeListener(this._handleChange);
-	},
-	render() {
-		var filters = WorkbenchStore.getAllFilters();
-		var connections = WorkbenchStore.getAllConnections();
-		var lineWidth = WorkbenchStore.getWireWidth();
-		var isDragging = EtherMovementStore.isDragging();
-
-		return (
-			<div className="m-workbench-items">
-				{filters.map((filter, id) => {
-					var frame = null;
-					var isSelected = SelectionStore.isItemSelected('Filter', id);
-					if (isSelected && isDragging) {
-						frame = EtherMovementStore.getItemPosition(id);
-					}
-					return <WFilter key={id} filter={filter} frame={frame} isSelected={isSelected} />;
-				}).toArray()}
-
-				{connections.map((con, id) => {
-					var isSelected1 = SelectionStore.isItemSelected('Filter', con.fromFilter);
-					var isSelected2 = SelectionStore.isItemSelected('Filter', con.toFilter);
-
-					if (isSelected1 && isDragging) {
-						var startPoint = EtherMovementStore.getItemPosition(con.fromFilter).moveBy(con.fromOffset);
-					} else {
-						var startPoint = filters.getIn([con.fromFilter, 'rect']).moveBy(con.fromOffset);
-					}
-					if (isSelected2 && isDragging) {
-						var endPoint = EtherMovementStore.getItemPosition(con.toFilter).moveBy(con.toOffset);
-					} else {
-						var endPoint = filters.getIn([con.toFilter, 'rect']).moveBy(con.toOffset);
-					}
-					var frame = calculateFrame(startPoint, endPoint, lineWidth);
-					var bezier = calculateBezierPoints(frame, startPoint, endPoint, lineWidth);
-
-					return <WWire key={id} frame={frame} bezier={bezier} width={lineWidth} />;
-				})}
-			</div>
-		);
-	}
-});
-module.exports = WorkbenchItems;

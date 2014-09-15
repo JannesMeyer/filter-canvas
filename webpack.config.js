@@ -61,10 +61,10 @@ var config = {
 };
 
 if ('production' === process.env.NODE_ENV) {
-	// config.plugins.push(new webpack.optimize.DedupePlugin());
-	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
 	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
-	config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+	config.plugins.push(new webpack.optimize.DedupePlugin());
+	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
+	// config.plugins.push(new webpack.optimize.UglifyJsPlugin());
 }
 
 module.exports = config;

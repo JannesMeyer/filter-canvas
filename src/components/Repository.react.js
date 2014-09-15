@@ -2,6 +2,7 @@ var RepositoryStore = require('../flux/RepositoryStore');
 
 var RFilter = require('./RFilter.react');
 var RPipe = require('./RPipe.react');
+var DetailPane = require('./DetailPane.react');
 
 var Repository = React.createClass({
 	render() {
@@ -19,6 +20,7 @@ var Repository = React.createClass({
 						{pipes.map((_, key) => <RPipe key={key} />).toArray()}
 					</div>
 				</div>
+				<DetailPane />
 			</div>
 		);
 	}
