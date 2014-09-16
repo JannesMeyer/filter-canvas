@@ -11,6 +11,9 @@ var isMacBrowser = Boolean(isBrowser && navigator.platform && navigator.platform
 
 /**
  * We're using these to map from strings to key codes
+ *
+ * Only some keys work in Safari during fullscreen mode:
+ * tab, enter, space, left, up, right, down, ; = , - . / ` [\ ] '
  */
 var keyCodeMap = {
 	'backspace': 8,
@@ -29,6 +32,7 @@ var keyCodeMap = {
 	'end': 35,
 	'pageup': 33,
 	'pagedown': 34,
+	// TODO: F1-F12
 	',': 188,
 	'.': 190,
 	'/': 191,
@@ -130,10 +134,11 @@ if (isBrowser) {
 			return;
 		}
 
-		var isInputEl = ev.target.tagName === 'INPUT' ||
-		                ev.target.tagName === 'TEXTAREA' ||
-		                ev.target.tagName === 'SELECT' ||
-		                ev.target.isContentEditable;
+		var element = ev.target;
+		var isInputEl = element.tagName === 'INPUT' ||
+		                element.tagName === 'TEXTAREA' ||
+		                element.tagName === 'SELECT' ||
+		                element.isContentEditable;
 
 		for (var i = 0; i < bindingList.length; ++i) {
 			var binding = bindingList[i];
@@ -155,29 +160,3 @@ if (isBrowser) {
 		}
 	});
 }
-
-/*
-	Only some keys work in Safari in fullscreen mode
-	9 	tab
-	13	enter
-	32	space
-	37	left
-	38	up
-	39	right
-	40	down
-
-	112	F1
-	123 F12
-
-	186	;
-	187	=
-	188	,
-	189	-
-	190	.
-	191	/
-	192 `
-	219	[
-	220	\
-	221	]
-	222	"
-*/
