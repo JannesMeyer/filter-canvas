@@ -1,9 +1,21 @@
 var AppActions = require('../flux/AppActions');
+var WorkbenchStore = require('../flux/WorkbenchStore');
 
 var Actions = React.createClass({
-	// Show file picker
+	getInitialState() {
+		return {
+			undoSteps: WorkbenchStore.hasUndoSteps(),
+			redoSteps: WorkbenchStore.hasRedoSteps()
+		};
+	},
+	shouldComponentUpdate(nextProps, nextState) {
+		return this.state.undoSteps !== nextState.undoSteps ||
+		       this.state.redoSteps !== nextState.redoSteps;
+	},
 	handleImport(ev) {
 		if (ev.button !== 0) { return; }
+
+		// Show file picker
 		this.refs.fileInput.getDOMNode().click();
 	},
 	handleFileChange(ev) {
@@ -49,10 +61,19 @@ var Actions = React.createClass({
 				<input type="file" className="hidden" onChange={this.handleFileChange} ref="fileInput" />
 				<button onClick={this.handleImport}>Import file</button>
 				<button onClick={this.handleExport}>Export file</button>
-				<button onClick={this.handleUndo}>Undo</button>
-				<button onClick={this.handleRedo}>Redo</button>
+				<button onClick={this.handleUndo} disabled={!this.state.undoSteps}>Undo</button>
+				<button onClick={this.handleRedo} disabled={!this.state.redoSteps}>Redo</button>
 			</div>
 		);
+	},
+	_handleChange() {
+		this.replaceState(this.getInitialState());
+	},
+	componentDidMount() {
+		WorkbenchStore.addChangeListener(this._handleChange);
+	},
+	componentWillUnmount() {
+		WorkbenchStore.removeChangeListener(this._handleChange);
 	}
 });
 module.exports = Actions;

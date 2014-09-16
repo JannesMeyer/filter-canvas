@@ -1,3 +1,4 @@
+var WorkbenchStore = require('./WorkbenchStore');
 var	SelectionStore = require('./SelectionStore');
 var EtherMovementStore = require('./EtherMovementStore');
 var Point = require('../lib/ImmutablePoint');
@@ -49,11 +50,11 @@ var AppActions = {
 	},
 
 	undo() {
-		console.log('TODO: undo');
+		Dispatcher.dispatch({ actionType: Constants.UNDO });
 	},
 
 	redo() {
-		console.log('TODO: redo');
+		Dispatcher.dispatch({ actionType: Constants.REDO });
 	},
 
 	createFilter(id, x, y) {

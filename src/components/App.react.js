@@ -39,6 +39,7 @@ if (addEventListener) {
 	});
 
 	// TODO: catch backspace, del, cmd+a, ctrl+a, ctrl+z, ctrl+shift+z
+	// TODO: maybe even copy and paste (cmd+c, cmd+v)
 	addEventListener('keydown', ev => {
 		var code = ev.keyCode;
 		if (code === 8) {

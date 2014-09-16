@@ -45,19 +45,18 @@ Dispatcher.register(function(action) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
 		startMousePos = action.mousePos;
 
-		var filters = WorkbenchStore.getAllFilters();
+		var items = WorkbenchStore.getAllItems();
 		SelectionStore.getSelectedItemIds().forEach(id => {
-			itemPositions[id] = filters.getIn([id, 'rect']);
+			itemPositions[id] = items.getIn([id, 'rect']);
 		});
 		isDragging = true;
 		return;
 
 		case Constants.MOVING_SELECTED_ITEMS:
 		var delta = action.mousePos.subtract(startMousePos);
-		// TODO: use getAllItems()
-		var filters = WorkbenchStore.getAllFilters();
+		var items = WorkbenchStore.getAllItems();
 		SelectionStore.getSelectedItemIds().forEach(id => {
-			itemPositions[id] = filters.getIn([id, 'rect']).moveBy(delta);
+			itemPositions[id] = items.getIn([id, 'rect']).moveBy(delta);
 		});
 
 		// if (requestId) {

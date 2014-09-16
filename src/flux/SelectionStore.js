@@ -43,46 +43,46 @@ module.exports = SelectionStore;
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
-		if (action.type !== Constants.ITEM_TYPE_FILTER) {
-			throw new Error('Unknown item type');
-		}
-		selectedItems = selectedItems.add(action.id);
-
-		SelectionStore.emitChange();
+			if (action.type !== Constants.ITEM_TYPE_FILTER) {
+				throw new Error('Unknown item type');
+			}
+			selectedItems = selectedItems.add(action.id);
+			SelectionStore.emitChange();
 		return;
 
 		case Constants.START_SELECTION:
-		startScrollPos = action.scrollPos;
-		startPos = lastPos = startScrollPos.add(action.mousePos);
-		isSelecting = true;
+			startScrollPos = action.scrollPos;
+			startPos = lastPos = startScrollPos.add(action.mousePos);
+			isSelecting = true;
 		return;
 
 		case Constants.RESIZE_SELECTION:
-		// Find itemsInsideSelection
-		lastPos = startScrollPos.add(action.mousePos);
-		var rect = SelectionStore.getSelectionRect();
-		itemsInsideSelection = WorkbenchStore.getFiltersCoveredBy(rect).keys().toSet();
-
-		SelectionStore.emitChange();
+			// Find itemsInsideSelection
+			lastPos = startScrollPos.add(action.mousePos);
+			var rect = SelectionStore.getSelectionRect();
+			itemsInsideSelection = WorkbenchStore.getItemsCoveredBy(rect).keys().toSet();
+			SelectionStore.emitChange();
 		return;
 
 		case Constants.FINISH_SELECTION:
-		// Transfer itemsInsideSelection
-		selectedItems = selectedItems.union(itemsInsideSelection);
-		itemsInsideSelection = itemsInsideSelection.clear();
-		isSelecting = false;
-
-		SelectionStore.emitChange();
+			// Transfer itemsInsideSelection
+			selectedItems = selectedItems.union(itemsInsideSelection);
+			itemsInsideSelection = itemsInsideSelection.clear();
+			isSelecting = false;
+			SelectionStore.emitChange();
 		return;
 
 		case Constants.CANCEL_SELECTION:
-		isSelecting = false;
+			isSelecting = false;
 		return;
 
 		case Constants.CLEAR_SELECTED_ITEMS:
-		selectedItems = selectedItems.clear();
+			selectedItems = selectedItems.clear();
+			SelectionStore.emitChange();
+		return;
 
-		SelectionStore.emitChange();
+		case Constants.CREATE_FILTER:
+			// TODO: waitFor WorkbenchStore and then select the latest id
 		return;
 	}
 });

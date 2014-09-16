@@ -21,42 +21,48 @@ var WorkbenchItems = React.createClass({
 		SelectionStore.removeChangeListener(this._handleChange);
 	},
 	render() {
-		var filters = WorkbenchStore.getAllFilters();
+		var items = WorkbenchStore.getAllItems();
 		var connections = WorkbenchStore.getAllConnections();
 		var lineWidth = WorkbenchStore.getWireWidth();
 		var isDragging = EtherMovementStore.isDragging();
 
 		return (
 			<div className="m-workbench-items">
-				{filters.map((filter, id) => {
+				{items.map((item, id) => {
 					var frame = null;
 					var isSelected = SelectionStore.isItemSelected(id);
 					if (isSelected && isDragging) {
 						frame = EtherMovementStore.getItemPosition(id);
 					}
-					return <WFilter key={id} filter={filter} frame={frame} isSelected={isSelected} />;
+					// TODO: item.type
+					return <WFilter key={id} filter={item} frame={frame} isSelected={isSelected} />;
 				}).toArray()}
 
-				{connections.map((con, id) => {
-					var isSelected1 = SelectionStore.isItemSelected(con.fromFilter);
-					var isSelected2 = SelectionStore.isItemSelected(con.toFilter);
+				{connections.map((cn, id) => {
+					var fromItem = cn.get('fromItem');
+					var fromOffset = cn.get('fromOffset');
+					var toItem = cn.get('toItem');
+					var toOffset = cn.get('toOffset');
+
+					var isSelected1 = SelectionStore.isItemSelected(fromItem);
+					var isSelected2 = SelectionStore.isItemSelected(toItem);
 
 					// TODO: Remove EtherMovementStore
 					if (isSelected1 && isDragging) {
-						var startPoint = EtherMovementStore.getItemPosition(con.fromFilter).moveBy(con.fromOffset);
+						var startPoint = EtherMovementStore.getItemPosition(fromItem).moveBy(fromOffset);
 					} else {
-						var startPoint = filters.getIn([con.fromFilter, 'rect']).moveBy(con.fromOffset);
+						var startPoint = items.getIn([fromItem, 'rect']).moveBy(fromOffset);
 					}
 					if (isSelected2 && isDragging) {
-						var endPoint = EtherMovementStore.getItemPosition(con.toFilter).moveBy(con.toOffset);
+						var endPoint = EtherMovementStore.getItemPosition(toItem).moveBy(toOffset);
 					} else {
-						var endPoint = filters.getIn([con.toFilter, 'rect']).moveBy(con.toOffset);
+						var endPoint = items.getIn([toItem, 'rect']).moveBy(toOffset);
 					}
 					var frame = calculateFrame(startPoint, endPoint, lineWidth);
 					var bezier = calculateBezierPoints(frame, startPoint, endPoint, lineWidth);
 
 					return <WWire key={id} frame={frame} bezier={bezier} width={lineWidth} />;
-				})}
+				}).toArray()}
 			</div>
 		);
 	}
