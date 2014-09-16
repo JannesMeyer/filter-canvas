@@ -1,13 +1,14 @@
 var AppActions = require('../flux/AppActions');
 var SelectionStore = require('../flux/SelectionStore');
 var EtherMovementStore = require('../flux/EtherMovementStore');
+var keypress = require('../lib/keypress-tool');
 
 var Workbench = require('./Workbench.react');
 var Repository = require('./Repository.react');
 var Actions = require('./Actions.react');
 
 function confirmPageUnload(ev) {
-	var message = 'You are leaving the page with unsaved changes.'
+	var message = 'You have unsaved changes.';
 	ev.returnValue = message;
 	return message;
 }
@@ -38,25 +39,21 @@ if (addEventListener) {
 		}
 	});
 
-	// TODO: catch backspace, del, cmd+a, ctrl+a, ctrl+z, ctrl+shift+z
-	// TODO: maybe even copy and paste (cmd+c, cmd+v)
-	addEventListener('keydown', ev => {
-		var code = ev.keyCode;
-		if (code === 8) {
-			// backspace
-			AppActions.deleteSelectedItems();
-			ev.preventDefault();
-		} else if (code === 46) {
-			// delete
-			AppActions.deleteSelectedItems();
-			ev.preventDefault();
-		}
-	});
+	// TODO: left, right, up, down
+	// Register global keyboard shortcuts
+	keypress.on('backspace',           AppActions.deleteSelectedItems);
+	keypress.on('del',                 AppActions.deleteSelectedItems);
+	keypress.on('z', ['ctrl'],         AppActions.undo);
+	keypress.on('z', ['ctrl','shift'], AppActions.redo);
+	keypress.on('y', ['ctrl'],         AppActions.redo);
+	keypress.on('a', ['ctrl'], ev => alert('select all'));
+	keypress.on('s', ['ctrl'], ev => alert('export'));
+	keypress.on('o', ['ctrl'], ev => alert('import'));
 
 	// TODO: save architecture in localstorage
-	// TODO: check for unsaved changes
 	// addEventListener('beforeunload', confirmPageUnload);
-	// removeEventListener('beforeunload', confirmPageUnload);
+	// TODO: check for unsaved changes
+	// TODO: removeEventListener('beforeunload', confirmPageUnload);
 }
 
 var App = React.createClass({

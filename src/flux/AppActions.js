@@ -5,6 +5,7 @@ var Point = require('../lib/ImmutablePoint');
 var Dispatcher = require('./dispatcher');
 var Constants = require('./constants');
 
+// TODO: move this to `lib/mouse-tool.js` or something like that
 /**
  * Usually user agent checking is a bad practice. But in this case we're using it to determine
  * which key has to be pressed to trigger multiple selection.
@@ -102,19 +103,16 @@ var AppActions = {
 		var mousePos = new Point(event.clientX, event.clientY);
 		var delta = EtherMovementStore.getAmountDragged(mousePos);
 
+		// Only a click
 		if (delta.isZero()) {
-			// TODO: make sure this is correct
-			Dispatcher.dispatch({
-				actionType: Constants.ITEM_CLICKED
-				// id: SelectionStore.getSelectedItemIds().first()
-			});
-		} else {
-			Dispatcher.dispatch({
-				actionType: Constants.MOVE_SELECTED_ITEMS_BY,
-				selectedItems: SelectionStore.getSelectedItemIds(),
-				delta: delta
-			});
+			return;
 		}
+
+		Dispatcher.dispatch({
+			actionType: Constants.MOVE_SELECTED_ITEMS_BY,
+			selectedItems: SelectionStore.getSelectedItemIds(),
+			delta: delta
+		});
 
 		event.preventDefault();
 		event.stopPropagation();
