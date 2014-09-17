@@ -154,6 +154,10 @@ var AppActions = {
 
 		event.preventDefault();
 		event.stopPropagation();
+	},
+
+	selectAll() {
+		Dispatcher.dispatch({ actionType: Constants.SELECT_ALL });
 	}
 
 };

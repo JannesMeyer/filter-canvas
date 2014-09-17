@@ -21,6 +21,7 @@ module.exports = keyMirror({
 	CLEAR_SELECTED_ITEMS: null,
 	ITEM_CLICKED: null,
 
+	SELECT_ALL: null,
 	START_SELECTION: null,
 	RESIZE_SELECTION: null,
 	FINISH_SELECTION: null,

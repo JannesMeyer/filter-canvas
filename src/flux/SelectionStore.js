@@ -84,5 +84,10 @@ Dispatcher.register(function(action) {
 		case Constants.CREATE_FILTER:
 			// TODO: waitFor WorkbenchStore and then select the latest id
 		return;
+
+		case Constants.SELECT_ALL:
+			selectedItems = WorkbenchStore.getAllItems().keys().toSet();
+			SelectionStore.emitChange();
+		return;
 	}
 });

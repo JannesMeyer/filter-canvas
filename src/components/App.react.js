@@ -46,9 +46,9 @@ if (addEventListener) {
 	keypress.on('z', ['ctrl'],         AppActions.undo);
 	keypress.on('z', ['ctrl','shift'], AppActions.redo);
 	keypress.on('y', ['ctrl'],         AppActions.redo);
-	keypress.on('a', ['ctrl'], ev => alert('select all'));
-	keypress.on('s', ['ctrl'], ev => alert('export'));
-	keypress.on('o', ['ctrl'], ev => alert('import'));
+	keypress.on('a', ['ctrl'],         AppActions.selectAll);
+	keypress.on('s', ['ctrl'],         AppActions.exportFile);
+	keypress.on('o', ['ctrl'],         AppActions.importFile);
 
 	// TODO: save architecture in localstorage
 	// addEventListener('beforeunload', confirmPageUnload);
