@@ -1,12 +1,14 @@
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var EtherMovementStore = require('../flux/EtherMovementStore');
 var SelectionStore = require('../flux/SelectionStore');
-var WFilter = require('./WFilter.react');
-var WWire = require('./WWire.react');
 var Point = require('../lib/ImmutablePoint');
 var Rect = require('../lib/ImmutableRect');
 
+var WItem = require('./WItem.react');
+var WWire = require('./WWire.react');
+
 var WorkbenchItems = React.createClass({
+
 	getInitialState() {
 		return {
 			items: WorkbenchStore.getAllItems(),
@@ -15,16 +17,19 @@ var WorkbenchItems = React.createClass({
 			isDragging: EtherMovementStore.isDragging()
 		};
 	},
+
 	componentDidMount() {
 		WorkbenchStore.addChangeListener(this._handleChange);
 		EtherMovementStore.addChangeListener(this._handleChange);
 		SelectionStore.addChangeListener(this._handleChange);
 	},
+
 	componentWillUnmount() {
 		WorkbenchStore.removeChangeListener(this._handleChange);
 		EtherMovementStore.removeChangeListener(this._handleChange);
 		SelectionStore.removeChangeListener(this._handleChange);
 	},
+
 	render() {
 		var items = this.state.items.toArray();
 		var connections = this.state.connections.toArray();
@@ -37,8 +42,7 @@ var WorkbenchItems = React.createClass({
 					if (isSelected && this.state.isDragging) {
 						frame = EtherMovementStore.getItemPosition(id);
 					}
-					// TODO: item.type
-					return <WFilter key={id} filter={item} frame={frame} isSelected={isSelected} />;
+					return <WItem key={id} item={item} frame={frame} isSelected={isSelected} />;
 				})}
 
 				{connections.map((cn, id) => {
@@ -69,9 +73,11 @@ var WorkbenchItems = React.createClass({
 			</div>
 		);
 	},
+
 	_handleChange() {
 		this.replaceState(this.getInitialState());
 	}
+
 });
 module.exports = WorkbenchItems;
 

@@ -2,21 +2,26 @@ var SelectionStore = require('../flux/SelectionStore');
 var AppActions = require('../flux/AppActions');
 
 var DetailPane = React.createClass({
+
 	getInitialState() {
 		return {
 			selectedItems: SelectionStore.getSelectedItemIds()
 		};
 	},
-	componentDidMount() {
-		SelectionStore.addChangeListener(this._handleChange);
-	},
-	componentWillUnmount() {
-		SelectionStore.removeChangeListener(this._handleChange);
-	},
+
 	handleDeleteClick(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.deleteSelectedItems();
 	},
+
+	componentDidMount() {
+		SelectionStore.addChangeListener(this._handleChange);
+	},
+
+	componentWillUnmount() {
+		SelectionStore.removeChangeListener(this._handleChange);
+	},
+
 	render() {
 		var numItems = this.state.selectedItems.length;
 
@@ -52,8 +57,10 @@ var DetailPane = React.createClass({
 			</div>
 		);
 	},
+
 	_handleChange() {
 		this.replaceState(this.getInitialState());
 	}
+
 });
 module.exports = DetailPane;

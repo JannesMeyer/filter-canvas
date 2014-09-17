@@ -1,22 +1,30 @@
 var AppActions = require('../flux/AppActions');
 var WorkbenchStore = require('../flux/WorkbenchStore');
+var keypress = require('../lib/keypress-tool');
 
 var Actions = React.createClass({
+
 	getInitialState() {
 		return {
 			undoSteps: WorkbenchStore.hasUndoSteps(),
 			redoSteps: WorkbenchStore.hasRedoSteps()
 		};
 	},
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state.undoSteps !== nextState.undoSteps ||
 		       this.state.redoSteps !== nextState.redoSteps;
 	},
-	handleImport(ev) {
-		if (ev.button !== 0) { return; }
-		// Show file picker
+
+	pickImportFile() {
 		this.refs.fileInput.getDOMNode().click();
 	},
+
+	handleImport(ev) {
+		if (ev.button !== 0) { return; }
+		this.pickImportFile();
+	},
+
 	handleFileChange(ev) {
 		var files = this.refs.fileInput.getDOMNode().files;
 		if (files.length === 0) {
@@ -39,24 +47,40 @@ var Actions = React.createClass({
 		});
 		reader.readAsText(files[0]);
 	},
+
 	handleExport(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.exportFile();
 	},
+
 	handleUndo(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.undo();
 	},
+
 	handleRedo(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.redo();
 	},
+
 	componentDidMount() {
 		WorkbenchStore.addChangeListener(this._handleChange);
+		keypress.on('o', ['ctrl'],         this.pickImportFile);
+		keypress.on('s', ['ctrl'],         AppActions.exportFile);
+		keypress.on('z', ['ctrl'],         AppActions.undo);
+		keypress.on('z', ['ctrl','shift'], AppActions.redo);
+		keypress.on('y', ['ctrl'],         AppActions.redo);
 	},
+
 	componentWillUnmount() {
 		WorkbenchStore.removeChangeListener(this._handleChange);
+		keypress.off('o', ['ctrl'],         this.pickImportFile);
+		keypress.off('s', ['ctrl'],         AppActions.exportFile);
+		keypress.off('z', ['ctrl'],         AppActions.undo);
+		keypress.off('z', ['ctrl','shift'], AppActions.redo);
+		keypress.off('y', ['ctrl'],         AppActions.redo);
 	},
+
 	render() {
 		return (
 			<div className="m-actions">
@@ -68,8 +92,10 @@ var Actions = React.createClass({
 			</div>
 		);
 	},
+
 	_handleChange() {
 		this.replaceState(this.getInitialState());
 	}
+
 });
 module.exports = Actions;

@@ -27,7 +27,7 @@ var App = React.createClass({
 		}
 	},
 
-	handleUnload(ev) {
+	confirmPageUnload(ev) {
 		var message = 'You have unsaved changes.';
 		ev.returnValue = message;
 		return message;
@@ -37,36 +37,25 @@ var App = React.createClass({
 		// Register global event handlers
 		addEventListener('mousemove', this.handleMouseMove);
 		addEventListener('mouseup',   this.handleMouseUp);
-		keypress.on('backspace',           AppActions.deleteSelectedItems);
-		keypress.on('del',                 AppActions.deleteSelectedItems);
-		keypress.on('z', ['ctrl'],         AppActions.undo);
-		keypress.on('z', ['ctrl','shift'], AppActions.redo);
-		keypress.on('y', ['ctrl'],         AppActions.redo);
-		keypress.on('a', ['ctrl'],         AppActions.selectAll);
-		keypress.on('esc',                 AppActions.cancel);
-		keypress.on('s', ['ctrl'],         AppActions.exportFile);
-		// TODO: what about the file picker?
-		keypress.on('o', ['ctrl'],         AppActions.importFile);
+		keypress.on('backspace',   AppActions.deleteSelectedItems);
+		keypress.on('del',         AppActions.deleteSelectedItems);
+		keypress.on('a', ['ctrl'], AppActions.selectAll);
+		keypress.on('esc',         AppActions.cancel);
 		// TODO: left, right, up, down
 
 		// TODO: save architecture in localstorage
-		// addEventListener('beforeunload', this.handleUnload);
+		// addEventListener('beforeunload', this.confirmPageUnload);
 		// TODO: check for unsaved changes
-		// TODO: removeEventListener('beforeunload', this.handleUnload);
+		// TODO: removeEventListener('beforeunload', this.confirmPageUnload);
 	},
 
 	componentWillUnmount() {
 		removeEventListener('mousemove', this.handleMouseMove);
 		removeEventListener('mouseup',   this.handleMouseUp);
-		keypress.off('backspace',           AppActions.deleteSelectedItems);
-		keypress.off('del',                 AppActions.deleteSelectedItems);
-		keypress.off('z', ['ctrl'],         AppActions.undo);
-		keypress.off('z', ['ctrl','shift'], AppActions.redo);
-		keypress.off('y', ['ctrl'],         AppActions.redo);
-		keypress.off('a', ['ctrl'],         AppActions.selectAll);
-		keypress.off('esc',                 AppActions.cancel);
-		keypress.off('s', ['ctrl'],         AppActions.exportFile);
-		keypress.off('o', ['ctrl'],         AppActions.importFile);
+		keypress.off('backspace',   AppActions.deleteSelectedItems);
+		keypress.off('del',         AppActions.deleteSelectedItems);
+		keypress.off('a', ['ctrl'], AppActions.selectAll);
+		keypress.off('esc',         AppActions.cancel);
 	},
 
 	render() {

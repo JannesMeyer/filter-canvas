@@ -25,77 +25,82 @@ body
 	position: relative
 	overflow: auto
 
-	> .m-selection
+.m-workbench-items
+	height: 100%
+	min-width: 200%
+	position: relative
+
+	> .filter,
+	> .pipe
 		position: absolute
-		z-index: 9999
 		// left, top, width, height
-		background: rgba(51, 181, 229, 0.2)
-		border: 1px solid rgba(0, 102, 255, 0.5)
-		transition: opacity 0.15s
-		pointer-events: none
+		border: 1px solid #000
+		cursor: move
+		z-index: 10
 
-	> .m-workbench-items
-		height: 100%
-		min-width: 200%
-		position: relative
-
-		> .wire
-			position: absolute
-			z-index: 0
-
-		> .filter
-			position: absolute
-			// left, top, width, height
-			border: 1px solid #000
-			background: #fff
-			cursor: move
-			z-index: 10
-
-			> h4
-				line-height: 20px // an even number
-				white-space: nowrap
-				overflow: hidden
-				text-overflow: ellipsis
-				text-align: center
-				position: relative
-				top: 50%
-				margin: 0 4px
-				margin-top: -0.5 * @line-height
-
-			> .inputs,
-			> .outputs
-				position: absolute
-				top: 50%
-				transform: translateY(-50%)
-				> .connector
-					position: relative
-					width: 12px
-					height: 8px
-					margin-top: 4px
-					margin-bottom: 4px
-					background: #000
-					cursor: pointer
-
-			> .inputs
-				left: 0
-				> .connector
-					left: -7px
-
-			> .outputs
-				right: 0
-				> .connector
-					right: -7px
-
-		> .filter.selected
+		&.selected
 			color: #114dcc
 			background: #f5f8ff
 			border-color: @color
-
-			.connector
+			> .inputs > .connector,
+			> .outputs > .connector
 				background: @color
 
+		> h4
+			line-height: 20px // an even number
+			white-space: nowrap
+			overflow: hidden
+			text-overflow: ellipsis
+			text-align: center
+			position: relative
+			top: 50%
+			margin: 0 4px
+			margin-top: -0.5 * @line-height
 
-.m-repository
+		> .inputs,
+		> .outputs
+			position: absolute
+			top: 50%
+			transform: translateY(-50%)
+			> .connector
+				position: relative
+				width: 12px
+				height: 8px
+				margin-top: 4px
+				margin-bottom: 4px
+				background: #000
+				cursor: pointer
+
+		> .inputs
+			left: 0
+			> .connector
+				left: -7px
+
+		> .outputs
+			right: 0
+			> .connector
+				right: -7px
+
+	> .filter
+		background: #fff
+
+	> .pipe
+		background: #fcfadc
+
+	> .wire
+		position: absolute
+		z-index: 0
+
+.m-selection
+	position: absolute
+	z-index: 9999
+	// left, top, width, height
+	background: rgba(51, 181, 229, 0.2)
+	border: 1px solid rgba(0, 102, 255, 0.5)
+	transition: opacity 0.15s
+	pointer-events: none
+
+.m-sidebar
 	position: absolute
 	top: 0
 	right: 0
@@ -106,30 +111,27 @@ body
 	z-index: 10000
 	background: #fff
 
-	> .m-item-container
+	> .m-repository-pane
 		height: 60%
 		overflow: auto
 		padding: 20px
 		background: #f6f6f6
 		border-bottom: 1px solid #ccc;
 
-		> .filter-repository > .m-filter
+		> .filter-repository > .item,
+		> .pipe-repository > .item
 			display: inline-block
 			border: 1px solid #000
 			padding: 8px
 			margin-bottom: 10px
 			margin-right: 6px
-			background: #fff
 			cursor: move
 
-		> .pipe-repository > .m-pipe
-			display: inline-block
-			border: 1px solid #000
-			padding: 8px
-			margin-bottom: 10px
-			margin-right: 6px
+		> .filter-repository > .item
+			background: #fff
+
+		> .pipe-repository > .item
 			background: #fcfadc
-			cursor: move
 
 	> .m-detail-pane
 		padding: 20px
@@ -143,7 +145,7 @@ body
 			margin-bottom: 5px
 			padding: 5px
 
-		> .actions > .red-button
+		> .actions > button.red-button
 			background: #f22
 			color: #fff
 			font-weight: bold

@@ -20,25 +20,35 @@ var WWire = React.createClass({
 		ctx.lineWidth = this.props.width - 2;
 		ctx.stroke();
 	},
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.frame && nextProps.frame &&
 		      !this.props.frame.equals(nextProps.frame);
 	},
+
 	shouldComponentRedraw(prevProps) {
 		return prevProps.frame.width  !== this.props.frame.width ||
 		       prevProps.frame.height !== this.props.frame.height;
 	},
+
 	componentDidUpdate(prevProps, prevState) {
 		if (this.shouldComponentRedraw(prevProps)) {
 			this.draw();
 		}
 	},
+
 	componentDidMount() {
 		this.draw();
 	},
+
 	render() {
-		var f = this.props.frame;
-		return <canvas className="wire" width={f.width} height={f.height} style={{ left: f.x, top: f.y }} />;
+		var frame = this.props.frame;
+		var style = {
+			left: frame.x,
+			top: frame.y
+		};
+		return <canvas className="wire" width={frame.width} height={frame.height} style={style} />;
 	}
+
 });
 module.exports = WWire;

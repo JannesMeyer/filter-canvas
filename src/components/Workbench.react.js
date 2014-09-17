@@ -3,9 +3,11 @@ var WorkbenchItems = require('./WorkbenchItems.react');
 var Selection = require('./Selection.react');
 
 var Workbench = React.createClass({
+
 	handleDragOver(ev) {
 		ev.preventDefault();
 	},
+
 	handleDrop(ev) {
 		// Get data
 		var data = JSON.parse(ev.dataTransfer.getData('application/json'));
@@ -19,10 +21,12 @@ var Workbench = React.createClass({
 		ev.stopPropagation(); // Stops some browsers from redirecting
 		ev.preventDefault();
 	},
+
 	handleMouseDown(ev) {
 		var node = this.getDOMNode();
 		AppActions.startSelection(node.scrollLeft, node.scrollTop, ev);
 	},
+
 	render() {
 		return (
 			<div className="m-workbench" onDragOver={this.handleDragOver} onDrop={this.handleDrop} onMouseDown={this.handleMouseDown}>
