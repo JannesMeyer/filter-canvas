@@ -43,7 +43,7 @@ body
 			position: absolute
 			z-index: 0
 
-		> .m-filter-on-canvas
+		> .filter
 			position: absolute
 			// left, top, width, height
 			border: 1px solid #000
@@ -67,29 +67,26 @@ body
 				position: absolute
 				top: 50%
 				transform: translateY(-50%)
+				> .connector
+					position: relative
+					width: 12px
+					height: 8px
+					margin-top: 4px
+					margin-bottom: 4px
+					background: #000
+					cursor: pointer
 
 			> .inputs
 				left: 0
+				> .connector
+					left: -7px
 
 			> .outputs
 				right: 0
+				> .connector
+					right: -7px
 
-			.connector
-				position: relative
-				width: 12px
-				height: 8px
-				margin-top: 4px
-				margin-bottom: 4px
-				background: #000
-				cursor: pointer
-
-			.connector.input
-				left: -7px
-
-			.connector.output
-				right: -7px
-
-		> .m-filter-on-canvas.selected
+		> .filter.selected
 			color: #114dcc
 			background: #f5f8ff
 			border-color: @color

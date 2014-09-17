@@ -1,16 +1,11 @@
 var SelectionStore = require('../flux/SelectionStore');
 var AppActions = require('../flux/AppActions');
 
-function getState() {
-	return {
-		selectedItems: SelectionStore.getSelectedItemIds()
-	};
-}
-
 var DetailPane = React.createClass({
-	getInitialState: getState,
-	_handleChange() {
-		this.replaceState(getState());
+	getInitialState() {
+		return {
+			selectedItems: SelectionStore.getSelectedItemIds()
+		};
 	},
 	componentDidMount() {
 		SelectionStore.addChangeListener(this._handleChange);
@@ -18,10 +13,8 @@ var DetailPane = React.createClass({
 	componentWillUnmount() {
 		SelectionStore.removeChangeListener(this._handleChange);
 	},
-	handleDelete(ev) {
-		if (ev.button !== 0) {
-			return;
-		}
+	handleDeleteClick(ev) {
+		if (ev.button !== 0) { return; }
 		AppActions.deleteSelectedItems();
 	},
 	render() {
@@ -38,7 +31,7 @@ var DetailPane = React.createClass({
 			saveAction = <button>Save as complex filter</button>;
 		}
 		if (numItems > 0) {
-			deleteAction = <button className="red-button" onClick={this.handleDelete}>Delete</button>;
+			deleteAction = <button className="red-button" onClick={this.handleDeleteClick}>Delete</button>;
 		}
 
 		var message;
@@ -58,6 +51,9 @@ var DetailPane = React.createClass({
 				</div>
 			</div>
 		);
+	},
+	_handleChange() {
+		this.replaceState(this.getInitialState());
 	}
 });
 module.exports = DetailPane;

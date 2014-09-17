@@ -1,7 +1,6 @@
 var AppActions = require('../flux/AppActions');
-var Constants = require('../flux/constants');
 var WorkbenchStore = require('../flux/WorkbenchStore');
-var WFilterConnectors = require('./WFilterConnectors.react');
+var WConnectors = require('./WConnectors.react');
 
 var WFilter = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
@@ -10,7 +9,7 @@ var WFilter = React.createClass({
 		       this.props.filter     !== nextProps.filter;
 	},
 	handleMouseDown(ev) {
-		AppActions.startMovingSelectedItems(Constants.ITEM_TYPE_FILTER, this.props.key, ev);
+		AppActions.startMovingSelectedItems(this.props.key, ev);
 	},
 	render() {
 		var filter = this.props.filter;
@@ -18,16 +17,16 @@ var WFilter = React.createClass({
 		var selected = (this.props.isSelected) ? ' selected' : '';
 
 		var style = {
-			left: frame.x + 'px',
-			top: frame.y + 'px',
-			width: frame.width + 'px',
-			height: frame.height + 'px'
+			left: frame.x,
+			top: frame.y,
+			width: frame.width,
+			height: frame.height
 		};
 		return (
-			<div className={'m-filter-on-canvas' + selected} style={style} onMouseDown={this.handleMouseDown}>
+			<div className={'filter' + selected} style={style} onMouseDown={this.handleMouseDown}>
 				<h4>{filter.get('class')}</h4>
-				<WFilterConnectors type="inputs" connectors={filter.get('inputs')} />
-				<WFilterConnectors type="outputs" connectors={filter.get('outputs')} />
+				<WConnectors type="inputs" connectors={filter.get('inputs')} />
+				<WConnectors type="outputs" connectors={filter.get('outputs')} />
 			</div>
 		);
 	}

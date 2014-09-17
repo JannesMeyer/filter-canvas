@@ -58,8 +58,8 @@ var AppActions = {
 		Dispatcher.dispatch({ actionType: Constants.REDO });
 	},
 
-	createFilter(id, x, y) {
-		Dispatcher.dispatch({ actionType: Constants.CREATE_FILTER, id, x, y });
+	createItem(type, id, x, y) {
+		Dispatcher.dispatch({ actionType: Constants.CREATE_ITEM, type, id, x, y });
 	},
 
 	deleteSelectedItems() {
@@ -69,7 +69,7 @@ var AppActions = {
 		});
 	},
 
-	startMovingSelectedItems(type, id, event) {
+	startMovingSelectedItems(id, event) {
 		var selected = SelectionStore.isItemSelected(id);
 		var selectionType = getSelectionType(event, selected);
 		if (selectionType === null) {
@@ -81,7 +81,6 @@ var AppActions = {
 
 		Dispatcher.dispatch({
 			actionType: Constants.START_MOVING_SELECTED_ITEMS,
-			type,
 			id,
 			mousePos: new Point(event.clientX, event.clientY)
 		});
@@ -157,7 +156,14 @@ var AppActions = {
 	},
 
 	selectAll() {
+		// TODO: cancel drag
+		Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
 		Dispatcher.dispatch({ actionType: Constants.SELECT_ALL });
+	},
+
+	cancel() {
+		// TODO: cancel drag, cancel selection
+		Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 	}
 
 };

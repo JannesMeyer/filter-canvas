@@ -6,8 +6,7 @@ module.exports = keyMirror({
 	UNDO: null,
 	REDO: null,
 
-	CREATE_FILTER: null,
-	CREATE_PIPE: null,
+	CREATE_ITEM: null,
 	ITEM_TYPE_FILTER: null,
 	ITEM_TYPE_PIPE: null,
 

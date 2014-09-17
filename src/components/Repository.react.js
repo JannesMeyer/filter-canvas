@@ -13,11 +13,11 @@ var Repository = React.createClass({
 				<div className="m-item-container">
 					<div className="filter-repository">
 						<h3>Filters</h3>
-						{filters.map((_, key) => <RFilter key={key} />).toArray()}
+						{Object.keys(filters).map(key => <RFilter key={key} />)}
 					</div>
 					<div className="pipe-repository">
 						<h3>Pipes</h3>
-						{pipes.map((_, key) => <RPipe key={key} />).toArray()}
+						{Object.keys(pipes).map(key => <RPipe key={key} />)}
 					</div>
 				</div>
 				<DetailPane />

@@ -7,8 +7,13 @@ var Point = require('../lib/ImmutablePoint');
 var Rect = require('../lib/ImmutableRect');
 
 var WorkbenchItems = React.createClass({
-	_handleChange() {
-		this.forceUpdate();
+	getInitialState() {
+		return {
+			items: WorkbenchStore.getAllItems(),
+			connections: WorkbenchStore.getAllConnections(),
+			lineWidth: WorkbenchStore.getWireWidth(),
+			isDragging: EtherMovementStore.isDragging()
+		};
 	},
 	componentDidMount() {
 		WorkbenchStore.addChangeListener(this._handleChange);
@@ -21,22 +26,20 @@ var WorkbenchItems = React.createClass({
 		SelectionStore.removeChangeListener(this._handleChange);
 	},
 	render() {
-		var items = WorkbenchStore.getAllItems();
-		var connections = WorkbenchStore.getAllConnections();
-		var lineWidth = WorkbenchStore.getWireWidth();
-		var isDragging = EtherMovementStore.isDragging();
+		var items = this.state.items.toArray();
+		var connections = this.state.connections.toArray();
 
 		return (
 			<div className="m-workbench-items">
 				{items.map((item, id) => {
 					var frame = null;
 					var isSelected = SelectionStore.isItemSelected(id);
-					if (isSelected && isDragging) {
+					if (isSelected && this.state.isDragging) {
 						frame = EtherMovementStore.getItemPosition(id);
 					}
 					// TODO: item.type
 					return <WFilter key={id} filter={item} frame={frame} isSelected={isSelected} />;
-				}).toArray()}
+				})}
 
 				{connections.map((cn, id) => {
 					var fromItem = cn.get('fromItem');
@@ -48,23 +51,26 @@ var WorkbenchItems = React.createClass({
 					var isSelected2 = SelectionStore.isItemSelected(toItem);
 
 					// TODO: Remove EtherMovementStore
-					if (isSelected1 && isDragging) {
+					if (isSelected1 && this.state.isDragging) {
 						var startPoint = EtherMovementStore.getItemPosition(fromItem).moveBy(fromOffset);
 					} else {
-						var startPoint = items.getIn([fromItem, 'rect']).moveBy(fromOffset);
+						var startPoint = items[fromItem].get('rect').moveBy(fromOffset);
 					}
-					if (isSelected2 && isDragging) {
+					if (isSelected2 && this.state.isDragging) {
 						var endPoint = EtherMovementStore.getItemPosition(toItem).moveBy(toOffset);
 					} else {
-						var endPoint = items.getIn([toItem, 'rect']).moveBy(toOffset);
+						var endPoint = items[toItem].get('rect').moveBy(toOffset);
 					}
-					var frame = calculateFrame(startPoint, endPoint, lineWidth);
-					var bezier = calculateBezierPoints(frame, startPoint, endPoint, lineWidth);
+					var frame = calculateFrame(startPoint, endPoint, this.state.lineWidth);
+					var bezier = calculateBezierPoints(frame, startPoint, endPoint, this.state.lineWidth);
 
-					return <WWire key={id} frame={frame} bezier={bezier} width={lineWidth} />;
-				}).toArray()}
+					return <WWire key={id} frame={frame} bezier={bezier} width={this.state.lineWidth} />;
+				})}
 			</div>
 		);
+	},
+	_handleChange() {
+		this.replaceState(this.getInitialState());
 	}
 });
 module.exports = WorkbenchItems;

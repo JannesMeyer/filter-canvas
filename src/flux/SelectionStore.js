@@ -43,9 +43,6 @@ module.exports = SelectionStore;
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
-			if (action.type !== Constants.ITEM_TYPE_FILTER) {
-				throw new Error('Unknown item type');
-			}
 			selectedItems = selectedItems.add(action.id);
 			SelectionStore.emitChange();
 		return;
@@ -73,6 +70,7 @@ Dispatcher.register(function(action) {
 		return;
 
 		case Constants.CANCEL_SELECTION:
+			itemsInsideSelection = itemsInsideSelection.clear();
 			isSelecting = false;
 		return;
 

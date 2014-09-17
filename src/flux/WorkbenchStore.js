@@ -105,9 +105,16 @@ module.exports = WorkbenchStore;
 // Register for all actions with the Dispatcher
 Dispatcher.register(function(action) {
 	switch(action.actionType) {
-		case Constants.CREATE_FILTER:
-			var filter = RepositoryStore.createFilterObject(action.id, action.x, action.y);
-			setData(data.updateIn(['items'], items => items.push(filter)));
+		case Constants.CREATE_ITEM:
+			var item;
+			if (action.type === Constants.ITEM_TYPE_FILTER) {
+				item = RepositoryStore.createFilterObject(action.id, action.x, action.y);
+			} else if (action.type === Constants.ITEM_TYPE_PIPE) {
+				item = RepositoryStore.createPipeObject(action.id, action.x, action.y);
+			} else {
+				throw new Error('Invalid type');
+			}
+			setData(data.updateIn(['items'], items => items.push(item)));
 		break;
 
 		case Constants.MOVE_SELECTED_ITEMS_BY:

@@ -10,11 +10,12 @@ var Workbench = React.createClass({
 		// Get data
 		var data = JSON.parse(ev.dataTransfer.getData('application/json'));
 
-		// Create filter
+		// Create item
 		var wb = this.getDOMNode();
 		var filterX = wb.scrollLeft + ev.clientX - data.clickX;
 		var filterY = wb.scrollTop + ev.clientY - data.clickY;
-		AppActions.createFilter(data.id, filterX, filterY);
+		AppActions.createItem(data.type, data.id, filterX, filterY);
+
 		ev.stopPropagation(); // Stops some browsers from redirecting
 		ev.preventDefault();
 	},

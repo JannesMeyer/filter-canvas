@@ -14,7 +14,6 @@ var Actions = React.createClass({
 	},
 	handleImport(ev) {
 		if (ev.button !== 0) { return; }
-
 		// Show file picker
 		this.refs.fileInput.getDOMNode().click();
 	},
@@ -40,9 +39,6 @@ var Actions = React.createClass({
 		});
 		reader.readAsText(files[0]);
 	},
-	handleLoadFile(ev) {
-
-	},
 	handleExport(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.exportFile();
@@ -54,6 +50,12 @@ var Actions = React.createClass({
 	handleRedo(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.redo();
+	},
+	componentDidMount() {
+		WorkbenchStore.addChangeListener(this._handleChange);
+	},
+	componentWillUnmount() {
+		WorkbenchStore.removeChangeListener(this._handleChange);
 	},
 	render() {
 		return (
@@ -68,12 +70,6 @@ var Actions = React.createClass({
 	},
 	_handleChange() {
 		this.replaceState(this.getInitialState());
-	},
-	componentDidMount() {
-		WorkbenchStore.addChangeListener(this._handleChange);
-	},
-	componentWillUnmount() {
-		WorkbenchStore.removeChangeListener(this._handleChange);
 	}
 });
 module.exports = Actions;

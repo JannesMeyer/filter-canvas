@@ -68,11 +68,65 @@ var keyCodeMap = {
  */
 var bindings = {};
 
+function parseChar(char) {
+	switch(typeof char) {
+	case 'string':
+		if (!keyCodeMap.hasOwnProperty(char)) {
+			throw new Error('Invalid char');
+		}
+		return keyCodeMap[char];
+
+	case 'number':
+		return char;
+
+	default:
+		throw new Error('The char argument should be a String or a Number');
+	}
+}
+
+/**
+ * Turns an Array of conditions into an object
+ */
+function parseConditions(conditions) {
+	var object = {
+		ctrl: false,
+		meta: false,
+		shift: false,
+		alt: false,
+		inputEl: false,
+		executeDefault: false
+	};
+	for (var i = 0; i < conditions.length; ++i) {
+		object[conditions[i]] = true;
+	}
+	if (isMacBrowser && object.ctrl) {
+		object.meta = true;
+		object.ctrl = false;
+	}
+	return object;
+}
+
+/**
+ * Make sure that everything in the first argument is present in
+ * the second argument, too.
+ */
+function matchesSignature(signature, object) {
+	var keys = Object.keys(signature);
+	for (var i = 0; i < keys.length; ++i) {
+		var key = keys[i];
+		if (signature[key] !== object[key]) {
+			return false;
+		}
+	}
+	return true;
+}
+
 /**
  * Add a new binding
  *
  * char: String or Number
- * conditions (optional): Array (of String)
+ * conditions (optional): Array containing 'ctrl', 'meta', 'shift',
+ *                        'alt', 'inputEl' and/or 'executeDefault'
  * callback: Function
  *
  * Example:
@@ -85,47 +139,51 @@ function on(char, conditions, callback) {
 		callback = conditions;
 		conditions = [];
 	}
-
-	// Parse the char parameter to a keyCode
-	var keyCode;
-	switch(typeof char) {
-		case 'string':
-			keyCode = keyCodeMap[char];
-			if (keyCode === undefined) {
-				throw new Error('Invalid char');
-			}
-		break;
-
-		case 'number':
-			keyCode = char;
-		break;
-
-		default:
-			throw new Error('The char argument should be a String or a Number');
-	}
+	var keyCode = parseChar(char);
+	var binding = parseConditions(conditions);
+	binding.callback = callback;
 
 	// Create a bindingList if it doesn't exist yet
 	if (!bindings.hasOwnProperty(keyCode)) {
 		bindings[keyCode] = [];
 	}
 
-	var ctrl = conditions.indexOf('ctrl') !== -1;
-	var meta = conditions.indexOf('meta') !== -1;
-	var shift = conditions.indexOf('shift') !== -1;
-	var alt = conditions.indexOf('alt') !== -1;
-	var inputEl = conditions.indexOf('inputEl') !== -1;
-	var executeDefault = conditions.indexOf('executeDefault') !== -1;
-	// On a Mac [ctrl → metaKey]
-	if (isMacBrowser && ctrl) {
-		meta = true;
-		ctrl = false;
+	// Save the binding
+	bindings[keyCode].push(binding);
+}
+
+/**
+ * Remove an event handler that was added with `on`
+ */
+function off(char, conditions, callback) {
+	if (!callback) {
+		// Swap arguments 2 and 3
+		callback = conditions;
+		conditions = [];
 	}
-	bindings[keyCode].push({ callback, ctrl, shift, alt, meta, inputEl, executeDefault });
+	var keyCode = parseChar(char);
+	var signature = parseConditions(conditions);
+	signature.callback = callback;
+
+	var bindingList = bindings[keyCode];
+	if (!bindingList) {
+		// No handler for this key exists
+		return;
+	}
+
+	// Delete handler(s)
+	bindingList
+		.filter(binding => matchesSignature(signature, binding))
+		.forEach((_, index) => bindingList.splice(index, 1));
+	if (bindingList.length === 0) {
+		delete bindings[keyCode];
+	}
 }
 
 if (isBrowser) {
 	// Export the `on` function
 	exports.on = on;
+	exports.off = off;
 
 	// Install the event handler
 	addEventListener('keydown', ev => {
@@ -134,28 +192,25 @@ if (isBrowser) {
 			return;
 		}
 
-		var element = ev.target;
-		var isInputEl = element.tagName === 'INPUT' ||
-		                element.tagName === 'TEXTAREA' ||
-		                element.tagName === 'SELECT' ||
-		                element.isContentEditable;
-
+		var el = ev.target;
+		var signature = {
+			inputEl: (el.tagName === 'INPUT' ||
+			          el.tagName === 'TEXTAREA' ||
+			          el.tagName === 'SELECT' ||
+			          el.isContentEditable),
+		  shift: ev.shiftKey,
+		  ctrl:  ev.ctrlKey,
+		  alt:   ev.altKey,
+		  meta:  ev.metaKey
+		};
 		for (var i = 0; i < bindingList.length; ++i) {
 			var binding = bindingList[i];
-			var isMatch = binding.inputEl === isInputEl &&
-			              binding.ctrl === ev.ctrlKey &&
-			              binding.shift === ev.shiftKey &&
-			              binding.alt === ev.altKey &&
-			              binding.meta === ev.metaKey;
-			if (!isMatch) {
-				continue;
-			}
-
-			// Execute the callback
-			binding.callback.call(undefined, ev);
-			// And prevent the default
-			if (!binding.executeDefault) {
-				ev.preventDefault();
+			if (matchesSignature(signature, binding)) {
+				binding.callback.call(undefined, ev);
+				if (!binding.executeDefault) {
+					ev.stopPropagation();
+					ev.preventDefault();
+				}
 			}
 		}
 	});
