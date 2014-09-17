@@ -1,4 +1,4 @@
-var WWire = React.createClass({
+var WorkbenchWire = React.createClass({
 	context: null,
 
 	draw() {
@@ -51,4 +51,4 @@ var WWire = React.createClass({
 	}
 
 });
-module.exports = WWire;
+module.exports = WorkbenchWire;

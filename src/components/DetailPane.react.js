@@ -9,6 +9,10 @@ var DetailPane = React.createClass({
 		};
 	},
 
+	shouldComponentUpdate(nextProps, nextState) {
+		return !this.state.selectedItems.equals(nextState.selectedItems);
+	},
+
 	handleDeleteClick(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.deleteSelectedItems();

@@ -1,12 +1,10 @@
-var constants = require('../flux/constants');
-
-var RPipe = React.createClass({
+var RepositoryItem = React.createClass({
 
 	handleDragStart(ev) {
 		var bounds = ev.currentTarget.getBoundingClientRect();
 		var data = {
 			id: this.props.key,
-			type: constants.ITEM_TYPE_PIPE,
+			type: this.props.type,
 			clickX: Math.floor(ev.clientX - bounds.left),
 			clickY: Math.floor(ev.clientY - bounds.top),
 			width: Math.floor(bounds.width),
@@ -17,8 +15,8 @@ var RPipe = React.createClass({
 	},
 
 	render() {
-		return <div className="m-pipe" draggable onDragStart={this.handleDragStart}>{this.props.key}</div>;
+		return <div className="item" draggable onDragStart={this.handleDragStart}>{this.props.key}</div>;
 	}
 
 });
-module.exports = RPipe;
+module.exports = RepositoryItem;

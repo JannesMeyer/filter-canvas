@@ -1,9 +1,9 @@
 var AppActions = require('../flux/AppActions');
 var constants = require('../flux/constants');
 
-var WConnectors = require('./WConnectors.react');
+var ItemConnectors = require('./ItemConnectors.react');
 
-var WItem = React.createClass({
+var WorkbenchItem = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return nextProps.frame !== null ||
@@ -40,11 +40,11 @@ var WItem = React.createClass({
 		return (
 			<div className={className} style={style} onMouseDown={this.handleMouseDown}>
 				<h4>{item.get('class')}</h4>
-				<WConnectors type="inputs" connectors={item.get('inputs')} />
-				<WConnectors type="outputs" connectors={item.get('outputs')} />
+				<ItemConnectors type="inputs" connectors={item.get('inputs')} />
+				<ItemConnectors type="outputs" connectors={item.get('outputs')} />
 			</div>
 		);
 	}
 
 });
-module.exports = WItem;
+module.exports = WorkbenchItem;

@@ -4,8 +4,8 @@ var SelectionStore = require('../flux/SelectionStore');
 var Point = require('../lib/ImmutablePoint');
 var Rect = require('../lib/ImmutableRect');
 
-var WItem = require('./WItem.react');
-var WWire = require('./WWire.react');
+var WorkbenchItem = require('./WorkbenchItem.react');
+var WorkbenchWire = require('./WorkbenchWire.react');
 
 var WorkbenchItems = React.createClass({
 
@@ -42,7 +42,7 @@ var WorkbenchItems = React.createClass({
 					if (isSelected && this.state.isDragging) {
 						frame = EtherMovementStore.getItemPosition(id);
 					}
-					return <WItem key={id} item={item} frame={frame} isSelected={isSelected} />;
+					return <WorkbenchItem key={id} item={item} frame={frame} isSelected={isSelected} />;
 				})}
 
 				{connections.map((cn, id) => {
@@ -68,7 +68,7 @@ var WorkbenchItems = React.createClass({
 					var frame = calculateFrame(startPoint, endPoint, this.state.lineWidth);
 					var bezier = calculateBezierPoints(frame, startPoint, endPoint, this.state.lineWidth);
 
-					return <WWire key={id} frame={frame} bezier={bezier} width={this.state.lineWidth} />;
+					return <WorkbenchWire key={id} frame={frame} bezier={bezier} width={this.state.lineWidth} />;
 				})}
 			</div>
 		);

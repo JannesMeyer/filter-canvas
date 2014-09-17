@@ -4,7 +4,8 @@ var EtherMovementStore = require('../flux/EtherMovementStore');
 var keypress = require('../lib/keypress-tool');
 
 var Workbench = require('./Workbench.react');
-var Repository = require('./Repository.react');
+var RepositoryPane = require('./RepositoryPane.react');
+var DetailPane = require('./DetailPane.react');
 var Actions = require('./Actions.react');
 
 var App = React.createClass({
@@ -63,7 +64,10 @@ var App = React.createClass({
 		return (
 			<div className="m-container" onMouseMove={this.handleMouseMove}>
 				<Workbench />
-				<Repository />
+				<div className="m-sidebar">
+					<RepositoryPane />
+					<DetailPane />
+				</div>
 				<Actions />
 			</div>
 		);
