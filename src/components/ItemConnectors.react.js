@@ -1,4 +1,4 @@
-var ItemConnectors = React.createClass({
+module.exports = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.connectors !== nextProps.connectors;
@@ -27,4 +27,3 @@ var ItemConnectors = React.createClass({
 	}
 
 });
-module.exports = ItemConnectors;

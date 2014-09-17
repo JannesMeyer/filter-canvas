@@ -1,4 +1,4 @@
-var RepositoryItem = React.createClass({
+module.exports = React.createClass({
 
 	handleDragStart(ev) {
 		var bounds = ev.currentTarget.getBoundingClientRect();
@@ -19,4 +19,3 @@ var RepositoryItem = React.createClass({
 	}
 
 });
-module.exports = RepositoryItem;

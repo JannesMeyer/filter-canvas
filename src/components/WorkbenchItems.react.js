@@ -7,7 +7,7 @@ var Rect = require('../lib/ImmutableRect');
 var WorkbenchItem = require('./WorkbenchItem.react');
 var WorkbenchWire = require('./WorkbenchWire.react');
 
-var WorkbenchItems = React.createClass({
+module.exports = React.createClass({
 
 	getInitialState() {
 		return {
@@ -79,7 +79,6 @@ var WorkbenchItems = React.createClass({
 	}
 
 });
-module.exports = WorkbenchItems;
 
 function calculateFrame(startPoint, endPoint, lineWidth) {
 	var orderedX = startPoint.x < endPoint.x;

@@ -8,7 +8,7 @@ var RepositoryPane = require('./RepositoryPane.react');
 var DetailPane = require('./DetailPane.react');
 var Actions = require('./Actions.react');
 
-var App = React.createClass({
+module.exports = React.createClass({
 
 	handleMouseMove(ev) {
 		if (EtherMovementStore.isDragging()) {
@@ -73,4 +73,3 @@ var App = React.createClass({
 		);
 	}
 });
-module.exports = App;

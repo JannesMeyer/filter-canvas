@@ -3,7 +3,7 @@ var constants = require('../flux/constants');
 
 var ItemConnectors = require('./ItemConnectors.react');
 
-var WorkbenchItem = React.createClass({
+module.exports = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return nextProps.frame !== null ||
@@ -47,4 +47,3 @@ var WorkbenchItem = React.createClass({
 	}
 
 });
-module.exports = WorkbenchItem;

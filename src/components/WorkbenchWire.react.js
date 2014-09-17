@@ -1,4 +1,4 @@
-var WorkbenchWire = React.createClass({
+module.exports = React.createClass({
 	context: null,
 
 	draw() {
@@ -51,4 +51,3 @@ var WorkbenchWire = React.createClass({
 	}
 
 });
-module.exports = WorkbenchWire;

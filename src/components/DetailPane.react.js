@@ -1,7 +1,7 @@
 var SelectionStore = require('../flux/SelectionStore');
 var AppActions = require('../flux/AppActions');
 
-var DetailPane = React.createClass({
+module.exports = React.createClass({
 
 	getInitialState() {
 		return {
@@ -67,4 +67,3 @@ var DetailPane = React.createClass({
 	}
 
 });
-module.exports = DetailPane;

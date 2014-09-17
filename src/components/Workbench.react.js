@@ -2,7 +2,7 @@ var AppActions = require('../flux/AppActions');
 var WorkbenchItems = require('./WorkbenchItems.react');
 var Selection = require('./Selection.react');
 
-var Workbench = React.createClass({
+module.exports = React.createClass({
 
 	handleDragOver(ev) {
 		ev.preventDefault();
@@ -35,5 +35,5 @@ var Workbench = React.createClass({
 			</div>
 		);
 	}
+
 });
-module.exports = Workbench;

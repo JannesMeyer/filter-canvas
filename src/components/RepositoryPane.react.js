@@ -2,7 +2,7 @@ var constants = require('../flux/constants');
 var RepositoryStore = require('../flux/RepositoryStore');
 var RepositoryItem = require('./RepositoryItem.react');
 
-var RepositoryPane = React.createClass({
+module.exports = React.createClass({
 
 	getInitialState() {
 		return {
@@ -46,4 +46,3 @@ var RepositoryPane = React.createClass({
 	}
 
 });
-module.exports = RepositoryPane;
