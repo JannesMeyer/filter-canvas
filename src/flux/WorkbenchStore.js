@@ -84,9 +84,12 @@ var WorkbenchStore = BaseStore.createStore({
 	getLastIndex() {
 		return data.get('items').length - 1;
 	},
-	// getItemPosition(id) {
-	// 	return data.getIn(['items', id, 'rect']);
-	// },
+	getItemParameters(id) {
+		return data.getIn(['items', id, 'parameter']);
+	},
+	getItemPosition(id) {
+		return data.getIn(['items', id, 'rect']);
+	},
 	getAllConnections() {
 		return data.get('connections');
 	},

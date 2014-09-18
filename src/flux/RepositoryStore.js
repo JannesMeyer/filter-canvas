@@ -10,11 +10,7 @@ var filters = require('../interface/FilterRepo');
 var pipes = require('../interface/PipeRepo');
 
 // Constants
-var filterConnectorHeight = 16;
-var filterPadding = 18;
-var filterMinHeight = 60;
-var filterMinWidth = 140;
-var filterTextPadding = 40;
+var connectorHeight = 16;
 
 /**
  * RepositoryStore single object
@@ -25,18 +21,23 @@ var filterTextPadding = 40;
  * RepositoryStore.removeListener(RepositoryStore.FILTERS_CHANGE, callback)
  */
 var RepositoryStore = BaseStore.createStore({
+
 	getAllFilters() {
 		return filters;
 	},
+
 	getFilter(id) {
 		return filters[id];
 	},
+
 	getAllPipes() {
 		return pipes;
 	},
+
 	getPipe(id) {
 		return pipes[id];
 	},
+
 	createFilterObject(id, x, y) {
 		var baseFilter = filters[id];
 		if (!baseFilter) {
@@ -47,10 +48,12 @@ var RepositoryStore = BaseStore.createStore({
 			class: id,
 			inputs: immutable.Range(0, baseFilter.inputs),
 			outputs: immutable.Range(0, baseFilter.outputs),
+			parameter: immutable.Map(baseFilter.parameter),
 			connections: immutable.Vector(),
 			rect: new Rect(x, y, this.getFilterWidth(id), this.getFilterHeight(baseFilter))
 		});
 	},
+
 	createPipeObject(id, x, y) {
 		var basePipe = pipes[id];
 		if (!basePipe) {
@@ -61,25 +64,26 @@ var RepositoryStore = BaseStore.createStore({
 			class: id,
 			inputs: immutable.Range(0, basePipe.inputs),
 			outputs: immutable.Range(0, basePipe.outputs),
+			parameter: immutable.Map(basePipe.parameter),
 			connections: immutable.Vector(),
-			rect: new Rect(x, y, 150, this.getPipeHeight(basePipe))
+			rect: new Rect(x, y, 40, this.getPipeHeight(basePipe))
 		});
 	},
 
 	// TODO: loop through all filters in the beginning and figure these values out once and for all
 	getFilterWidth(id) {
-		var width = filterTextPadding + Math.round(id.length * 5.5);
-		return Math.max(width, filterMinWidth);
+		return Math.max(140, Math.floor(id.length * 5.5) + 40);
 	},
-	getFilterHeight(filter) {
-		var connectors = Math.max(filter.inputs, filter.outputs);
-		var height = connectors * filterConnectorHeight + 2 * filterPadding;
-		return Math.max(filterMinHeight, height); // TODO: eliminate filterMinHeight
+
+	getFilterHeight(baseFilter) {
+		var c = Math.max(baseFilter.inputs, baseFilter.outputs);
+		return Math.max(60, c * connectorHeight + 28);
 	},
+
 	getPipeHeight(basePipe) {
-		var connectors = Math.max(basePipe.inputs, basePipe.outputs);
-		var height = connectors * filterConnectorHeight + 2 * filterPadding;
-		return Math.max(filterMinHeight, height); // TODO: eliminate filterMinHeight
+		var c = Math.max(basePipe.inputs, basePipe.outputs);
+		return Math.max(32, c * connectorHeight);
 	}
+
 });
 module.exports = RepositoryStore;

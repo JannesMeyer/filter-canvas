@@ -29,7 +29,7 @@ class Rect {
 	}
 	/**
 	 * Add these values to the current values
-	 * All parameters default to zero
+	 * All arguments default to zero
 	 */
 	addValues(x, y, width, height) {
 		x = x || 0;

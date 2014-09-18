@@ -21,8 +21,10 @@ module.exports = React.createClass({
 		var type = item.get('type');
 
 		var className;
+		var title;
 		if (type === constants.ITEM_TYPE_FILTER) {
 			className = 'filter';
+			title = <h4>{item.get('class')}</h4>;
 		} else if (type === constants.ITEM_TYPE_PIPE) {
 			className = 'pipe';
 		} else {
@@ -39,7 +41,7 @@ module.exports = React.createClass({
 		};
 		return (
 			<div className={className} style={style} onMouseDown={this.handleMouseDown}>
-				<h4>{item.get('class')}</h4>
+				{title}
 				<ItemConnectors type="inputs" connectors={item.get('inputs')} />
 				<ItemConnectors type="outputs" connectors={item.get('outputs')} />
 			</div>
