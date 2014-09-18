@@ -37,10 +37,8 @@ var SelectionStore = BaseStore.createStore({
 		return selectedItems.union(itemsInsideSelection);
 	}
 });
-module.exports = SelectionStore;
 
-// Register for all actions with the Dispatcher
-Dispatcher.register(function(action) {
+SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
 			selectedItems = selectedItems.add(action.id);
@@ -79,8 +77,11 @@ Dispatcher.register(function(action) {
 			SelectionStore.emitChange();
 		return;
 
-		case Constants.CREATE_FILTER:
-			// TODO: waitFor WorkbenchStore and then select the latest id
+		case Constants.CREATE_ITEM:
+			// Select the item after the it was created
+			Dispatcher.waitFor([ WorkbenchStore.dispatchToken ]);
+			selectedItems = immutable.Set(WorkbenchStore.getLastIndex());
+			SelectionStore.emitChange();
 		return;
 
 		case Constants.SELECT_ALL:
@@ -89,3 +90,5 @@ Dispatcher.register(function(action) {
 		return;
 	}
 });
+
+module.exports = SelectionStore;

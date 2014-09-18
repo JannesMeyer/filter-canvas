@@ -81,9 +81,12 @@ var WorkbenchStore = BaseStore.createStore({
 	getItemsCoveredBy(rect) {
 		return data.get('items').toMap().filter(f => rect.intersectsRect(f.get('rect')));
 	},
-	getItemPosition(id) {
-		return data.getIn(['items', id, 'rect']);
+	getLastIndex() {
+		return data.get('items').length - 1;
 	},
+	// getItemPosition(id) {
+	// 	return data.getIn(['items', id, 'rect']);
+	// },
 	getAllConnections() {
 		return data.get('connections');
 	},
@@ -100,10 +103,8 @@ var WorkbenchStore = BaseStore.createStore({
 		return redoSteps.length !== 0;
 	}
 });
-module.exports = WorkbenchStore;
 
-// Register for all actions with the Dispatcher
-Dispatcher.register(function(action) {
+WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.CREATE_ITEM:
 			var item;
@@ -129,6 +130,8 @@ Dispatcher.register(function(action) {
 		break;
 
 		case Constants.DELETE_SELECTED_ITEMS:
+			// TODO: make sure that all IDs are still the same when deleting items in the middle
+			// TODO: they should be set to undefined instead of deleted?
 			// TODO: improve updating
 			// TODO: remove other filter's connection references
 			// TODO: clear selection in SelectionStore (but waitFor WorkbenchStore)
@@ -165,6 +168,7 @@ Dispatcher.register(function(action) {
 	}
 });
 
+module.exports = WorkbenchStore;
 
 
 

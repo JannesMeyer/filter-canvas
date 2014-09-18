@@ -37,10 +37,8 @@ var EtherMovementStore = BaseStore.createStore({
 		return isDragging;
 	}
 });
-module.exports = EtherMovementStore;
 
-// Register for all actions with the Dispatcher
-Dispatcher.register(function(action) {
+EtherMovementStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case Constants.START_MOVING_SELECTED_ITEMS:
 		startMousePos = action.mousePos;
@@ -72,3 +70,5 @@ Dispatcher.register(function(action) {
 		return;
 	}
 });
+
+module.exports = EtherMovementStore;
