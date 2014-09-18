@@ -72,36 +72,73 @@ function redo() {
  * (like a singleton)
  */
 var WorkbenchStore = BaseStore.createStore({
+	/**
+	 * returns an immutable.Vector
+	 */
 	getAllItems() {
 		return data.get('items');
 	},
+	/**
+	 * returns an immutable.Map
+	 */
 	getItem(id) {
 		return data.getIn(['items', id]);
 	},
+	/**
+	 * returns an immutable.Set
+	 */
 	getItemsCoveredBy(rect) {
-		return data.get('items').toMap().filter(f => rect.intersectsRect(f.get('rect')));
+		return data.get('items')
+			.toMap()
+			.filter(f => rect.intersectsRect(f.get('rect')))
+			.keySeq()
+			.toSet();
 	},
+	/**
+	 * returns a number
+	 */
 	getLastIndex() {
 		return data.get('items').length - 1;
 	},
+	/**
+	 * returns an immutable.Map
+	 */
 	getItemParameters(id) {
 		return data.getIn(['items', id, 'parameter']);
 	},
+	/**
+	 * returns an ImmutableRect
+	 */
 	getItemPosition(id) {
 		return data.getIn(['items', id, 'rect']);
 	},
+	/**
+	 * returns an immutable.Vector
+	 */
 	getAllConnections() {
 		return data.get('connections');
 	},
+	/**
+	 * returns an immutable.Map
+	 */
 	getConnection(id) {
 		return data.getIn(['connections', id]);
 	},
+	/**
+	 * returns a number
+	 */
 	getWireWidth() {
 		return wireWidth;
 	},
+	/**
+	 * returns a boolean
+	 */
 	hasUndoSteps() {
 		return undoSteps.length !== 0;
 	},
+	/**
+	 * returns a boolean
+	 */
 	hasRedoSteps() {
 		return redoSteps.length !== 0;
 	}
