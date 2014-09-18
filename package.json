@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "start": "./server.js",
-    "prepublish": "NODE_ENV=production webpack"
+    "prepublish": "NODE_ENV=production webpack --colors"
   },
   "description": "Configuration tool for filters and pipes architectures",
   "devDependencies": {
