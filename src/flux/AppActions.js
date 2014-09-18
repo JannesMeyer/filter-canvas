@@ -160,13 +160,16 @@ var AppActions = {
 	},
 
 	selectAll() {
-		// TODO: cancel drag
-		Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
+		// TODO: ignore during item drag
+		// TODO: ignore during selection drag
 		Dispatcher.dispatch({ actionType: Constants.SELECT_ALL });
 	},
 
 	cancel() {
-		// TODO: cancel drag, cancel selection
+		// TODO: cancel item drag
+		// TODO: cancel selection drag
+		// TODO: clear selected items
+		Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
 		Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 	}
 

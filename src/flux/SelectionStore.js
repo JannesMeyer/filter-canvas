@@ -62,19 +62,20 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 		case Constants.FINISH_SELECTION:
 			// Transfer itemsInsideSelection
 			selectedItems = selectedItems.union(itemsInsideSelection);
-			itemsInsideSelection = itemsInsideSelection.clear();
+			itemsInsideSelection = immutable.Set();
 			isSelecting = false;
 			SelectionStore.emitChange();
 		return;
 
+		// TODO: emitChange, because it could be cancelled for other reason than just no movement
 		case Constants.CANCEL_SELECTION:
-			itemsInsideSelection = itemsInsideSelection.clear();
+			itemsInsideSelection = immutable.Set();
 			isSelecting = false;
 		return;
 
 		case Constants.CLEAR_SELECTED_ITEMS:
 		case Constants.DELETE_SELECTED_ITEMS:
-			selectedItems = selectedItems.clear();
+			selectedItems = immutable.Set();
 			SelectionStore.emitChange();
 		return;
 
@@ -86,7 +87,7 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 		return;
 
 		case Constants.SELECT_ALL:
-			selectedItems = WorkbenchStore.getAllItems().keys().toSet();
+			selectedItems = WorkbenchStore.getAllItems().keySeq().toSet();
 			SelectionStore.emitChange();
 		return;
 	}
