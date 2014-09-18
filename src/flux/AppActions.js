@@ -66,6 +66,10 @@ var AppActions = {
 		Dispatcher.dispatch({ actionType: Constants.CREATE_ITEM, type, id, x, y });
 	},
 
+	updateItemParams(id, params) {
+		// TODO
+	},
+
 	deleteSelectedItems() {
 		Dispatcher.dispatch({
 			actionType: Constants.DELETE_SELECTED_ITEMS,

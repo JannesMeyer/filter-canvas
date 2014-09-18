@@ -170,11 +170,12 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.DELETE_SELECTED_ITEMS:
+			if (action.selectedItems.length === 0) {
+				break;
+			}
 			// TODO: make sure that all IDs are still the same when deleting items in the middle
-			// TODO: they should be set to undefined instead of deleted?
-			// TODO: improve updating
+			// TODO: should they be set to undefined instead of deleted?
 			// TODO: remove other filter's connection references
-			// TODO: clear selection in SelectionStore (but waitFor WorkbenchStore)
 			var connectionDeleteList = immutable.Set().asMutable();
 			setData(data.withMutations(data => {
 				// Delete items

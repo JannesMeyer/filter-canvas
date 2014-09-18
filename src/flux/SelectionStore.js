@@ -75,6 +75,9 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 
 		case Constants.CLEAR_SELECTED_ITEMS:
 		case Constants.DELETE_SELECTED_ITEMS:
+			if (selectedItems.length === 0) {
+				break;
+			}
 			selectedItems = immutable.Set();
 			SelectionStore.emitChange();
 		return;

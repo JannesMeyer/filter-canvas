@@ -1,10 +1,9 @@
 'use strict';
 
 var webpack = require('webpack');
-var ErrorNotificationPlugin = require('./WebpackErrorNotificationPlugin');
 var path = require('path');
-var getAbsolutePath = path.join.bind(path, __dirname);
 
+var getAbsolutePath = path.join.bind(path, __dirname);
 var paths = {
 	main: getAbsolutePath(),
 	modules: getAbsolutePath('node_modules'),
@@ -14,10 +13,7 @@ var paths = {
 
 var config = {
 	cache: true,
-	entry: [
-		'webpack/hot/dev-server',
-		paths.entryScript
-	],
+	entry: [ paths.entryScript ],
 	output: {
 		path: paths.publicScripts,
 		filename: '[name].bundle.js',
@@ -27,15 +23,13 @@ var config = {
 	plugins: [
 		new webpack.ProvidePlugin({
 			'React': 'react'
-		}),
-		new webpack.HotModuleReplacementPlugin(),
-		new ErrorNotificationPlugin()
+		})
 	],
 	module: {
 		loaders: [
 			{
 				test: /\.react\.js$/,
-				loaders: ['react-hot-loader', 'strict-loader', 'jsx-loader?harmony&insertPragma=React.DOM'],
+				loaders: ['strict-loader', 'jsx-loader?harmony&insertPragma=React.DOM'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
@@ -62,9 +56,13 @@ var config = {
 
 if ('production' === process.env.NODE_ENV) {
 	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
-	config.plugins.push(new webpack.optimize.DedupePlugin());
 	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
-	// config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+	config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+} else {
+	// Hot module replacement in development
+	config.entry.unshift('webpack/hot/dev-server');
+	config.plugins.push(new webpack.HotModuleReplacementPlugin());
+	config.module.loaders[0].loaders.unshift('react-hot-loader');
 }
 
 module.exports = config;
