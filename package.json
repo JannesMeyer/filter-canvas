@@ -1,5 +1,5 @@
 {
-  "name": "Pipes",
+  "name": "filter-canvas",
   "version": "1.0.0",
   "author": "Jannes Meyer <jannes.meyer@gmail.com>",
   "private": true,
@@ -12,15 +12,12 @@
     "css-loader": "0.x",
     "immutable": "2.x",
     "jsx-loader": "0.x",
+    "normalize.css": "^3.0.1",
     "react": "0.x",
     "react-hot-loader": "0.x",
     "style-loader": "0.x",
     "stylus-loader": "^0.4.0",
     "webpack": "1.x",
     "webpack-dev-server": "1.x"
-  },
-  "dependencies": {
-    "es6-collections": "^0.2.1",
-    "normalize.css": "^3.0.1"
   }
 }

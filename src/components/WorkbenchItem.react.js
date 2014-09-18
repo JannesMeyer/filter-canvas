@@ -24,9 +24,9 @@ module.exports = React.createClass({
 		var isPipe   = (type === constants.ITEM_TYPE_PIPE);
 
 		var classes = cx({
-			'filter': isFilter,
-			'pipe': isPipe,
-			'selected': this.props.isSelected
+			filter: isFilter,
+			pipe: isPipe,
+			selected: this.props.isSelected
 		});
 		var style = {
 			left: frame.x,

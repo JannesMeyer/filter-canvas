@@ -146,7 +146,7 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 						// Collect connections to delete
 						connectionDeleteList.union(data.getIn(['items', itemId, 'connections']));
 						// Delete item
-						items = items.delete(itemId);
+						items = items.remove(itemId);
 					});
 					return items;
 				});
@@ -154,7 +154,7 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 				// Delete connections
 				data.updateIn(['connections'], cns => {
 					connectionDeleteList.forEach(cnId => {
-						cns = cns.delete(cnId);
+						cns = cns.remove(cnId);
 					});
 					return cns;
 				});
