@@ -50,6 +50,10 @@ var AppActions = {
 		console.log('TODO: export file');
 	},
 
+	saveSelectedItemsAsFilter() {
+		console.log('TODO: save selected items as filter');
+	},
+
 	undo() {
 		Dispatcher.dispatch({ actionType: Constants.UNDO });
 	},

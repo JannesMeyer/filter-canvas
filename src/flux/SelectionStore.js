@@ -77,6 +77,8 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 			SelectionStore.emitChange();
 		return;
 
+		// TODO: delete
+
 		case Constants.CREATE_ITEM:
 			// Select the item after the it was created
 			Dispatcher.waitFor([ WorkbenchStore.dispatchToken ]);

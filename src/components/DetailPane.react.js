@@ -14,6 +14,16 @@ module.exports = React.createClass({
 		return !this.state.selectedItems.equals(nextState.selectedItems);
 	},
 
+	handleUpdateClick(ev) {
+		if (ev.button !== 0) { return; }
+		console.log('TODO: update parameters');
+	},
+
+	handleSaveAsClick(ev) {
+		if (ev.button !== 0) { return; }
+		AppActions.saveSelectedItemsAsFilter();
+	},
+
 	handleDeleteClick(ev) {
 		if (ev.button !== 0) { return; }
 		AppActions.deleteSelectedItems();
@@ -28,56 +38,35 @@ module.exports = React.createClass({
 	},
 
 	render() {
-		var numItems = this.state.selectedItems.length;
-
-		var itemDetails = null;
-		var updateItemAction = null;
-		if (numItems === 1) {
-			var itemId = this.state.selectedItems.first();
-			var item = WorkbenchStore.getItem(itemId);
-			var params = item.get('parameter');
-			var itemClass = item.get('class');
-			itemDetails = (
-				<div className="details">
-					<h3>{itemClass}</h3>
-					{params.map((value, key) => {
-						if (typeof value === 'number') {
-							return <div key={key}><label>{key} <input type="number" defaultValue={value} /></label></div>;
-						} else {
-							return <div key={key}><label>{key} <input type="text" defaultValue={value} /></label></div>;
-						}
-					}).toArray()}
-				</div>
-			);
-			if (params.length > 0) {
-				updateItemAction = <button>Update parameters</button>;
-			}
-		}
-
-		var saveAction = null;
-		var deleteAction = null;
-		if (numItems > 1) {
-			saveAction = <button>Save as complex filter</button>;
-		}
-		if (numItems > 0) {
-			deleteAction = <button className="red-button" onClick={this.handleDeleteClick}>Delete</button>;
-		}
+		var items = this.state.selectedItems;
+		var count = items.length;
 
 		var message;
-		if (numItems === 0) {
-			message = 'No items selected';
-		} else if (numItems > 1) {
-			message = numItems + ' items selected';
+		if (count === 0) { message = 'No items selected'; }
+		if (count > 1)   { message = count + ' items selected'; }
+
+		var itemClass, itemParams = [];
+		if (count === 1) {
+			var item = WorkbenchStore.getItem(items.first());
+
+			itemClass = item.get('class');
+			itemParams = item.get('parameter').map((value, key) => {
+				var type = (typeof value === 'number') ? 'number' : 'text';
+				return <div key={key}><label>{key} <input type={type} defaultValue={value} /></label></div>;
+			}).toArray();
 		}
 
 		return (
 			<div className="m-detail-pane">
 				{message}
-				{itemDetails}
+				<div className="details">
+					<h3>{itemClass}</h3>
+					{itemParams}
+				</div>
 				<div className="actions">
-					{updateItemAction}
-					{saveAction}
-					{deleteAction}
+					{itemParams.length > 0 && <button onClick={this.handleUpdateClick}>Update parameters</button>}
+					{items.length > 1      && <button onClick={this.handleSaveAsClick}>Save as complex filter</button>}
+					{items.length > 0      && <button onClick={this.handleDeleteClick} className="red-button">Delete</button>}
 				</div>
 			</div>
 		);
