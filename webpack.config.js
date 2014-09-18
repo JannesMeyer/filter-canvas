@@ -57,7 +57,19 @@ var config = {
 if ('production' === process.env.NODE_ENV) {
 	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
 	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
-	config.plugins.push(new webpack.optimize.UglifyJsPlugin());
+	var options = {
+		// Regex that never matches
+		comments: / ^/,
+		mangle: {
+			sort: true
+		},
+		compress: {
+			drop_console: true,
+			hoist_vars: true,
+			warnings: false
+		}
+	};
+	config.plugins.push(new webpack.optimize.UglifyJsPlugin(options));
 } else {
 	// Hot module replacement in development
 	config.entry.unshift('webpack/hot/dev-server');
