@@ -1,3 +1,4 @@
+var cx = require('react/lib/cx');
 var AppActions = require('../flux/AppActions');
 var constants = require('../flux/constants');
 
@@ -19,20 +20,14 @@ module.exports = React.createClass({
 		var item = this.props.item;
 		var frame = this.props.frame || item.get('rect');
 		var type = item.get('type');
+		var isFilter = (type === constants.ITEM_TYPE_FILTER);
+		var isPipe   = (type === constants.ITEM_TYPE_PIPE);
 
-		var className;
-		var title;
-		if (type === constants.ITEM_TYPE_FILTER) {
-			className = 'filter';
-			title = <h4>{item.get('class')}</h4>;
-		} else if (type === constants.ITEM_TYPE_PIPE) {
-			className = 'pipe';
-		} else {
-			throw new Error('Invalid item type');
-		}
-		if (this.props.isSelected) {
-			className += ' selected';
-		}
+		var classes = cx({
+			'filter': isFilter,
+			'pipe': isPipe,
+			'selected': this.props.isSelected
+		});
 		var style = {
 			left: frame.x,
 			top: frame.y,
@@ -40,8 +35,8 @@ module.exports = React.createClass({
 			height: frame.height
 		};
 		return (
-			<div className={className} style={style} onMouseDown={this.handleMouseDown}>
-				{title}
+			<div className={classes} style={style} onMouseDown={this.handleMouseDown}>
+				{isFilter && <h4>{item.get('class')}</h4>}
 				<ItemConnectors type="inputs" connectors={item.get('inputs')} />
 				<ItemConnectors type="outputs" connectors={item.get('outputs')} />
 			</div>
