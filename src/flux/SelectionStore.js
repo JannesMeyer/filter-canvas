@@ -73,11 +73,10 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 		return;
 
 		case Constants.CLEAR_SELECTED_ITEMS:
+		case Constants.DELETE_SELECTED_ITEMS:
 			selectedItems = selectedItems.clear();
 			SelectionStore.emitChange();
 		return;
-
-		// TODO: delete
 
 		case Constants.CREATE_ITEM:
 			// Select the item after the it was created
