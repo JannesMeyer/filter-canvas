@@ -1,5 +1,5 @@
 var immutable = require('immutable');
-var Rect = require('../lib/ImmutableRect');
+var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
 var BaseStore = require('../lib/BaseStore');
 var Dispatcher = require('./dispatcher');
@@ -8,9 +8,6 @@ var Constants = require('./constants');
 // Data
 var filters = require('../interface/FilterRepo');
 var pipes = require('../interface/PipeRepo');
-
-// Constants
-var connectorHeight = 16;
 
 /**
  * RepositoryStore single object
@@ -50,7 +47,7 @@ var RepositoryStore = BaseStore.createStore({
 			outputs: immutable.Range(0, baseFilter.outputs),
 			parameter: immutable.Map(baseFilter.parameter),
 			connections: immutable.Vector(),
-			rect: new Rect(x, y, this.getFilterWidth(id), this.getFilterHeight(baseFilter))
+			rect: WorkbenchLayout.getFilterFrame(x, y, id, baseFilter.inputs, baseFilter.outputs)
 		});
 	},
 
@@ -66,23 +63,8 @@ var RepositoryStore = BaseStore.createStore({
 			outputs: immutable.Range(0, basePipe.outputs),
 			parameter: immutable.Map(basePipe.parameter),
 			connections: immutable.Vector(),
-			rect: new Rect(x, y, 40, this.getPipeHeight(basePipe))
+			rect: WorkbenchLayout.getPipeFrame(x, y, id, basePipe.inputs, basePipe.outputs)
 		});
-	},
-
-	// TODO: loop through all filters in the beginning and figure these values out once and for all
-	getFilterWidth(id) {
-		return Math.max(140, Math.floor(id.length * 5.5) + 40);
-	},
-
-	getFilterHeight(baseFilter) {
-		var c = Math.max(baseFilter.inputs, baseFilter.outputs);
-		return Math.max(60, c * connectorHeight + 28);
-	},
-
-	getPipeHeight(basePipe) {
-		var c = Math.max(basePipe.inputs, basePipe.outputs);
-		return Math.max(32, c * connectorHeight);
 	}
 
 });

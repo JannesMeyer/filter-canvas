@@ -1,4 +1,5 @@
 module.exports = React.createClass({
+
 	context: null,
 
 	draw() {
@@ -22,8 +23,9 @@ module.exports = React.createClass({
 	},
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.props.frame && nextProps.frame &&
-		      !this.props.frame.equals(nextProps.frame);
+		return this.props.frame &&
+		       nextProps.frame &&
+		       !this.props.frame.equals(nextProps.frame);
 	},
 
 	shouldComponentRedraw(prevProps) {
@@ -42,12 +44,8 @@ module.exports = React.createClass({
 	},
 
 	render() {
-		var frame = this.props.frame;
-		var style = {
-			left: frame.x,
-			top: frame.y
-		};
-		return <canvas className="wire" width={frame.width} height={frame.height} style={style} />;
+		var f = this.props.frame;
+		return <canvas className="wire" width={f.width} height={f.height} style={{ left: f.x, top: f.y }} />;
 	}
 
 });
