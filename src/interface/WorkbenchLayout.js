@@ -1,21 +1,20 @@
 var Point = require('../lib/ImmutablePoint');
 var Rect = require('../lib/ImmutableRect');
 
-// Constants
-var connectorHeight = 16;
+var CONNECTOR_HEIGHT = 16;
 
 var WorkbenchLayout = {
 
 	getFilterFrame(x, y, name, inputs, outputs) {
 		var c = Math.max(inputs, outputs);
 		var width = Math.max(140, Math.floor(name.length * 5.5) + 40);
-		var height = Math.max(60, c * connectorHeight + 28);
+		var height = Math.max(60, c * CONNECTOR_HEIGHT + 28);
 		return new Rect(x, y, width, height);
 	},
 
 	getPipeFrame(x, y, name, inputs, outputs) {
 		var c = Math.max(inputs, outputs);
-		var height = Math.max(32, c * connectorHeight);
+		var height = Math.max(32, c * CONNECTOR_HEIGHT);
 		return new Rect(x, y, 40, height);
 	},
 
@@ -39,7 +38,7 @@ var WorkbenchLayout = {
 		}
 	},
 
-	calculateBezierPoints(frame, startPoint, endPoint, lineWidth) {
+	getBezierPoints(frame, startPoint, endPoint, lineWidth) {
 		if (frame === null) {
 			return null;
 		}

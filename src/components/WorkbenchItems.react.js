@@ -65,7 +65,7 @@ module.exports = React.createClass({
 						var endPoint = items[toItem].get('rect').moveBy(toOffset);
 					}
 					var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint, this.state.lineWidth);
-					var bezier = WorkbenchLayout.calculateBezierPoints(frame, startPoint, endPoint, this.state.lineWidth);
+					var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint, this.state.lineWidth);
 
 					return <WorkbenchWire key={id} frame={frame} bezier={bezier} width={this.state.lineWidth} />;
 				})}

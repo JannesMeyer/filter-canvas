@@ -17,7 +17,8 @@ var data = immutable.Map({
 		RepositoryStore.createFilterObject('SourceFilterExample', 20,  20 + 0 * 70),
 		RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 1 * 70),
 		RepositoryStore.createFilterObject('EndFilter',           508, 123        ),
-		RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 3 * 70)
+		RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 3 * 70),
+		RepositoryStore.createPipeObject('ForwardPipe', 300, 150, { pipelines: 3 })
 		// RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 4 * 70),
 		// RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 5 * 70),
 		// RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 6 * 70),
