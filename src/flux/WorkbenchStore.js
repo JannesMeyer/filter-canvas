@@ -9,14 +9,7 @@ var constants = require('./constants');
 
 // Data
 var data = immutable.Map({
-	items: immutable.Vector(
-		createFilterObject('SourceFilterExample', 20,  20),
-		createFilterObject('WorkFilterExample', 20,  90),
-		createFilterObject('EndFilter', 508, 123),
-		createFilterObject('WorkFilterExample', 20,  230),
-		createPipeObject('ForwardPipe', 300, 150, { pipelines: 3 })
-	),
-	connections: immutable.Vector()
+	items: immutable.Vector()
 });
 var undoStack = [];
 var redoStack = [];
@@ -33,6 +26,9 @@ function setData(newData) {
 	data = newData;
 	WorkbenchStore.emitChange();
 }
+
+// function delete() {
+// }
 
 /**
  * Undo the previous action
@@ -108,18 +104,6 @@ var WorkbenchStore = BaseStore.createStore({
 		return data.getIn(['items', id, 'rect']);
 	},
 	/**
-	 * returns an immutable.Vector
-	 */
-	getAllConnections() {
-		return data.get('connections');
-	},
-	/**
-	 * returns an immutable.Map
-	 */
-	getConnection(id) {
-		return data.getIn(['connections', id]);
-	},
-	/**
 	 * returns a boolean
 	 */
 	hasUndoSteps() {
@@ -136,15 +120,13 @@ var WorkbenchStore = BaseStore.createStore({
 WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case constants.CREATE_ITEM:
-			var item;
 			if (action.type === constants.ITEM_TYPE_FILTER) {
-				item = createFilterObject(action.id, action.x, action.y);
+				addFilter(action.id, action.x, action.y);
 			} else if (action.type === constants.ITEM_TYPE_PIPE) {
-				item = createPipeObject(action.id, action.x, action.y);
+				addPipe(action.id, action.x, action.y);
 			} else {
 				throw new Error('Invalid type');
 			}
-			setData(data.updateIn(['items'], items => items.push(item)));
 		break;
 
 		case constants.MOVE_SELECTED_ITEMS_BY:
@@ -213,62 +195,34 @@ module.exports = WorkbenchStore;
  * Item adding
  *************************************************************************/
 
-function addConnection({ fromItem, fromConnector, toItem, toConnector }) {
-	var item1 = data.getIn(['items', fromItem]);
-	var item2 = data.getIn(['items', toItem]);
-	if (!item1) {
-		throw new Error('The source filter doesn\'t exist');
-	}
-	if (!item2) {
-		throw new Error('The target filter doesn\'t exist');
-	}
-	var numOutputs = item1.get('outputs').length;
-	var numInputs = item2.get('inputs').length;
-	if (fromConnector < 0 || toConnector < 0) {
-		throw new Error('Only positive integers are valid connector keys');
-	}
-	if (fromConnector >= numOutputs || toConnector >= numInputs) {
-		throw new Error('The filter doesn\'t have sufficient connectors');
-	}
-
-	var cn = immutable.Map({
-		fromItem,
-		fromConnector,
-		fromOffset: WorkbenchLayout.getConnectorOffset(item1.get('rect'), numOutputs, fromConnector, true),
-		toItem,
-		toConnector,
-		toOffset: WorkbenchLayout.getConnectorOffset(item2.get('rect'), numInputs, toConnector, false)
-	});
-	var cnId = data.get('connections').length;
-
-	setData(data.withMutations(data => {
-		data.updateIn(['connections'], cns => cns.push(cn));
-		data.updateIn(['items', fromItem, 'connections'], cns => cns.push(cnId));
-		data.updateIn(['items', toItem, 'connections'], cns => cns.push(cnId));
-	}));
-}
-
-function createFilterObject(name, x, y, params) {
+function addFilter(name, x, y, params) {
 	var baseFilter = RepositoryStore.getFilter(name);
 	if (!baseFilter) {
 		throw new Error('The filter class doesn\'t exist');
 	}
-	return immutable.Map({
+
+	var inputs = baseFilter.inputs;
+	var outputs = baseFilter.outputs;
+	var parameter = merge(baseFilter.parameter, params);
+
+	var item = immutable.Map({
 		type: constants.ITEM_TYPE_FILTER,
 		class: name,
-		inputs: immutable.Vector.from(new Array(baseFilter.inputs)),
-		outputs: immutable.Vector.from(new Array(baseFilter.outputs)),
-		parameter: immutable.Map(merge(baseFilter.parameter, params)),
-		connections: immutable.Vector(),
-		rect: WorkbenchLayout.getFilterFrame(x, y, name, baseFilter.inputs, baseFilter.outputs)
+		inputs: immutable.Vector.from(new Array(inputs)),
+		outputs: immutable.Vector.from(new Array(outputs)),
+		parameter: immutable.Map(parameter),
+		rect: WorkbenchLayout.getFilterFrame(x, y, name, inputs, outputs)
 	});
+	setData(data.updateIn(['items'], items => items.push(item)));
 }
 
-function createPipeObject(name, x, y, params) {
+
+function addPipe(name, x, y, params) {
 	var basePipe = RepositoryStore.getPipe(name);
 	if (!basePipe) {
 		throw new Error('The pipe class doesn\'t exist');
 	}
+
 	var inputs = basePipe.inputs || 0;
 	var outputs = basePipe.outputs || 0;
 	// TODO: don't copy invalid params
@@ -285,16 +239,39 @@ function createPipeObject(name, x, y, params) {
 	}
 
 	// immutable.Range(0, inputs).map(val => null).toVector()
-
-	return immutable.Map({
+	var item = immutable.Map({
 		type: constants.ITEM_TYPE_PIPE,
 		class: name,
 		inputs: immutable.Vector.from(new Array(inputs)),
 		outputs: immutable.Vector.from(new Array(outputs)),
 		parameter: immutable.Map(parameter),
-		connections: immutable.Vector(),
 		rect: WorkbenchLayout.getPipeFrame(x, y, name, inputs, outputs)
 	});
+	setData(data.updateIn(['items'], items => items.push(item)));
+}
+
+
+function addConnection({ from, to }) {
+	var item1 = data.getIn(['items', from[0]]);
+	var item2 = data.getIn(['items', to[0]]);
+	var outputIndex = from[1];
+	var inputIndex = to[1];
+	if (!item1 || !item2) {
+		throw new Error('Invalid item ID');
+	}
+	var frame1 = item1.get('rect');
+	var frame2 = item2.get('rect');
+	var outputs = item1.get('outputs');
+	var inputs = item2.get('inputs');
+	if (outputIndex < 0 || outputIndex >= outputs.length ||
+	    inputIndex  < 0 || inputIndex  >= inputs.length) {
+		throw new Error('Connector index out of bounds');
+	}
+
+	setData(data.withMutations(data => {
+		data.updateIn(['items', from[0], 'outputs', outputIndex], () => immutable.Vector.from(to));
+		data.updateIn(['items', to[0], 'inputs', inputIndex], () => immutable.Vector.from(from));
+	}));
 }
 
 
@@ -304,23 +281,19 @@ function createPipeObject(name, x, y, params) {
  * Testing
  *************************************************************************/
 
-addConnection({
-	fromItem: 0,
-	fromConnector: 0,
-	toItem: 2,
-	toConnector: 0
-});
-addConnection({
-	fromItem: 1,
-	fromConnector: 0,
-	toItem: 2,
-	toConnector: 1
-});
-addConnection({
-	fromItem: 3,
-	fromConnector: 0,
-	toItem: 2,
-	toConnector: 2
-});
+// 0 .. 4
+addFilter('SourceFilterExample', 20,  20);
+addFilter('WorkFilterExample', 20,  90);
+addFilter('EndFilter', 508, 123);
+addFilter('WorkFilterExample', 20,  230);
+addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
+
+addConnection({ from: [0, 0], to: [2, 0] });
+addConnection({ from: [1, 0], to: [2, 1] });
+addConnection({ from: [3, 0], to: [2, 2] });
+// addConnection(new OutputPath(0, 0), new InputPath(2, 0));
+
+console.log(data.toJS());
+
 undoStack = [];
 redoStack = [];
