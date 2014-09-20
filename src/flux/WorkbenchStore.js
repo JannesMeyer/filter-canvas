@@ -11,6 +11,7 @@ var constants = require('./constants');
 var data = immutable.Map({
 	items: immutable.Vector()
 });
+var connectorOffsets = {};
 var undoStack = [];
 var redoStack = [];
 
@@ -102,6 +103,12 @@ var WorkbenchStore = BaseStore.createStore({
 	 */
 	getItemPosition(id) {
 		return data.getIn(['items', id, 'rect']);
+	},
+	getInputOffset(id, inputId) {
+		return connectorOffsets['input' + id + ',' + inputId];
+	},
+	getOutputOffset(id, outputId) {
+		return connectorOffsets['output' + id + ',' + outputId];
 	},
 	/**
 	 * returns a boolean
@@ -267,6 +274,9 @@ function addConnection({ from, to }) {
 	    inputIndex  < 0 || inputIndex  >= inputs.length) {
 		throw new Error('Connector index out of bounds');
 	}
+
+	connectorOffsets['output'+from] = WorkbenchLayout.getConnectorOffset(frame1, outputs.length, outputIndex, true);
+	connectorOffsets['input' +to]   = WorkbenchLayout.getConnectorOffset(frame2, inputs.length, inputIndex, false);
 
 	setData(data.withMutations(data => {
 		data.updateIn(['items', from[0], 'outputs', outputIndex], () => immutable.Vector.from(to));

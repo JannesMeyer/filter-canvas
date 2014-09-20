@@ -41,10 +41,8 @@ module.exports = React.createClass({
 				frame = EtherMovementStore.getItemPosition(itemId);
 			}
 
-			var outputs = item.get('outputs');
-			outputs.forEach((to, outputIndex) => {
+			item.get('outputs').forEach((to, outputIndex) => {
 				if (!to) { return; }
-				var otherItem = WorkbenchStore.getItem(to.get(0));
 				var isOtherSelected = SelectionStore.isItemSelected(to.get(0));
 
 				// TODO: Remove EtherMovementStore
@@ -59,8 +57,8 @@ module.exports = React.createClass({
 					var endPoint = WorkbenchStore.getItemPosition(to.get(0));
 				}
 
-				startPoint = startPoint.moveBy(WorkbenchLayout.getConnectorOffset(startPoint, outputs.length, outputIndex, true));
-				endPoint = endPoint.moveBy(WorkbenchLayout.getConnectorOffset(endPoint, otherItem.get('inputs').length, to.get(1), false));
+				startPoint = startPoint.moveBy(WorkbenchStore.getOutputOffset(itemId, outputIndex));
+				endPoint = endPoint.moveBy(WorkbenchStore.getInputOffset(to.get(0), to.get(1)));
 
 				var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint, wireWidth);
 				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint, wireWidth);
