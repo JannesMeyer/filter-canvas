@@ -12,7 +12,7 @@ module.exports = React.createClass({
 		return {
 			items: WorkbenchStore.getAllItems(),
 			connections: WorkbenchStore.getAllConnections(),
-			lineWidth: WorkbenchStore.getWireWidth(),
+			wireWidth: WorkbenchLayout.getWireWidth(),
 			isDragging: EtherMovementStore.isDragging()
 		};
 	},
@@ -43,7 +43,6 @@ module.exports = React.createClass({
 					}
 					return <WorkbenchItem key={id} item={item} frame={frame} isSelected={isSelected} />;
 				})}
-
 				{connections.map((cn, id) => {
 					var fromItem = cn.get('fromItem');
 					var fromOffset = cn.get('fromOffset');
@@ -64,10 +63,10 @@ module.exports = React.createClass({
 					} else {
 						var endPoint = items[toItem].get('rect').moveBy(toOffset);
 					}
-					var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint, this.state.lineWidth);
-					var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint, this.state.lineWidth);
+					var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint, this.state.wireWidth);
+					var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint, this.state.wireWidth);
 
-					return <WorkbenchWire key={id} frame={frame} bezier={bezier} width={this.state.lineWidth} />;
+					return <WorkbenchWire key={id} frame={frame} bezier={bezier} width={this.state.wireWidth} />;
 				})}
 			</div>
 		);

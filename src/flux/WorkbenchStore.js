@@ -1,29 +1,21 @@
 var immutable = require('immutable');
 var Point = require('../lib/ImmutablePoint');
+var merge = require('react/lib/merge');
+var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
 var BaseStore = require('../lib/BaseStore');
 var RepositoryStore = require('./RepositoryStore');
 var Dispatcher = require('./dispatcher');
 var Constants = require('./constants');
 
-// Constants
-var connectorHeight = 8;
-var connectorMargin = 4;
-var wireWidth = 5;
-
 // Data
 var data = immutable.Map({
 	items: immutable.Vector(
-		RepositoryStore.createFilterObject('SourceFilterExample', 20,  20 + 0 * 70),
-		RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 1 * 70),
-		RepositoryStore.createFilterObject('EndFilter',           508, 123        ),
-		RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 3 * 70),
-		RepositoryStore.createPipeObject('ForwardPipe', 300, 150, { pipelines: 3 })
-		// RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 4 * 70),
-		// RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 5 * 70),
-		// RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 6 * 70),
-		// RepositoryStore.createFilterObject('WorkFilterExample',   20,  20 + 7 * 70),
-		// RepositoryStore.createFilterObject('EndFilterExample',    20,  20 + 8 * 70)
+		createFilterObject('SourceFilterExample', 20,  20 + 0 * 70),
+		createFilterObject('WorkFilterExample',   20,  20 + 1 * 70),
+		createFilterObject('EndFilter',           508, 123        ),
+		createFilterObject('WorkFilterExample',   20,  20 + 3 * 70),
+		createPipeObject('ForwardPipe', 300, 150, { pipelines: 3 })
 	),
 	connections: immutable.Vector()
 });
@@ -126,12 +118,6 @@ var WorkbenchStore = BaseStore.createStore({
 		return data.getIn(['connections', id]);
 	},
 	/**
-	 * returns a number
-	 */
-	getWireWidth() {
-		return wireWidth;
-	},
-	/**
 	 * returns a boolean
 	 */
 	hasUndoSteps() {
@@ -150,9 +136,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		case Constants.CREATE_ITEM:
 			var item;
 			if (action.type === Constants.ITEM_TYPE_FILTER) {
-				item = RepositoryStore.createFilterObject(action.id, action.x, action.y);
+				item = createFilterObject(action.id, action.x, action.y);
 			} else if (action.type === Constants.ITEM_TYPE_PIPE) {
-				item = RepositoryStore.createPipeObject(action.id, action.x, action.y);
+				item = createPipeObject(action.id, action.x, action.y);
 			} else {
 				throw new Error('Invalid type');
 			}
@@ -212,26 +198,6 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 
 module.exports = WorkbenchStore;
 
-
-
-
-
-
-
-/**
- * Calculates the offset of a connector to the top left point of its filter
- */
-function calculateConnectorOffset(filterFrame, connectors, connectorId, isOutput) {
-	var totalHeight = (connectors + 1) * connectorMargin + connectors * connectorHeight;
-	var x = isOutput ? filterFrame.width + 6 : -6;
-	var y = Math.round(
-			(filterFrame.height - totalHeight) / 2 +
-			(connectorId + 1) * connectorMargin +
-			connectorId * connectorHeight +
-			Math.floor(Math.abs(connectorHeight - wireWidth) / 2));
-	return new Point(x, y);
-}
-
 /**
  * Adds a connection
  */
@@ -256,10 +222,10 @@ function addConnection({ fromItem, fromConnector, toItem, toConnector }) {
 	var cn = immutable.Map({
 		fromItem,
 		fromConnector,
-		fromOffset: calculateConnectorOffset(item1.get('rect'), numOutputs, fromConnector, true),
+		fromOffset: WorkbenchLayout.getConnectorOffset(item1.get('rect'), numOutputs, fromConnector, true),
 		toItem,
 		toConnector,
-		toOffset: calculateConnectorOffset(item2.get('rect'), numInputs, toConnector, false)
+		toOffset: WorkbenchLayout.getConnectorOffset(item2.get('rect'), numInputs, toConnector, false)
 	});
 	var cnId = data.get('connections').length;
 
@@ -269,6 +235,59 @@ function addConnection({ fromItem, fromConnector, toItem, toConnector }) {
 		data.updateIn(['items', toItem, 'connections'], cns => cns.push(cnId));
 	}));
 }
+
+
+/*************************************************************************
+ * Item adding
+ *************************************************************************/
+
+function createFilterObject(name, x, y, params) {
+	var baseFilter = RepositoryStore.getFilter(name);
+	if (!baseFilter) {
+		throw new Error('The filter class doesn\'t exist');
+	}
+	return immutable.Map({
+		type: Constants.ITEM_TYPE_FILTER,
+		class: name,
+		inputs: immutable.Range(0, baseFilter.inputs),
+		outputs: immutable.Range(0, baseFilter.outputs),
+		parameter: immutable.Map(merge(baseFilter.parameter, params)),
+		connections: immutable.Vector(),
+		rect: WorkbenchLayout.getFilterFrame(x, y, name, baseFilter.inputs, baseFilter.outputs)
+	});
+}
+
+function createPipeObject(name, x, y, params) {
+	var basePipe = RepositoryStore.getPipe(name);
+	if (!basePipe) {
+		throw new Error('The pipe class doesn\'t exist');
+	}
+	var inputs = basePipe.inputs || 0;
+	var outputs = basePipe.outputs || 0;
+	// TODO: don't copy invalid params
+	var parameter = merge(basePipe.parameter, params);
+	if (parameter.inputs !== undefined) {
+		inputs += parameter.inputs;
+	}
+	if (parameter.outputs !== undefined) {
+		outputs += parameter.outputs;
+	}
+	if (parameter.pipelines !== undefined) {
+		inputs += parameter.pipelines;
+		outputs += parameter.pipelines;
+	}
+
+	return immutable.Map({
+		type: Constants.ITEM_TYPE_PIPE,
+		class: name,
+		inputs: immutable.Range(0, inputs),
+		outputs: immutable.Range(0, outputs),
+		parameter: immutable.Map(parameter),
+		connections: immutable.Vector(),
+		rect: WorkbenchLayout.getPipeFrame(x, y, name, inputs, outputs)
+	});
+}
+
 
 
 
