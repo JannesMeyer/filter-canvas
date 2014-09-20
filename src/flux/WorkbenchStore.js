@@ -1,31 +1,33 @@
 var immutable = require('immutable');
-var Point = require('../lib/ImmutablePoint');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
 var BaseStore = require('../lib/BaseStore');
 var RepositoryStore = require('./RepositoryStore');
-var Dispatcher = require('./dispatcher');
-var Constants = require('./constants');
+var dispatcher = require('./dispatcher');
+var constants = require('./constants');
 
 // Data
 var data = immutable.Map({
 	items: immutable.Vector(
-		createFilterObject('SourceFilterExample', 20,  20 + 0 * 70),
-		createFilterObject('WorkFilterExample',   20,  20 + 1 * 70),
-		createFilterObject('EndFilter',           508, 123        ),
-		createFilterObject('WorkFilterExample',   20,  20 + 3 * 70),
+		createFilterObject('SourceFilterExample', 20,  20),
+		createFilterObject('WorkFilterExample', 20,  90),
+		createFilterObject('EndFilter', 508, 123),
+		createFilterObject('WorkFilterExample', 20,  230),
 		createPipeObject('ForwardPipe', 300, 150, { pipelines: 3 })
 	),
 	connections: immutable.Vector()
 });
-var undoSteps = [];
-var redoSteps = [];
+var undoStack = [];
+var redoStack = [];
 
+/**
+ * Modify the data object
+ */
 function setData(newData) {
 	// Push the current state to the undo stack and clear the redo stack
-	undoSteps.push(data);
-	redoSteps = [];
+	undoStack.push(data);
+	redoStack = [];
 
 	// Change the data object
 	data = newData;
@@ -36,13 +38,13 @@ function setData(newData) {
  * Undo the previous action
  */
 function undo() {
-	if (undoSteps.length === 0) {
+	if (undoStack.length === 0) {
 		return;
 	}
-	redoSteps.push(data);
+	redoStack.push(data);
 
 	// Change the data object
-	data = undoSteps.pop();
+	data = undoStack.pop();
 	WorkbenchStore.emitChange();
 }
 
@@ -50,13 +52,13 @@ function undo() {
  * Redo the following action
  */
 function redo() {
-	if (redoSteps.length === 0) {
+	if (redoStack.length === 0) {
 		return;
 	}
-	undoSteps.push(data);
+	undoStack.push(data);
 
 	// Change the data object
-	data = redoSteps.pop();
+	data = redoStack.pop();
 	WorkbenchStore.emitChange();
 }
 
@@ -121,23 +123,23 @@ var WorkbenchStore = BaseStore.createStore({
 	 * returns a boolean
 	 */
 	hasUndoSteps() {
-		return undoSteps.length !== 0;
+		return undoStack.length !== 0;
 	},
 	/**
 	 * returns a boolean
 	 */
 	hasRedoSteps() {
-		return redoSteps.length !== 0;
+		return redoStack.length !== 0;
 	}
 });
 
-WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
+WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
-		case Constants.CREATE_ITEM:
+		case constants.CREATE_ITEM:
 			var item;
-			if (action.type === Constants.ITEM_TYPE_FILTER) {
+			if (action.type === constants.ITEM_TYPE_FILTER) {
 				item = createFilterObject(action.id, action.x, action.y);
-			} else if (action.type === Constants.ITEM_TYPE_PIPE) {
+			} else if (action.type === constants.ITEM_TYPE_PIPE) {
 				item = createPipeObject(action.id, action.x, action.y);
 			} else {
 				throw new Error('Invalid type');
@@ -145,8 +147,8 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			setData(data.updateIn(['items'], items => items.push(item)));
 		break;
 
-		case Constants.MOVE_SELECTED_ITEMS_BY:
-			// item.get('type') === Constants.ITEM_TYPE_FILTER
+		case constants.MOVE_SELECTED_ITEMS_BY:
+			// item.get('type') === constants.ITEM_TYPE_FILTER
 			// TODO: improve the updating
 			setData(data.withMutations(data => {
 				action.selectedItems.forEach((_, id) => {
@@ -156,7 +158,7 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			// TODO: redraw wires?
 		break;
 
-		case Constants.DELETE_SELECTED_ITEMS:
+		case constants.DELETE_SELECTED_ITEMS:
 			if (action.selectedItems.length === 0) {
 				break;
 			}
@@ -186,11 +188,11 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			}));
 		break;
 
-		case Constants.UNDO:
+		case constants.UNDO:
 			undo();
 		break;
 
-		case Constants.REDO:
+		case constants.REDO:
 			redo();
 		break;
 	}
@@ -198,9 +200,19 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 
 module.exports = WorkbenchStore;
 
-/**
- * Adds a connection
- */
+
+
+
+
+
+
+
+
+
+/*************************************************************************
+ * Item adding
+ *************************************************************************/
+
 function addConnection({ fromItem, fromConnector, toItem, toConnector }) {
 	var item1 = data.getIn(['items', fromItem]);
 	var item2 = data.getIn(['items', toItem]);
@@ -236,21 +248,16 @@ function addConnection({ fromItem, fromConnector, toItem, toConnector }) {
 	}));
 }
 
-
-/*************************************************************************
- * Item adding
- *************************************************************************/
-
 function createFilterObject(name, x, y, params) {
 	var baseFilter = RepositoryStore.getFilter(name);
 	if (!baseFilter) {
 		throw new Error('The filter class doesn\'t exist');
 	}
 	return immutable.Map({
-		type: Constants.ITEM_TYPE_FILTER,
+		type: constants.ITEM_TYPE_FILTER,
 		class: name,
-		inputs: immutable.Range(0, baseFilter.inputs),
-		outputs: immutable.Range(0, baseFilter.outputs),
+		inputs: immutable.Vector.from(new Array(baseFilter.inputs)),
+		outputs: immutable.Vector.from(new Array(baseFilter.outputs)),
 		parameter: immutable.Map(merge(baseFilter.parameter, params)),
 		connections: immutable.Vector(),
 		rect: WorkbenchLayout.getFilterFrame(x, y, name, baseFilter.inputs, baseFilter.outputs)
@@ -277,19 +284,18 @@ function createPipeObject(name, x, y, params) {
 		outputs += parameter.pipelines;
 	}
 
+	// immutable.Range(0, inputs).map(val => null).toVector()
+
 	return immutable.Map({
-		type: Constants.ITEM_TYPE_PIPE,
+		type: constants.ITEM_TYPE_PIPE,
 		class: name,
-		inputs: immutable.Range(0, inputs),
-		outputs: immutable.Range(0, outputs),
+		inputs: immutable.Vector.from(new Array(inputs)),
+		outputs: immutable.Vector.from(new Array(outputs)),
 		parameter: immutable.Map(parameter),
 		connections: immutable.Vector(),
 		rect: WorkbenchLayout.getPipeFrame(x, y, name, inputs, outputs)
 	});
 }
-
-
-
 
 
 
@@ -316,5 +322,5 @@ addConnection({
 	toItem: 2,
 	toConnector: 2
 });
-undoSteps = [];
-redoSteps = [];
+undoStack = [];
+redoStack = [];

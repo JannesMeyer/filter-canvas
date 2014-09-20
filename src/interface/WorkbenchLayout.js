@@ -1,7 +1,6 @@
 var Point = require('../lib/ImmutablePoint');
 var Rect = require('../lib/ImmutableRect');
 
-// Constants
 var CONNECTOR_HEIGHT = 8;
 var CONNECTOR_MARGIN = 4;
 var WIRE_WIDTH = 5;

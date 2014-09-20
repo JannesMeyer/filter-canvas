@@ -4,8 +4,8 @@ var Rect = require('../lib/ImmutableRect');
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore = require('./WorkbenchStore');
 var SelectionStore = require('./SelectionStore');
-var Dispatcher = require('./dispatcher');
-var Constants = require('./constants');
+var dispatcher = require('./dispatcher');
+var constants = require('./constants');
 
 var requestAnimationFrame = window.requestAnimationFrame ||
                             window.mozRequestAnimationFrame ||
@@ -38,9 +38,9 @@ var EtherMovementStore = BaseStore.createStore({
 	}
 });
 
-EtherMovementStore.dispatchToken = Dispatcher.register(function(action) {
+EtherMovementStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
-		case Constants.START_MOVING_SELECTED_ITEMS:
+		case constants.START_MOVING_SELECTED_ITEMS:
 		startMousePos = action.mousePos;
 
 		var items = WorkbenchStore.getAllItems();
@@ -50,7 +50,7 @@ EtherMovementStore.dispatchToken = Dispatcher.register(function(action) {
 		isDragging = true;
 		return;
 
-		case Constants.MOVING_SELECTED_ITEMS:
+		case constants.MOVING_SELECTED_ITEMS:
 		var delta = action.mousePos.subtract(startMousePos);
 		var items = WorkbenchStore.getAllItems();
 		SelectionStore.getSelectedItemIds().forEach(id => {
@@ -64,7 +64,7 @@ EtherMovementStore.dispatchToken = Dispatcher.register(function(action) {
 		EtherMovementStore.emitChange();
 		return;
 
-		case Constants.FINISH_MOVING_SELECTED_ITEMS:
+		case constants.FINISH_MOVING_SELECTED_ITEMS:
 		isDragging = false;
 		requestId = null;
 		return;

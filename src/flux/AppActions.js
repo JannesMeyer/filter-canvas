@@ -1,9 +1,10 @@
-var WorkbenchStore = require('./WorkbenchStore');
-var	SelectionStore = require('./SelectionStore');
-var EtherMovementStore = require('./EtherMovementStore');
 var Point = require('../lib/ImmutablePoint');
-var Dispatcher = require('./dispatcher');
-var Constants = require('./constants');
+
+var WorkbenchStore = require('./WorkbenchStore');
+var EtherMovementStore = require('./EtherMovementStore');
+var	SelectionStore = require('./SelectionStore');
+var dispatcher = require('./dispatcher');
+var constants = require('./constants');
 
 // TODO: move this to `lib/mouse-tool.js` or something like that
 /**
@@ -24,17 +25,17 @@ function getSelectionType(ev, isItemSelected) {
 	// Keep the existing selection if the user is
 	// going to drag a part of it
 	if (isItemSelected) {
-		return Constants.SELECTION_TYPE_EXTEND;
+		return constants.SELECTION_TYPE_EXTEND;
 	}
 
 	// Continue with the existing selection if the user is
 	// pressing the OS-specific key
 	if (isMacSystem && ev.metaKey ||
 		 !isMacSystem && ev.ctrlKey) {
-		return Constants.SELECTION_TYPE_EXTEND;
+		return constants.SELECTION_TYPE_EXTEND;
 	}
 
-	return Constants.SELECTION_TYPE_NEW;
+	return constants.SELECTION_TYPE_NEW;
 }
 
 /**
@@ -55,15 +56,15 @@ var AppActions = {
 	},
 
 	undo() {
-		Dispatcher.dispatch({ actionType: Constants.UNDO });
+		dispatcher.dispatch({ actionType: constants.UNDO });
 	},
 
 	redo() {
-		Dispatcher.dispatch({ actionType: Constants.REDO });
+		dispatcher.dispatch({ actionType: constants.REDO });
 	},
 
 	createItem(type, id, x, y) {
-		Dispatcher.dispatch({ actionType: Constants.CREATE_ITEM, type, id, x, y });
+		dispatcher.dispatch({ actionType: constants.CREATE_ITEM, type, id, x, y });
 	},
 
 	updateItemParams(id, params) {
@@ -71,8 +72,8 @@ var AppActions = {
 	},
 
 	deleteSelectedItems() {
-		Dispatcher.dispatch({
-			actionType: Constants.DELETE_SELECTED_ITEMS,
+		dispatcher.dispatch({
+			actionType: constants.DELETE_SELECTED_ITEMS,
 			selectedItems: SelectionStore.getSelectedItemIds()
 		});
 	},
@@ -83,12 +84,12 @@ var AppActions = {
 		if (selectionType === null) {
 			return;
 		}
-		if (selectionType === Constants.SELECTION_TYPE_NEW) {
-			Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
+		if (selectionType === constants.SELECTION_TYPE_NEW) {
+			dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
 		}
 
-		Dispatcher.dispatch({
-			actionType: Constants.START_MOVING_SELECTED_ITEMS,
+		dispatcher.dispatch({
+			actionType: constants.START_MOVING_SELECTED_ITEMS,
 			id,
 			mousePos: new Point(event.clientX, event.clientY)
 		});
@@ -98,14 +99,14 @@ var AppActions = {
 	},
 
 	moveSelectedItems(clientX, clientY) {
-		Dispatcher.dispatch({
-			actionType: Constants.MOVING_SELECTED_ITEMS,
+		dispatcher.dispatch({
+			actionType: constants.MOVING_SELECTED_ITEMS,
 			mousePos: new Point(clientX, clientY)
 		});
 	},
 
 	finishMovingSelectedItems(event) {
-		Dispatcher.dispatch({ actionType: Constants.FINISH_MOVING_SELECTED_ITEMS });
+		dispatcher.dispatch({ actionType: constants.FINISH_MOVING_SELECTED_ITEMS });
 
 		var mousePos = new Point(event.clientX, event.clientY);
 		var delta = EtherMovementStore.getAmountDragged(mousePos);
@@ -115,8 +116,8 @@ var AppActions = {
 			return;
 		}
 
-		Dispatcher.dispatch({
-			actionType: Constants.MOVE_SELECTED_ITEMS_BY,
+		dispatcher.dispatch({
+			actionType: constants.MOVE_SELECTED_ITEMS_BY,
 			selectedItems: SelectionStore.getSelectedItemIds(),
 			delta: delta
 		});
@@ -131,12 +132,12 @@ var AppActions = {
 			return;
 		}
 
-		if (selectionType === Constants.SELECTION_TYPE_NEW) {
-			Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
+		if (selectionType === constants.SELECTION_TYPE_NEW) {
+			dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
 		}
 
-		Dispatcher.dispatch({
-			actionType: Constants.START_SELECTION,
+		dispatcher.dispatch({
+			actionType: constants.START_SELECTION,
 			scrollPos: new Point(scrollLeft, scrollTop),
 			mousePos: new Point(event.clientX, event.clientY)
 		});
@@ -146,17 +147,17 @@ var AppActions = {
 	},
 
 	resizeSelection(clientX, clientY) {
-		Dispatcher.dispatch({
-			actionType: Constants.RESIZE_SELECTION,
+		dispatcher.dispatch({
+			actionType: constants.RESIZE_SELECTION,
 			mousePos: new Point(clientX, clientY)
 		});
 	},
 
 	finishSelection(event) {
 		if (SelectionStore.isClick()) {
-			Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
+			dispatcher.dispatch({ actionType: constants.CANCEL_SELECTION });
 		} else {
-			Dispatcher.dispatch({ actionType: Constants.FINISH_SELECTION });
+			dispatcher.dispatch({ actionType: constants.FINISH_SELECTION });
 		}
 
 		event.preventDefault();
@@ -166,15 +167,15 @@ var AppActions = {
 	selectAll() {
 		// TODO: ignore during item drag
 		// TODO: ignore during selection drag
-		Dispatcher.dispatch({ actionType: Constants.SELECT_ALL });
+		dispatcher.dispatch({ actionType: constants.SELECT_ALL });
 	},
 
 	cancel() {
 		// TODO: cancel item drag
 		// TODO: cancel selection drag
 		// TODO: clear selected items
-		Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
-		Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
+		dispatcher.dispatch({ actionType: constants.CANCEL_SELECTION });
+		dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
 	}
 
 };
