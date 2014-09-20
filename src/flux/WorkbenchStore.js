@@ -15,6 +15,7 @@ var data = immutable.Map({
 var connectorOffsets = {};
 var undoStack = [];
 var redoStack = [];
+var isLoading = true;
 
 /**
  * Modify the data object
@@ -24,13 +25,15 @@ function setData(newData) {
 	undoStack.push(data);
 	redoStack = [];
 
+	// TODO: add __DEV__ variable
+	if (process.env.NODE_ENV !== 'production' && !isLoading) {
+		console.log('Items:', newData.get('items').toJS());
+	}
+
 	// Change the data object
 	data = newData;
 	WorkbenchStore.emitChange();
 }
-
-// function delete() {
-// }
 
 /**
  * Undo the previous action
@@ -65,18 +68,21 @@ function redo() {
  * (like a singleton)
  */
 var WorkbenchStore = BaseStore.createStore({
+
 	/**
 	 * returns an immutable.Vector
 	 */
 	getAllItems() {
 		return data.get('items');
 	},
+
 	/**
 	 * returns an immutable.Map
 	 */
 	getItem(id) {
 		return data.getIn(['items', id]);
 	},
+
 	/**
 	 * returns an immutable.Set
 	 */
@@ -87,27 +93,31 @@ var WorkbenchStore = BaseStore.createStore({
 			.keySeq()
 			.toSet();
 	},
+
 	/**
 	 * returns a number
 	 */
 	getLastIndex() {
 		return data.get('items').length - 1;
 	},
+
 	/**
 	 * returns an immutable.Map
 	 */
 	getItemParameters(id) {
 		return data.getIn(['items', id, 'parameter']);
 	},
+
 	/**
 	 * returns an ImmutableRect
 	 */
 	getItemPosition(id) {
 		return data.getIn(['items', id, 'rect']);
 	},
+
 	/**
 	 * Caches the offset values from `WorkbenchLayout.getConnectorOffset()`
-	 * c: WPath
+	 * c: WPath to a connector
 	 */
 	getConnectorOffset(c) {
 		// Implicitly calls c.toString(), because only Strings can be keys of an Object
@@ -127,18 +137,21 @@ var WorkbenchStore = BaseStore.createStore({
 		}
 		return connectorOffsets[c] = WorkbenchLayout.getConnectorOffset(frame, numConnectors, c.isOutput, c.connector);
 	},
+
 	/**
 	 * returns a boolean
 	 */
 	hasUndoSteps() {
 		return undoStack.length !== 0;
 	},
+
 	/**
 	 * returns a boolean
 	 */
 	hasRedoSteps() {
 		return redoStack.length !== 0;
 	}
+
 });
 
 WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
@@ -291,10 +304,9 @@ function addConnection({ from, to }) {
  * Testing
  *************************************************************************/
 
-// 0..4
 addFilter('SourceFilterExample', 20,  20);
 addFilter('WorkFilterExample', 20,  90);
-addFilter('EndFilter', 508, 123);
+addFilter('EndFilter', 508, 141);
 addFilter('WorkFilterExample', 20,  230);
 addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
 
@@ -306,7 +318,6 @@ addConnection({ from: [4, 0], to: [2, 0] });
 addConnection({ from: [4, 1], to: [2, 1] });
 addConnection({ from: [4, 2], to: [2, 2] });
 
-// console.log(data.toJS());
-
+isLoading = false;
 undoStack = [];
 redoStack = [];
