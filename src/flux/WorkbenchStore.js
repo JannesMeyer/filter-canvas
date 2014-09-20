@@ -1,7 +1,7 @@
 var immutable = require('immutable');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
-var ConnectorPath = require('../lib/ConnectorPath');
+var WPath = require('../lib/WPath');
 
 var BaseStore = require('../lib/BaseStore');
 var RepositoryStore = require('./RepositoryStore');
@@ -107,7 +107,7 @@ var WorkbenchStore = BaseStore.createStore({
 	},
 	/**
 	 * Caches the offset values from `WorkbenchLayout.getConnectorOffset()`
-	 * c: ConnectorPath
+	 * c: WPath
 	 */
 	getConnectorOffset(c) {
 		// Implicitly calls c.toString(), because only Strings can be keys of an Object
@@ -276,8 +276,8 @@ function addPipe(name, x, y, params) {
 
 
 function addConnection({ from, to }) {
-	var output = new ConnectorPath(from[0], 1, from[1]);
-	var input = new ConnectorPath(to[0], 0, to[1]);
+	var output = new WPath(from[0], 1, from[1]);
+	var input = new WPath(to[0], 0, to[1]);
 	setData(data.withMutations(data => {
 		data.updateIn(['items', output.item, 'outputs', output.connector], () => input);
 		data.updateIn(['items', input.item,  'inputs',  input.connector],  () => output);

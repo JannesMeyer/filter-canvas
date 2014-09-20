@@ -1,7 +1,7 @@
 var SelectionStore = require('../flux/SelectionStore');
 var EtherMovementStore = require('../flux/EtherMovementStore');
 var WorkbenchStore = require('../flux/WorkbenchStore');
-var ConnectorPath = require('../lib/ConnectorPath');
+var WPath = require('../lib/WPath');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
 var WorkbenchItem = require('./WorkbenchItem.react');
@@ -42,14 +42,14 @@ module.exports = React.createClass({
 				frame = EtherMovementStore.getItemPosition(itemId);
 			}
 
-			var from = new ConnectorPath(itemId, 1, undefined); // unfinished object
-			item.get('outputs').forEach((to, outputIndex) => {
+			var from = new WPath(itemId, 1);
+			item.get('outputs').forEach((to, fromConnector) => {
 				if (!to) {
 					return;
 				}
 
-				// Complete the ConnectorPath
-				from.connector = outputIndex;
+				// Enhance the path object
+				from.connector = fromConnector;
 
 				// TODO: Remove EtherMovementStore
 				if (isSelected && isDragging) {
