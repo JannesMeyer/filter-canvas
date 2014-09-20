@@ -34,7 +34,7 @@ var WorkbenchLayout = {
 		var cHeight = c * (CONNECTOR_MARGIN + CONNECTOR_HEIGHT) + CONNECTOR_MARGIN;
 
 		var height = Math.max(32, cHeight + 10);
-		return new Rect(x, y, 40, height);
+		return new Rect(x, y, 50, height);
 	},
 
 	getConnectionFrame(startPoint, endPoint, lineWidth) {

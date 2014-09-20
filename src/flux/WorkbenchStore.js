@@ -298,9 +298,14 @@ addFilter('EndFilter', 508, 123);
 addFilter('WorkFilterExample', 20,  230);
 addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
 
-addConnection({ from: [0, 0], to: [2, 0] });
-addConnection({ from: [1, 0], to: [2, 1] });
-addConnection({ from: [3, 0], to: [2, 2] });
+addConnection({ from: [0, 0], to: [4, 0] });
+addConnection({ from: [1, 0], to: [4, 1] });
+addConnection({ from: [3, 0], to: [4, 2] });
+
+addConnection({ from: [4, 0], to: [2, 0] });
+addConnection({ from: [4, 1], to: [2, 1] });
+addConnection({ from: [4, 2], to: [2, 2] });
+
 // console.log(data.toJS());
 
 undoStack = [];
