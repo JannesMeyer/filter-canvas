@@ -1,6 +1,7 @@
 var SelectionStore = require('../flux/SelectionStore');
 var EtherMovementStore = require('../flux/EtherMovementStore');
 var WorkbenchStore = require('../flux/WorkbenchStore');
+var ConnectorPath = require('../lib/ConnectorPath');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
 var WorkbenchItem = require('./WorkbenchItem.react');
@@ -34,38 +35,45 @@ module.exports = React.createClass({
 		var isDragging = this.state.isDragging;
 
 		var wireElements = [];
-		var itemElements = items.map((item, id) => {
+		var itemElements = items.map((item, itemId) => {
 			var frame = null;
-			var isSelected = SelectionStore.isItemSelected(id);
+			var isSelected = SelectionStore.isItemSelected(itemId);
 			if (isSelected && isDragging) {
-				frame = EtherMovementStore.getItemPosition(id);
+				frame = EtherMovementStore.getItemPosition(itemId);
 			}
 
+			var from = new ConnectorPath(itemId, 1, undefined); // unfinished object
 			item.get('outputs').forEach((to, outputIndex) => {
-				if (!to) { return; }
-				var isOtherSelected = SelectionStore.isItemSelected(to.get(0));
+				if (!to) {
+					return;
+				}
+
+				// Complete the ConnectorPath
+				from.connector = outputIndex;
 
 				// TODO: Remove EtherMovementStore
 				if (isSelected && isDragging) {
-					var frame1 = EtherMovementStore.getItemPosition(id);
+					var frame1 = EtherMovementStore.getItemPosition(itemId);
 				} else {
-					var frame1 = WorkbenchStore.getItemPosition(id);
-				}
-				if (isOtherSelected && isDragging) {
-					var frame2 = EtherMovementStore.getItemPosition(to.get(0));
-				} else {
-					var frame2 = WorkbenchStore.getItemPosition(to.get(0));
+					var frame1 = WorkbenchStore.getItemPosition(itemId);
 				}
 
-				var startPoint = frame1.moveBy(WorkbenchStore.getOutputOffset(id, outputIndex));
-				var endPoint = frame2.moveBy(WorkbenchStore.getInputOffset(to.get(0), to.get(1)));
+				var isOtherSelected = SelectionStore.isItemSelected(to.item);
+				if (isOtherSelected && isDragging) {
+					var frame2 = EtherMovementStore.getItemPosition(to.item);
+				} else {
+					var frame2 = WorkbenchStore.getItemPosition(to.item);
+				}
+
+				var startPoint = frame1.moveBy(WorkbenchStore.getConnectorOffset(from));
+				var endPoint = frame2.moveBy(WorkbenchStore.getConnectorOffset(to));
 				var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint, wireWidth);
 				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint, wireWidth);
 
-				wireElements.push(<WorkbenchWire key={id + ',' + outputIndex} frame={frame} bezier={bezier} width={wireWidth} />);
+				wireElements.push(<WorkbenchWire key={from.toString()} frame={frame} bezier={bezier} width={wireWidth} />);
 			});
 
-			return <WorkbenchItem key={id} item={item} frame={frame} isSelected={isSelected} />;
+			return <WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />;
 		});
 
 		return (

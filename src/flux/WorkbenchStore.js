@@ -1,6 +1,7 @@
 var immutable = require('immutable');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
+var ConnectorPath = require('../lib/ConnectorPath');
 
 var BaseStore = require('../lib/BaseStore');
 var RepositoryStore = require('./RepositoryStore');
@@ -104,11 +105,27 @@ var WorkbenchStore = BaseStore.createStore({
 	getItemPosition(id) {
 		return data.getIn(['items', id, 'rect']);
 	},
-	getInputOffset(id, inputId) {
-		return connectorOffsets['input' + id + ',' + inputId];
-	},
-	getOutputOffset(id, outputId) {
-		return connectorOffsets['output' + id + ',' + outputId];
+	/**
+	 * Caches the offset values from `WorkbenchLayout.getConnectorOffset()`
+	 * c: ConnectorPath
+	 */
+	getConnectorOffset(c) {
+		// Implicitly calls c.toString(), because only Strings can be keys of an Object
+		var offset = connectorOffsets[c];
+		if (offset) {
+			return offset;
+		}
+		// Calculate the value first and then cache it
+		var item = data.getIn(['items', c.item]);
+		if (!item) {
+			throw new Error('Invalid item ID');
+		}
+		var frame = item.get('rect');
+		var numConnectors = item.get(c.isOutput ? 'outputs' : 'inputs').length;
+		if (c.connector < 0 || c.connector >= numConnectors) {
+			throw new Error('Invalid connector index');
+		}
+		return connectorOffsets[c] = WorkbenchLayout.getConnectorOffset(frame, numConnectors, c.isOutput, c.connector);
 	},
 	/**
 	 * returns a boolean
@@ -259,28 +276,11 @@ function addPipe(name, x, y, params) {
 
 
 function addConnection({ from, to }) {
-	var item1 = data.getIn(['items', from[0]]);
-	var item2 = data.getIn(['items', to[0]]);
-	var outputIndex = from[1];
-	var inputIndex = to[1];
-	if (!item1 || !item2) {
-		throw new Error('Invalid item ID');
-	}
-	var frame1 = item1.get('rect');
-	var frame2 = item2.get('rect');
-	var outputs = item1.get('outputs');
-	var inputs = item2.get('inputs');
-	if (outputIndex < 0 || outputIndex >= outputs.length ||
-	    inputIndex  < 0 || inputIndex  >= inputs.length) {
-		throw new Error('Connector index out of bounds');
-	}
-
-	connectorOffsets['output'+from] = WorkbenchLayout.getConnectorOffset(frame1, outputs.length, outputIndex, true);
-	connectorOffsets['input' +to]   = WorkbenchLayout.getConnectorOffset(frame2, inputs.length, inputIndex, false);
-
+	var output = new ConnectorPath(from[0], 1, from[1]);
+	var input = new ConnectorPath(to[0], 0, to[1]);
 	setData(data.withMutations(data => {
-		data.updateIn(['items', from[0], 'outputs', outputIndex], () => immutable.Vector.from(to));
-		data.updateIn(['items', to[0], 'inputs', inputIndex], () => immutable.Vector.from(from));
+		data.updateIn(['items', output.item, 'outputs', output.connector], () => input);
+		data.updateIn(['items', input.item,  'inputs',  input.connector],  () => output);
 	}));
 }
 
@@ -291,7 +291,7 @@ function addConnection({ from, to }) {
  * Testing
  *************************************************************************/
 
-// 0 .. 4
+// 0..4
 addFilter('SourceFilterExample', 20,  20);
 addFilter('WorkFilterExample', 20,  90);
 addFilter('EndFilter', 508, 123);
@@ -301,7 +301,6 @@ addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
 addConnection({ from: [0, 0], to: [2, 0] });
 addConnection({ from: [1, 0], to: [2, 1] });
 addConnection({ from: [3, 0], to: [2, 2] });
-// addConnection(new OutputPath(0, 0), new InputPath(2, 0));
 // console.log(data.toJS());
 
 undoStack = [];
