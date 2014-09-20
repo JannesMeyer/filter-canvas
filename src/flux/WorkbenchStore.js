@@ -302,8 +302,7 @@ addConnection({ from: [0, 0], to: [2, 0] });
 addConnection({ from: [1, 0], to: [2, 1] });
 addConnection({ from: [3, 0], to: [2, 2] });
 // addConnection(new OutputPath(0, 0), new InputPath(2, 0));
-
-console.log(data.toJS());
+// console.log(data.toJS());
 
 undoStack = [];
 redoStack = [];

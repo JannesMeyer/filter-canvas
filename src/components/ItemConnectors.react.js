@@ -6,20 +6,18 @@ module.exports = React.createClass({
 
 	handleMouseDown(ev) {
 		if (ev.button !== 0) { return; }
-
-		console.log('TODO: connection drag');
-
 		ev.stopPropagation();
 		ev.preventDefault();
+
+		console.log('TODO: connection drag');
 	},
 
 	render() {
 		var connectors = this.props.connectors;
-		var type = this.props.type;
 		return (
-			<div className={type}>
-				{connectors.map(key =>
-					<div className="connector" key={key} onMouseDown={this.handleMouseDown}></div>
+			<div className={this.props.type}>
+				{connectors.map((_, index) =>
+					<div className="connector" key={index} onMouseDown={this.handleMouseDown}></div>
 				).toArray()}
 			</div>
 		);

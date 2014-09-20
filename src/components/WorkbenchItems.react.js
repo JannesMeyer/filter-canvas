@@ -34,11 +34,11 @@ module.exports = React.createClass({
 		var isDragging = this.state.isDragging;
 
 		var wireElements = [];
-		var itemElements = items.map((item, itemId) => {
+		var itemElements = items.map((item, id) => {
 			var frame = null;
-			var isSelected = SelectionStore.isItemSelected(itemId);
+			var isSelected = SelectionStore.isItemSelected(id);
 			if (isSelected && isDragging) {
-				frame = EtherMovementStore.getItemPosition(itemId);
+				frame = EtherMovementStore.getItemPosition(id);
 			}
 
 			item.get('outputs').forEach((to, outputIndex) => {
@@ -47,26 +47,25 @@ module.exports = React.createClass({
 
 				// TODO: Remove EtherMovementStore
 				if (isSelected && isDragging) {
-					var startPoint = EtherMovementStore.getItemPosition(itemId);
+					var frame1 = EtherMovementStore.getItemPosition(id);
 				} else {
-					var startPoint = WorkbenchStore.getItemPosition(itemId);
+					var frame1 = WorkbenchStore.getItemPosition(id);
 				}
 				if (isOtherSelected && isDragging) {
-					var endPoint = EtherMovementStore.getItemPosition(to.get(0));
+					var frame2 = EtherMovementStore.getItemPosition(to.get(0));
 				} else {
-					var endPoint = WorkbenchStore.getItemPosition(to.get(0));
+					var frame2 = WorkbenchStore.getItemPosition(to.get(0));
 				}
 
-				startPoint = startPoint.moveBy(WorkbenchStore.getOutputOffset(itemId, outputIndex));
-				endPoint = endPoint.moveBy(WorkbenchStore.getInputOffset(to.get(0), to.get(1)));
-
+				var startPoint = frame1.moveBy(WorkbenchStore.getOutputOffset(id, outputIndex));
+				var endPoint = frame2.moveBy(WorkbenchStore.getInputOffset(to.get(0), to.get(1)));
 				var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint, wireWidth);
 				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint, wireWidth);
 
-				wireElements.push(<WorkbenchWire key={itemId + '.' + outputIndex} frame={frame} bezier={bezier} width={wireWidth} />);
+				wireElements.push(<WorkbenchWire key={id + ',' + outputIndex} frame={frame} bezier={bezier} width={wireWidth} />);
 			});
 
-			return <WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />;
+			return <WorkbenchItem key={id} item={item} frame={frame} isSelected={isSelected} />;
 		});
 
 		return (
