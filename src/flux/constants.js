@@ -5,10 +5,8 @@ module.exports = keyMirror({
 	EXPORT_FILE: null,
 	UNDO: null,
 	REDO: null,
-
 	CREATE_ITEM: null,
-	ITEM_TYPE_FILTER: null,
-	ITEM_TYPE_PIPE: null,
+	SELECT_ALL: null,
 
 	START_MOVING_SELECTED_ITEMS: null,
 	MOVING_SELECTED_ITEMS: null,
@@ -18,13 +16,19 @@ module.exports = keyMirror({
 	SAVE_SELECTED_ITEMS_AS_FILTER: null,
 	DELETE_SELECTED_ITEMS: null,
 	CLEAR_SELECTED_ITEMS: null,
-	ITEM_CLICKED: null,
 
-	SELECT_ALL: null,
 	START_SELECTION: null,
 	RESIZE_SELECTION: null,
 	FINISH_SELECTION: null,
 	CANCEL_SELECTION: null,
+
+	START_CONNECTION: null,
+	RESIZE_CONNECTION: null,
+	FINISH_CONNECTION: null,
+	CANCEL_CONNECTION: null,
+
+	ITEM_TYPE_FILTER: null,
+	ITEM_TYPE_PIPE: null,
 	SELECTION_TYPE_NEW: null,
 	SELECTION_TYPE_EXTEND: null
 });

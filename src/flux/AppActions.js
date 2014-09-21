@@ -164,6 +164,34 @@ var AppActions = {
 		event.stopPropagation();
 	},
 
+	startConnection(event, connector) {
+		dispatcher.dispatch({
+			actionType: constants.START_CONNECTION,
+			// scrollPos: new Point(scrollLeft, scrollRight),
+			// mousePos: new Point(event.clientX, event.clientY),
+			connector
+		});
+
+		event.preventDefault();
+		event.stopPropagation();
+	},
+
+	resizeConnection(clientX, clientY) {
+		dispatcher.dispatch({
+			actionType: constants.RESIZE_CONNECTION,
+			mousePos: new Point(clientX, clientY)
+		});
+	},
+
+	finishConnection(event) {
+
+	FINISH_CONNECTION
+	CANCEL_CONNECTION
+
+		event.preventDefault();
+		event.stopPropagation();
+	},
+
 	selectAll() {
 		// TODO: ignore during item drag
 		// TODO: ignore during selection drag

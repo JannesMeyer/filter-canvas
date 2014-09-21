@@ -85,8 +85,8 @@ module.exports = React.createClass({
 		return (
 			<div className="m-actions">
 				<input type="file" className="hidden" onChange={this.handleFileChange} ref="fileInput" />
-				<button onClick={this.handleImport}>Import file</button>
-				<button onClick={this.handleExport}>Export file</button>
+				<button onClick={this.handleImport}>Import JSON</button>
+				<button onClick={this.handleExport}>Export JSON</button>
 				<button onClick={this.handleUndo} disabled={!this.state.undoSteps}>Undo</button>
 				<button onClick={this.handleRedo} disabled={!this.state.redoSteps}>Redo</button>
 			</div>
