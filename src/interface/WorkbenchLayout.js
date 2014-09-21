@@ -3,7 +3,7 @@ var Rect = require('../lib/ImmutableRect');
 
 var CONNECTOR_HEIGHT = 8;
 var CONNECTOR_MARGIN = 4;
-var WIRE_WIDTH = 5;
+var WIRE_WIDTH = 8;
 
 var WorkbenchLayout = {
 
@@ -37,7 +37,7 @@ var WorkbenchLayout = {
 		return new Rect(x, y, 50, height);
 	},
 
-	getConnectionFrame(startPoint, endPoint, lineWidth) {
+	getConnectionFrame(startPoint, endPoint) {
 		var orderedX = startPoint.x < endPoint.x;
 		var orderedY = startPoint.y < endPoint.y;
 		if (!orderedX) {
@@ -47,17 +47,17 @@ var WorkbenchLayout = {
 		if (orderedY) {
 			return new Rect(
 				startPoint.x, startPoint.y,
-				endPoint.x - startPoint.x, endPoint.y - startPoint.y + lineWidth
+				endPoint.x - startPoint.x, endPoint.y - startPoint.y + WIRE_WIDTH
 			);
 		} else {
 			return new Rect(
 				startPoint.x, endPoint.y,
-				endPoint.x - startPoint.x, startPoint.y - endPoint.y + lineWidth
+				endPoint.x - startPoint.x, startPoint.y - endPoint.y + WIRE_WIDTH
 			);
 		}
 	},
 
-	getBezierPoints(frame, startPoint, endPoint, lineWidth) {
+	getBezierPoints(frame, startPoint, endPoint) {
 		if (frame === null) {
 			return null;
 		}
@@ -67,8 +67,8 @@ var WorkbenchLayout = {
 			// TODO: draw the wire to a previous location
 			return null;
 		}
-		var upperY = lineWidth / 2;
-		var lowerY = frame.height - lineWidth / 2;
+		var upperY = WIRE_WIDTH / 2;
+		var lowerY = frame.height - WIRE_WIDTH / 2;
 		var middleX = Math.min(0.5 * frame.width, 200);
 		var p0, p1, p2, p3;
 		if (orderedY) {

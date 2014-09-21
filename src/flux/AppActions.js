@@ -164,16 +164,13 @@ var AppActions = {
 		event.stopPropagation();
 	},
 
-	startConnection(event, connector) {
+	startConnection(connector, clientX, clientY) {
 		dispatcher.dispatch({
 			actionType: constants.START_CONNECTION,
 			// scrollPos: new Point(scrollLeft, scrollRight),
-			// mousePos: new Point(event.clientX, event.clientY),
+			mousePos: new Point(clientX, clientY),
 			connector
 		});
-
-		event.preventDefault();
-		event.stopPropagation();
 	},
 
 	resizeConnection(clientX, clientY) {

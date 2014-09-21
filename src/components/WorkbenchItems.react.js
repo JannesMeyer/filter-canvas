@@ -6,13 +6,13 @@ var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
 var WorkbenchItem = require('./WorkbenchItem.react');
 var WorkbenchWire = require('./WorkbenchWire.react');
+var CreateConnection = require('./CreateConnection.react');
 
 module.exports = React.createClass({
 
 	getInitialState() {
 		return {
 			items: WorkbenchStore.getAllItems(),
-			wireWidth: WorkbenchLayout.getWireWidth(),
 			isDragging: EtherMovementStore.isDragging()
 		};
 	},
@@ -31,8 +31,8 @@ module.exports = React.createClass({
 
 	render() {
 		var items = this.state.items.toArray();
-		var wireWidth = this.state.wireWidth;
 		var isDragging = this.state.isDragging;
+		var wireWidth = WorkbenchLayout.getWireWidth();
 
 		var wireElements = [];
 		var itemElements = items.map((item, itemId) => {
@@ -67,8 +67,8 @@ module.exports = React.createClass({
 
 				var startPoint = frame1.moveBy(WorkbenchStore.getConnectorOffset(from));
 				var endPoint = frame2.moveBy(WorkbenchStore.getConnectorOffset(to));
-				var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint, wireWidth);
-				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint, wireWidth);
+				var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint);
+				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint);
 
 				wireElements.push(<WorkbenchWire key={from.toString()} frame={frame} bezier={bezier} width={wireWidth} />);
 			});
@@ -80,6 +80,7 @@ module.exports = React.createClass({
 			<div className="m-workbench-items">
 				{wireElements}
 				{itemElements}
+				<CreateConnection />
 			</div>
 		);
 	},

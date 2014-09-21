@@ -44,8 +44,9 @@ module.exports = React.createClass({
 	},
 
 	render() {
+		var dragging = this.props.dragging ? ' dragging' : '';
 		var f = this.props.frame;
-		return <canvas className="wire" width={f.width} height={f.height} style={{ left: f.x, top: f.y }} />;
+		return <canvas className={'wire' + dragging} width={f.width} height={f.height} style={{ left: f.x, top: f.y }} />;
 	}
 
 });

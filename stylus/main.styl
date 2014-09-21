@@ -68,28 +68,35 @@ body
 				height: 8px
 				margin-top: 4px
 				margin-bottom: 4px
-				background: #000
+				// background: #000
+				background: #0886D6
 				cursor: pointer
 
 		> .inputs
 			left: 0
 			> .connector
 				left: -7px
+				border-radius: 0 4px 4px 0
 
 		> .outputs
 			right: 0
 			> .connector
 				right: -7px
+				border-radius: 4px 0 0 4px
 
 	> .filter
 		background: #fff
 
 	> .pipe
-		background: #fcfadc
+		background: #fff
 
 	> .wire
 		position: absolute
 		z-index: 0
+		pointer-events: none // TODO: remove
+
+	> .wire.dragging
+		z-index: 9999
 
 .m-selection
 	position: absolute
