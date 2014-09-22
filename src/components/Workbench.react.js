@@ -1,6 +1,7 @@
 var AppActions = require('../flux/AppActions');
 var WorkbenchItems = require('./WorkbenchItems.react');
 var CreateSelection = require('./CreateSelection.react');
+var CreateConnection = require('./CreateConnection.react');
 
 module.exports = React.createClass({
 
@@ -32,6 +33,7 @@ module.exports = React.createClass({
 			<div className="m-workbench" onDragOver={this.handleDragOver} onDrop={this.handleDrop} onMouseDown={this.handleMouseDown}>
 				<WorkbenchItems />
 				<CreateSelection />
+				<CreateConnection />
 			</div>
 		);
 	}

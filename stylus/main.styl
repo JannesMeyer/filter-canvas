@@ -90,13 +90,13 @@ body
 	> .pipe
 		background: #fff
 
-	> .wire
-		position: absolute
-		z-index: 0
-		pointer-events: none // TODO: remove
+.m-wire
+	position: absolute
+	z-index: 0
 
-	> .wire.dragging
-		z-index: 9999
+.m-wire.dragging
+	z-index: 9999
+	pointer-events: none
 
 .m-selection
 	position: absolute

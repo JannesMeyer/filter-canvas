@@ -167,9 +167,9 @@ var AppActions = {
 	startConnection(connector, clientX, clientY) {
 		dispatcher.dispatch({
 			actionType: constants.START_CONNECTION,
+			connector,
 			// scrollPos: new Point(scrollLeft, scrollRight),
-			mousePos: new Point(clientX, clientY),
-			connector
+			mousePos: new Point(clientX, clientY)
 		});
 	},
 
@@ -180,13 +180,11 @@ var AppActions = {
 		});
 	},
 
-	finishConnection(event) {
-
-	FINISH_CONNECTION
-	CANCEL_CONNECTION
-
-		event.preventDefault();
-		event.stopPropagation();
+	finishConnection(clientX, clientY) {
+		dispatcher.dispatch({
+			actionType: constants.FINISH_CONNECTION,
+			mousePos: new Point(clientX, clientY)
+		});
 	},
 
 	selectAll() {

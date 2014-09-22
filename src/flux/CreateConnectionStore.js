@@ -1,7 +1,9 @@
-var immutable = require('immutable');
 var BaseStore = require('../lib/BaseStore');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
+
+// Data
+var isDragging = false;
 
 /**
  * CreateConnectionStore single object
@@ -9,24 +11,35 @@ var constants = require('./constants');
  */
 var CreateConnectionStore = BaseStore.createStore({
 
+	isDragging() {
+		return isDragging;
+	}
+
 });
 
 CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case constants.START_CONNECTION:
-			console.log('start connection from', connector);
+			console.log('start from', action.connector);
+			isDragging = true;
+			CreateConnectionStore.emitChange();
 		break;
 
 		case constants.RESIZE_CONNECTION:
-			console.log('resize connection');
+			// TODO: resize connection
+			// CreateConnectionStore.emitChange();
 		break;
 
 		case constants.FINISH_CONNECTION:
-			console.log('finish connection');
+			console.log('end at [...]');
+			isDragging = false;
+			CreateConnectionStore.emitChange();
 		break;
 
 		case constants.CANCEL_CONNECTION:
-			console.log('cancel connection');
+			console.log('Cancel');
+			isDragging = false;
+			CreateConnectionStore.emitChange();
 		break;
 	}
 });

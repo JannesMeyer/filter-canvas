@@ -6,7 +6,6 @@ var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
 var WorkbenchItem = require('./WorkbenchItem.react');
 var WorkbenchWire = require('./WorkbenchWire.react');
-var CreateConnection = require('./CreateConnection.react');
 
 module.exports = React.createClass({
 
@@ -80,7 +79,6 @@ module.exports = React.createClass({
 			<div className="m-workbench-items">
 				{wireElements}
 				{itemElements}
-				<CreateConnection />
 			</div>
 		);
 	},

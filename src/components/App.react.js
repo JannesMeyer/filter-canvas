@@ -1,5 +1,6 @@
 var AppActions = require('../flux/AppActions');
 var SelectionStore = require('../flux/SelectionStore');
+var CreateConnectionStore = require('../flux/CreateConnectionStore');
 var EtherMovementStore = require('../flux/EtherMovementStore');
 var keypress = require('../lib/keypress-tool');
 
@@ -15,6 +16,8 @@ module.exports = React.createClass({
 			AppActions.moveSelectedItems(ev.clientX, ev.clientY);
 		} else if (SelectionStore.isSelecting()) {
 			AppActions.resizeSelection(ev.clientX, ev.clientY);
+		} else if (CreateConnectionStore.isDragging()) {
+			AppActions.resizeConnection(ev.clientX, ev.clientY);
 		}
 	},
 
@@ -25,6 +28,10 @@ module.exports = React.createClass({
 			AppActions.finishMovingSelectedItems(ev);
 		} else if (SelectionStore.isSelecting()) {
 			AppActions.finishSelection(ev);
+		} else if (CreateConnectionStore.isDragging()) {
+			AppActions.finishConnection(ev.clientX, ev.clientY);
+			ev.stopPropagation();
+			ev.preventDefault();
 		}
 	},
 

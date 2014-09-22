@@ -1,3 +1,5 @@
+var cx = require('react/lib/cx');
+
 module.exports = React.createClass({
 
 	context: null,
@@ -25,7 +27,8 @@ module.exports = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.frame &&
 		       nextProps.frame &&
-		       !this.props.frame.equals(nextProps.frame);
+		       !this.props.frame.equals(nextProps.frame) ||
+		       this.props.dragging !== nextProps.dragging;
 	},
 
 	shouldComponentRedraw(prevProps) {
@@ -44,9 +47,19 @@ module.exports = React.createClass({
 	},
 
 	render() {
-		var dragging = this.props.dragging ? ' dragging' : '';
-		var f = this.props.frame;
-		return <canvas className={'wire' + dragging} width={f.width} height={f.height} style={{ left: f.x, top: f.y }} />;
+		var frame = this.props.frame;
+		var isDragging = this.props.dragging;
+
+		var classes = cx({
+			'm-wire': true,
+			'dragging': (isDragging === true),
+			'hidden': (isDragging === false)
+		});
+		var style = {
+			left: frame.x,
+			top: frame.y
+		};
+		return <canvas className={classes} width={frame.width} height={frame.height} style={style} />;
 	}
 
 });

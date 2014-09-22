@@ -10,7 +10,7 @@ module.exports = React.createClass({
 		return {
 			startPoint: new Point(0, 0),
 			endPoint: new Point(200, 200),
-			visible: true
+			active: CreateConnectionStore.isDragging()
 		};
 	},
 
@@ -24,14 +24,11 @@ module.exports = React.createClass({
 
 	render() {
 		var state = this.state;
-		if (!state.visible) {
-			return null;
-		}
+
 		var frame = WorkbenchLayout.getConnectionFrame(state.startPoint, state.endPoint);
 		var bezier = WorkbenchLayout.getBezierPoints(frame, state.startPoint, state.endPoint);
 		var wireWidth = WorkbenchLayout.getWireWidth();
-
-		return <WorkbenchWire dragging={true} frame={frame} bezier={bezier} width={wireWidth} />;
+		return <WorkbenchWire dragging={state.active} frame={frame} bezier={bezier} width={wireWidth} />;
 	},
 
 	_handleChange() {
