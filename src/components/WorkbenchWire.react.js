@@ -1,4 +1,5 @@
 var cx = require('react/lib/cx');
+var Rect = require('../lib/ImmutableRect');
 
 module.exports = React.createClass({
 
@@ -25,6 +26,7 @@ module.exports = React.createClass({
 	},
 
 	shouldComponentUpdate(nextProps, nextState) {
+		// TODO: fix these weird conditions
 		return this.props.frame &&
 		       nextProps.frame &&
 		       !this.props.frame.equals(nextProps.frame) ||
@@ -37,17 +39,21 @@ module.exports = React.createClass({
 	},
 
 	componentDidUpdate(prevProps, prevState) {
-		if (this.shouldComponentRedraw(prevProps)) {
+		// TODO: fix these weird conditions
+		if (this.props.frame && prevProps.frame && this.shouldComponentRedraw(prevProps)) {
 			this.draw();
 		}
 	},
 
 	componentDidMount() {
-		this.draw();
+		// TODO: fix these weird conditions
+		if (this.props.frame) {
+			this.draw();
+		}
 	},
 
 	render() {
-		var frame = this.props.frame;
+		var frame = this.props.frame || Rect.Zero;
 		var isDragging = this.props.dragging;
 
 		var classes = cx({

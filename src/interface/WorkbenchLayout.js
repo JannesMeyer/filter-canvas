@@ -38,6 +38,9 @@ var WorkbenchLayout = {
 	},
 
 	getConnectionFrame(startPoint, endPoint) {
+		if (!startPoint || !endPoint) {
+			return null;
+		}
 		var orderedX = startPoint.x < endPoint.x;
 		var orderedY = startPoint.y < endPoint.y;
 		if (!orderedX) {

@@ -7,9 +7,10 @@ var WorkbenchWire = require('./WorkbenchWire.react');
 module.exports = React.createClass({
 
 	getInitialState() {
+		var {startPoint, endPoint} = CreateConnectionStore.getPoints();
 		return {
-			startPoint: new Point(0, 0),
-			endPoint: new Point(200, 200),
+			startPoint,
+			endPoint,
 			active: CreateConnectionStore.isDragging()
 		};
 	},
@@ -25,9 +26,9 @@ module.exports = React.createClass({
 	render() {
 		var state = this.state;
 
+		var wireWidth = WorkbenchLayout.getWireWidth();
 		var frame = WorkbenchLayout.getConnectionFrame(state.startPoint, state.endPoint);
 		var bezier = WorkbenchLayout.getBezierPoints(frame, state.startPoint, state.endPoint);
-		var wireWidth = WorkbenchLayout.getWireWidth();
 		return <WorkbenchWire dragging={state.active} frame={frame} bezier={bezier} width={wireWidth} />;
 	},
 
