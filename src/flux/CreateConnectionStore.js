@@ -29,9 +29,12 @@ var CreateConnectionStore = BaseStore.createStore({
 CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case constants.START_CONNECTION:
-			console.log('start from', action.connector);
+			var item = WorkbenchStore.getItem(action.connector[0]);
+			var type = item.get('type');
+			var frame = item.get('rect');
+			var isFilter = (type === constants.ITEM_TYPE_FILTER);
+			var isPipe = (type === constants.ITEM_TYPE_PIPE);
 			// TODO: remove WPath
-			var frame = WorkbenchStore.getItemPosition(action.connector[0]);
 			var offset = WorkbenchStore.getConnectorOffset(new WPath(action.connector[0], action.connector[1], action.connector[2]));
 
 			isOutput = action.connector[1];
@@ -41,6 +44,13 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 			} else {
 				startPoint = action.mousePos;
 				endPoint = frame.moveBy(offset);
+			}
+
+			// TODO: perhaps not the best idea to modify the DOM from here
+			if (isFilter) {
+				document.body.classList.add('s-create-connection-from-filter');
+			} else if (isPipe) {
+				document.body.classList.add('s-create-connection-from-pipe');
 			}
 
 			isDragging = true;
@@ -58,6 +68,9 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.CANCEL_CONNECTION:
 		case constants.FINISH_CONNECTION:
+			document.body.classList.remove('s-create-connection-from-filter');
+			document.body.classList.remove('s-create-connection-from-pipe');
+
 			isDragging = false;
 			CreateConnectionStore.emitChange();
 		break;

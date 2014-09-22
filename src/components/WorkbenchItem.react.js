@@ -55,13 +55,13 @@ module.exports = React.createClass({
 
 				<div className="inputs">
 					{inputs.map((connectedTo, id) =>
-						<div key={id} className="connector" onMouseDown={this.handleConnectorMouseDown.bind(this, 0, id, connectedTo)}></div>
+						<div key={id} className={cx({ connector: true, unconnected: !connectedTo })} onMouseDown={this.handleConnectorMouseDown.bind(this, 0, id, connectedTo)}></div>
 					)}
 				</div>
 
 				<div className="outputs">
 					{outputs.map((connectedTo, id) =>
-						<div key={id} className="connector" onMouseDown={this.handleConnectorMouseDown.bind(this, 1, id, connectedTo)}></div>
+						<div key={id} className={cx({ connector: true, unconnected: !connectedTo })} onMouseDown={this.handleConnectorMouseDown.bind(this, 1, id, connectedTo)}></div>
 					)}
 				</div>
 			</div>
