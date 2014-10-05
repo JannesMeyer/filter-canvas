@@ -47,12 +47,13 @@ module.exports = React.createClass({
 
 		var itemClass, itemParams = [];
 		if (count === 1) {
-			var item = WorkbenchStore.getItem(items.first());
+			var itemId = items.first();
+			var item = WorkbenchStore.getItem(itemId);
 
 			itemClass = item.get('class');
 			itemParams = item.get('parameter').map((value, key) => {
 				var type = (typeof value === 'number') ? 'number' : 'text';
-				return <label key={key}>{key}<input type={type} defaultValue={value} /></label>;
+				return <label key={itemId + ',' + key}>{key}<input type={type} defaultValue={value} /></label>;
 			}).toArray();
 		}
 

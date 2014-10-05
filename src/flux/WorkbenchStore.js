@@ -17,7 +17,6 @@ var data = immutable.Map({
 var connectorOffsets = {};
 var undoStack = [];
 var redoStack = [];
-var isLoading = true;
 
 var isDragging = false;
 var itemPositions = immutable.Map();
@@ -36,7 +35,7 @@ function setData(newData) {
 	redoStack = [];
 
 	// TODO: add __DEV__ variable
-	if (process.env.NODE_ENV !== 'production' && !isLoading) {
+	if (process.env.NODE_ENV !== 'production') {
 		console.log('Items:', newData.get('items').toJS());
 	}
 
@@ -378,6 +377,5 @@ addConnection({ from: [4, 0], to: [2, 0] });
 addConnection({ from: [4, 1], to: [2, 1] });
 addConnection({ from: [4, 2], to: [2, 2] });
 
-isLoading = false;
 undoStack = [];
 redoStack = [];
