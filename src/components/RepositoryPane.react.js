@@ -29,13 +29,13 @@ module.exports = React.createClass({
 		var pipes = Object.keys(this.state.pipes);
 		return (
 			<div className="m-repository-pane">
-				<div className="filter-repository">
-					<h3>Filters</h3>
-					{filters.map(id => <RepositoryItem key={id} type={constants.ITEM_TYPE_FILTER} />)}
-				</div>
 				<div className="pipe-repository">
 					<h3>Pipes</h3>
 					{pipes.map(id => <RepositoryItem key={id} type={constants.ITEM_TYPE_PIPE} />)}
+				</div>
+				<div className="filter-repository">
+					<h3>Filters</h3>
+					{filters.map(id => <RepositoryItem key={id} type={constants.ITEM_TYPE_FILTER} />)}
 				</div>
 			</div>
 		);

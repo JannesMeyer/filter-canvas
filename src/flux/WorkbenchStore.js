@@ -33,9 +33,8 @@ function setData(newData) {
 	undoStack.push(data);
 	redoStack = [];
 
-	// TODO: add __DEV__ variable
 	if (process.env.NODE_ENV !== 'production') {
-		console.log('Items:', newData.get('items').toJS());
+		console.log(newData.get('items').toJS());
 	}
 
 	// Change the data object
@@ -215,31 +214,33 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.DELETE_SELECTED_ITEMS:
-			if (action.selectedItems.length === 0) {
+		var deleteItems = action.selectedItems;
+			if (deleteItems.length === 0) {
 				break;
 			}
-			// TODO: make sure that all IDs are still the same when deleting items in the middle
-			// TODO: should they be set to undefined instead of deleted?
-			// TODO: remove other filter's connection references
-			var connectionDeleteList = immutable.Set().asMutable();
+
 			setData(data.withMutations(data => {
+				// TODO: deleting items leads to a sparse array
+				// TODO: should old IDs be reused?
+
+				// Clear connections (they work similar to doubly linked lists)
+				var clearConnectors = immutable.Sequence();
+				deleteItems.forEach(itemId => {
+					var item = data.getIn(['items', itemId]);
+					clearConnectors = clearConnectors.concat(item.get('inputs'));
+					clearConnectors = clearConnectors.concat(item.get('outputs'));
+				});
+				clearConnectors.forEach(c => {
+					if (!c || deleteItems.has(c[0])) { return; }
+					data.updateIn(['items', c[0], (c[1] ? 'outputs' : 'inputs'), c[2]], () => undefined);
+				});
+
 				// Delete items
 				data.updateIn(['items'], items => {
-					action.selectedItems.forEach(itemId => {
-						// Collect connections to delete
-						connectionDeleteList.union(data.getIn(['items', itemId, 'connections']));
-						// Delete item
+					deleteItems.forEach(itemId => {
 						items = items.remove(itemId);
 					});
 					return items;
-				});
-
-				// Delete connections
-				data.updateIn(['connections'], cns => {
-					connectionDeleteList.forEach(cnId => {
-						cns = cns.remove(cnId);
-					});
-					return cns;
 				});
 			}));
 		break;
@@ -342,10 +343,11 @@ function addPipe(name, x, y, params) {
 		outputs += parameter.pipelines;
 	}
 
-	// immutable.Range(0, inputs).map(val => null).toVector()
 	var item = immutable.Map({
 		type: constants.ITEM_TYPE_PIPE,
 		class: name,
+		// inputs: immutable.Range(0, inputs).map(val => null).toVector(),
+		// outputs: immutable.Range(0, outputs).map(val => null).toVector(),
 		inputs: immutable.Vector.from(new Array(inputs)),
 		outputs: immutable.Vector.from(new Array(outputs)),
 		parameter: immutable.Map(parameter),

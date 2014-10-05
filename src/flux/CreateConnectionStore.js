@@ -68,6 +68,7 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.CANCEL_CONNECTION:
 		case constants.FINISH_CONNECTION:
+			// TODO: perhaps not the best idea to modify the DOM from here
 			document.body.classList.remove('s-create-connection-from-filter');
 			document.body.classList.remove('s-create-connection-from-pipe');
 
