@@ -1,7 +1,6 @@
 var immutable = require('immutable');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
-var Rect = require('../lib/ImmutableRect');
 
 var BaseStore = require('../lib/BaseStore');
 var RepositoryStore; // late import
@@ -20,16 +19,12 @@ var redoStack = [];
 var isDragging = false;
 var itemPositions = immutable.Map();
 var startMousePos;
-// var requestId;
-// var requestAnimationFrame = window.requestAnimationFrame ||
-//                             window.mozRequestAnimationFrame ||
-//                             window.webkitRequestAnimationFrame;
 
 /**
  * Modify the data object
  */
 function setData(newData) {
-	// Push the current state to the undo stack and clear the redo stack
+	// Push the current state onto the undo stack and clear the redo stack
 	undoStack.push(data);
 	redoStack = [];
 
@@ -119,12 +114,11 @@ var WorkbenchStore = BaseStore.createStore({
 	 * returns an ImmutableRect
 	 */
 	getItemPosition(id) {
-		// TODO: this also depends on whether the item is selected
 		if (isDragging && itemPositions.has(id)) {
 			return itemPositions.get(id);
+		} else {
+			return data.getIn(['items', id, 'rect']);
 		}
-
-		return data.getIn(['items', id, 'rect']);
 	},
 
 	/**
@@ -203,8 +197,6 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.MOVE_SELECTED_ITEMS_BY:
-			// item.get('type') === constants.ITEM_TYPE_FILTER
-			// TODO: improve the updating
 			setData(data.withMutations(data => {
 				action.selectedItems.forEach((_, id) => {
 					data.updateIn(['items', id, 'rect'], rect => rect.moveBy(action.delta));
@@ -214,7 +206,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.DELETE_SELECTED_ITEMS:
-		var deleteItems = action.selectedItems;
+			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
 				break;
 			}
@@ -266,15 +258,11 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 
 			// TODO: emit a special signal
 			WorkbenchStore.emitChange();
-
-			// if (requestId) { return; }
-			// requestId = requestAnimationFrame(function() {});
 		break;
 
 		case constants.FINISH_MOVING_SELECTED_ITEMS:
 			isDragging = false;
 			itemPositions = immutable.Map();
-			// requestId = null;
 		break;
 	}
 });
@@ -323,10 +311,8 @@ function addPipe(name, x, y, params) {
 	if (!basePipe) {
 		throw new Error('The pipe class doesn\'t exist');
 	}
-
 	var inputs = basePipe.inputs || 0;
 	var outputs = basePipe.outputs || 0;
-	// TODO: don't copy invalid params
 	var parameter = merge(basePipe.parameter, params);
 	if (parameter.inputs !== undefined) {
 		inputs += parameter.inputs;
@@ -343,7 +329,6 @@ function addPipe(name, x, y, params) {
 		type: constants.ITEM_TYPE_PIPE,
 		class: name,
 		// inputs: immutable.Range(0, inputs).map(val => null).toVector(),
-		// outputs: immutable.Range(0, outputs).map(val => null).toVector(),
 		inputs: immutable.Vector.from(new Array(inputs)),
 		outputs: immutable.Vector.from(new Array(outputs)),
 		parameter: immutable.Map(parameter),
@@ -372,6 +357,7 @@ addFilter('WorkFilterExample', 20,  90);
 addFilter('EndFilter', 508, 141);
 addFilter('WorkFilterExample', 20,  230);
 addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
+addFilter('WorkFilterExample', 60,  380);
 
 addConnection([0, 1, 0], [4, 0, 0]);
 addConnection([1, 1, 0], [4, 0, 1]);
@@ -379,7 +365,4 @@ addConnection([3, 1, 0], [4, 0, 2]);
 
 addConnection([4, 1, 0], [2, 0, 0]);
 addConnection([4, 1, 1], [2, 0, 1]);
-addConnection([4, 1, 2], [2, 0, 2]);
-
-undoStack = [];
-redoStack = [];
+addConnection([4, 1, 2], [5, 0, 0]);
