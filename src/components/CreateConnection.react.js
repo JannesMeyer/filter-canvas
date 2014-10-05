@@ -26,10 +26,14 @@ var CreateConnection = React.createClass({
 	render() {
 		var state = this.state;
 
+		if (!state.active) {
+			return null;
+		}
+
 		var wireWidth = WorkbenchLayout.getWireWidth();
 		var frame = WorkbenchLayout.getConnectionFrame(state.startPoint, state.endPoint);
 		var bezier = WorkbenchLayout.getBezierPoints(frame, state.startPoint, state.endPoint);
-		return <WorkbenchWire dragging={state.active} frame={frame} bezier={bezier} width={wireWidth} />;
+		return <WorkbenchWire dragging={true} frame={frame} bezier={bezier} width={wireWidth} />;
 	},
 
 	_handleChange() {

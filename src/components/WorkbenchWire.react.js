@@ -26,11 +26,7 @@ var WorkbenchWire = React.createClass({
 	},
 
 	shouldComponentUpdate(nextProps, nextState) {
-		// TODO: fix these weird conditions
-		return this.props.frame &&
-		       nextProps.frame &&
-		       !this.props.frame.equals(nextProps.frame) ||
-		       this.props.dragging !== nextProps.dragging;
+		return !nextProps.frame.equals(this.props.frame);
 	},
 
 	shouldComponentRedraw(prevProps) {
@@ -39,27 +35,21 @@ var WorkbenchWire = React.createClass({
 	},
 
 	componentDidUpdate(prevProps, prevState) {
-		// TODO: fix these weird conditions
-		if (this.props.bezier && prevProps.bezier && this.shouldComponentRedraw(prevProps)) {
+		if (this.shouldComponentRedraw(prevProps)) {
 			this.draw();
 		}
 	},
 
 	componentDidMount() {
-		// TODO: fix these weird conditions
-		if (this.props.bezier) {
-			this.draw();
-		}
+		this.draw();
 	},
 
 	render() {
-		var frame = this.props.frame || Rect.Zero;
-		var isDragging = this.props.dragging;
+		var frame = this.props.frame;
 
 		var classes = cx({
 			'm-wire': true,
-			'dragging': (isDragging === true),
-			'hidden': (isDragging === false)
+			'dragging': this.props.dragging
 		});
 		var style = {
 			left: frame.x,

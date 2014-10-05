@@ -38,10 +38,6 @@ var WorkbenchLayout = {
 	},
 
 	getConnectionFrame(startPoint, endPoint) {
-		if (!startPoint || !endPoint) {
-			return;
-		}
-
 		var frame;
 		if (startPoint.x < endPoint.x) {
 			// Draw the wire to a following location
@@ -50,18 +46,14 @@ var WorkbenchLayout = {
 		} else {
 			// Draw the wire to a previous location
 			frame = Rect.fromTwoPoints(startPoint, endPoint);
+			frame.height += WIRE_WIDTH;
 			frame.x -= 100;
 			frame.width += 200;
-			frame.height += WIRE_WIDTH;
 		}
 		return frame;
 	},
 
 	getBezierPoints(frame, startPoint, endPoint) {
-		if (!frame) {
-			return;
-		}
-
 		var p0, p1, p2, p3;
 		var width = frame.width;
 		var height = frame.height;

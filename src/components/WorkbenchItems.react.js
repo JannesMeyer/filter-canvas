@@ -37,7 +37,6 @@ var WorkbenchItems = React.createClass({
 			// Any outputs connected?
 			item.get('outputs').forEach((to, outputId) => {
 				if (!to) {
-					// This particular output is not connected yet
 					return;
 				}
 				// The "address" of the target connector
