@@ -64,16 +64,20 @@ var WorkbenchLayout = {
 			return;
 		}
 
-		var orderedX = startPoint.x < endPoint.x;
-		var orderedY = startPoint.y < endPoint.y;
+		var p0, p1, p2, p3;
 
 		var y1 = WIRE_WIDTH / 2;
 		var y2 = frame.height - WIRE_WIDTH / 2;
-		if (!orderedY) { [y1, y2] = [y2, y1]; }
 		var x1 = Math.min(0.4 * frame.width, 200);
 		var x2 = Math.max(0.6 * frame.width, frame.width - 200);
 
-		var p0, p1, p2, p3;
+		var orderedY = startPoint.y < endPoint.y;
+		var orderedX = startPoint.x < endPoint.x;
+
+		if (!orderedY) {
+			[y1, y2] = [y2, y1];
+		}
+
 		if (orderedX) {
 			// Draw the wire to a following location
 			p0 = new Point(0, y1);
