@@ -42,10 +42,8 @@ var WorkbenchLayout = {
 			return;
 		}
 
-		var orderedX = startPoint.x < endPoint.x;
-		var orderedY = startPoint.y < endPoint.y;
 		var frame;
-		if (orderedX) {
+		if (startPoint.x < endPoint.x) {
 			// Draw the wire to a following location
 			frame = Rect.fromTwoPoints(startPoint, endPoint);
 			frame.height += WIRE_WIDTH;
@@ -65,30 +63,22 @@ var WorkbenchLayout = {
 		}
 
 		var p0, p1, p2, p3;
-
+		var width = frame.width;
+		var height = frame.height;
 		var y1 = WIRE_WIDTH / 2;
-		var y2 = frame.height - WIRE_WIDTH / 2;
-		var x1 = Math.min(0.4 * frame.width, 200);
-		var x2 = Math.max(0.6 * frame.width, frame.width - 200);
-
-		var orderedY = startPoint.y < endPoint.y;
-		var orderedX = startPoint.x < endPoint.x;
-
-		if (!orderedY) {
-			[y1, y2] = [y2, y1];
-		}
-
-		if (orderedX) {
+		var y2 = height - WIRE_WIDTH / 2;
+		if (startPoint.y > endPoint.y) { [y1, y2] = [y2, y1]; }
+		if (startPoint.x < endPoint.x) {
 			// Draw the wire to a following location
 			p0 = new Point(0, y1);
-			p1 = new Point(x1, y1);
-			p2 = new Point(x2, y2);
-			p3 = new Point(frame.width, y2);
+			p1 = new Point(Math.min(0.4 * width,         200), y1);
+			p2 = new Point(Math.max(0.6 * width, width - 200), y2);
+			p3 = new Point(width, y2);
 		} else {
 			// Draw the wire to a previous location
-			p0 = new Point(frame.width - 100, y1);
-			p1 = new Point(frame.width, y1);
-			p2 = new Point(0, y2);
+			p0 = new Point(width - 100, y1);
+			p1 = new Point(width,       y1);
+			p2 = new Point(0,   y2);
 			p3 = new Point(100, y2);
 		}
 		return [p0, p1, p2, p3];
