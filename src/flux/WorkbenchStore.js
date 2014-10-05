@@ -2,7 +2,6 @@ var immutable = require('immutable');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
 var Rect = require('../lib/ImmutableRect');
-var WPath = require('../lib/WPath');
 
 var BaseStore = require('../lib/BaseStore');
 var RepositoryStore; // late import
@@ -146,25 +145,34 @@ var WorkbenchStore = BaseStore.createStore({
 
 	/**
 	 * Caches the offset values from `WorkbenchLayout.getConnectorOffset()`
-	 * c: WPath to a connector
+	 * c: Path (in array form) of a connector
 	 */
-	getConnectorOffset(c) {
-		// Implicitly calls c.toString(), because only Strings can be keys of an Object
-		var offset = connectorOffsets[c];
+	getConnectorOffset(cnrPath) {
+		// Implicitly calls cnrPath.toString(), because only Strings
+		// can be keys of an Object
+		var offset = connectorOffsets[cnrPath];
 		if (offset) {
+			// Return the cached value
 			return offset;
 		}
-		// Calculate the value first and then cache it
-		var item = data.getIn(['items', c.item]);
+
+		var itemId = cnrPath[0];
+		var isOutput = cnrPath[1];
+		var connectorId = cnrPath[2];
+
+		// Calculate the offset value
+		var item = data.getIn(['items', itemId]);
 		if (!item) {
 			throw new Error('Invalid item ID');
 		}
 		var frame = item.get('rect');
-		var numConnectors = item.get(c.isOutput ? 'outputs' : 'inputs').length;
-		if (c.connector < 0 || c.connector >= numConnectors) {
+		var numConnectors = item.get(isOutput ? 'outputs' : 'inputs').length;
+		if (connectorId < 0 || connectorId >= numConnectors) {
 			throw new Error('Invalid connector index');
 		}
-		return connectorOffsets[c] = WorkbenchLayout.getConnectorOffset(frame, numConnectors, c.isOutput, c.connector);
+
+		// Save it to the cache and return it
+		return connectorOffsets[cnrPath] = WorkbenchLayout.getConnectorOffset(frame, numConnectors, isOutput, connectorId);
 	},
 
 	/**
@@ -347,12 +355,10 @@ function addPipe(name, x, y, params) {
 }
 
 
-function addConnection({ from, to }) {
-	var output = new WPath(from[0], 1, from[1]);
-	var input = new WPath(to[0], 0, to[1]);
+function addConnection(output, input) {
 	setData(data.withMutations(data => {
-		data.updateIn(['items', output.item, 'outputs', output.connector], () => input);
-		data.updateIn(['items', input.item,  'inputs',  input.connector],  () => output);
+		data.updateIn(['items', output[0], 'outputs', output[2]], () => input);
+		data.updateIn(['items', input[0],  'inputs',  input[2]],  () => output);
 	}));
 }
 
@@ -369,13 +375,13 @@ addFilter('EndFilter', 508, 141);
 addFilter('WorkFilterExample', 20,  230);
 addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
 
-addConnection({ from: [0, 0], to: [4, 0] });
-addConnection({ from: [1, 0], to: [4, 1] });
-addConnection({ from: [3, 0], to: [4, 2] });
+addConnection([0, 1, 0], [4, 0, 0]);
+addConnection([1, 1, 0], [4, 0, 1]);
+addConnection([3, 1, 0], [4, 0, 2]);
 
-addConnection({ from: [4, 0], to: [2, 0] });
-addConnection({ from: [4, 1], to: [2, 1] });
-addConnection({ from: [4, 2], to: [2, 2] });
+addConnection([4, 1, 0], [2, 0, 0]);
+addConnection([4, 1, 1], [2, 0, 1]);
+addConnection([4, 1, 2], [2, 0, 2]);
 
 undoStack = [];
 redoStack = [];

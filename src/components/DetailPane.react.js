@@ -52,8 +52,9 @@ module.exports = React.createClass({
 
 			itemClass = item.get('class');
 			itemParams = item.get('parameter').map((value, key) => {
+				var id = itemId + ',' + key;
 				var type = (typeof value === 'number') ? 'number' : 'text';
-				return <label key={itemId + ',' + key}>{key}<input type={type} defaultValue={value} /></label>;
+				return <label key={id}>{key}<input type={type} defaultValue={value} /></label>;
 			}).toArray();
 		}
 

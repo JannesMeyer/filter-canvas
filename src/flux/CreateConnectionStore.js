@@ -1,6 +1,5 @@
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var BaseStore = require('../lib/BaseStore');
-var WPath = require('../lib/WPath');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
@@ -29,15 +28,16 @@ var CreateConnectionStore = BaseStore.createStore({
 CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case constants.START_CONNECTION:
-			var item = WorkbenchStore.getItem(action.connector[0]);
+			var itemId = action.connector[0];
+			var isOutput = action.connector[1];
+
+			var item = WorkbenchStore.getItem(itemId);
 			var type = item.get('type');
 			var frame = item.get('rect');
 			var isFilter = (type === constants.ITEM_TYPE_FILTER);
 			var isPipe = (type === constants.ITEM_TYPE_PIPE);
-			// TODO: remove WPath
-			var offset = WorkbenchStore.getConnectorOffset(new WPath(action.connector[0], action.connector[1], action.connector[2]));
+			var offset = WorkbenchStore.getConnectorOffset(action.connector);
 
-			isOutput = action.connector[1];
 			if (isOutput) {
 				startPoint = frame.moveBy(offset);
 				endPoint = action.mousePos;

@@ -19,9 +19,9 @@ var WorkbenchLayout = {
 	/**
 	 * Calculates the offset of a connector to the top left point of its filter
 	 */
-	getConnectorOffset(parentFrame, numConnectors, isOutput, connector) {
+	getConnectorOffset(parentFrame, numConnectors, isOutput, connectorId) {
 		var cHeight = numConnectors * (CONNECTOR_MARGIN + CONNECTOR_HEIGHT) + CONNECTOR_MARGIN;
-		var cPos    = connector     * (CONNECTOR_MARGIN + CONNECTOR_HEIGHT) + CONNECTOR_MARGIN;
+		var cPos    = connectorId   * (CONNECTOR_MARGIN + CONNECTOR_HEIGHT) + CONNECTOR_MARGIN;
 		var cCenter = Math.floor(Math.abs(CONNECTOR_HEIGHT - WIRE_WIDTH) / 2);
 
 		var x = isOutput ? parentFrame.width + 6 : -6;

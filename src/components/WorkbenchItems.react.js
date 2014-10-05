@@ -1,7 +1,6 @@
 var SelectionStore = require('../flux/SelectionStore');
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
-var WPath = require('../lib/WPath');
 
 var WorkbenchItem = require('./WorkbenchItem.react');
 var WorkbenchWire = require('./WorkbenchWire.react');
@@ -36,23 +35,18 @@ module.exports = React.createClass({
 			items.push(<WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />);
 
 			// Any outputs connected?
-			var from = new WPath(itemId, 1);
 			item.get('outputs').forEach((to, outputId) => {
 				if (!to) {
 					// This particular output is not connected yet
 					return;
 				}
 				// The "address" of the target connector
-				// var from = [itemId, 1, outputId];
+				var from = [itemId, 1, outputId];
 
-				// TODO: remove WPath
-				// Enhance the path object
-				from.connector = outputId;
-
-				var filterPos1 = WorkbenchStore.getItemPosition(itemId);
-				var filterPos2 = WorkbenchStore.getItemPosition(to.item);
+				var filterPos1 = WorkbenchStore.getItemPosition(from[0]);
+				var filterPos2 = WorkbenchStore.getItemPosition(to[0]);
 				var startPoint = filterPos1.moveBy(WorkbenchStore.getConnectorOffset(from));
-				var endPoint = filterPos2.moveBy(WorkbenchStore.getConnectorOffset(to));
+				var endPoint   = filterPos2.moveBy(WorkbenchStore.getConnectorOffset(to));
 
 				var frame  = WorkbenchLayout.getConnectionFrame(startPoint, endPoint);
 				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint);

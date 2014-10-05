@@ -24,7 +24,7 @@ module.exports = React.createClass({
 			return;
 		}
 
-		// [itemId, in/out, connectorId]
+		// Path format: [itemId, isOutput, connectorId]
 		var connector = [this.props.key, isOutput, id];
 		AppActions.startConnection(connector, ev.clientX, ev.clientY);
 	},
