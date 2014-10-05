@@ -6,8 +6,8 @@ var constants = require('./constants');
 // Data
 var isDragging = false;
 var isOutput;
-var startPoint;
-var endPoint;
+var origin;
+var lastPos;
 
 /**
  * CreateConnectionStore single object
@@ -20,7 +20,11 @@ var CreateConnectionStore = BaseStore.createStore({
 	},
 
 	getPoints() {
-		return { startPoint, endPoint };
+		if (isOutput) {
+			return { startPoint: origin, endPoint: lastPos };
+		} else {
+			return { startPoint: lastPos, endPoint: origin };
+		}
 	}
 
 });
@@ -29,28 +33,31 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case constants.START_CONNECTION:
 			var itemId = action.connector[0];
-			var isOutput = action.connector[1];
+			isOutput = action.connector[1];
 
 			var item = WorkbenchStore.getItem(itemId);
-			var type = item.get('type');
 			var frame = item.get('rect');
+			var type = item.get('type');
 			var isFilter = (type === constants.ITEM_TYPE_FILTER);
 			var isPipe = (type === constants.ITEM_TYPE_PIPE);
 			var offset = WorkbenchStore.getConnectorOffset(action.connector);
 
-			if (isOutput) {
-				startPoint = frame.moveBy(offset);
-				endPoint = action.mousePos;
-			} else {
-				startPoint = action.mousePos;
-				endPoint = frame.moveBy(offset);
-			}
+			origin = frame.moveBy(offset);
+			lastPos = action.mousePos;
 
 			// TODO: perhaps not the best idea to modify the DOM from here
 			if (isFilter) {
-				document.body.classList.add('s-create-connection-from-filter');
+				if (isOutput) {
+					document.body.classList.add('s-new-connection-from-filter-output');
+				} else {
+					document.body.classList.add('s-new-connection-from-filter-input');
+				}
 			} else if (isPipe) {
-				document.body.classList.add('s-create-connection-from-pipe');
+				if (isOutput) {
+					document.body.classList.add('s-new-connection-from-pipe-output');
+				} else {
+					document.body.classList.add('s-new-connection-from-pipe-input');
+				}
 			}
 
 			isDragging = true;
@@ -58,19 +65,17 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.RESIZE_CONNECTION:
-			if (isOutput) {
-				endPoint = action.mousePos;
-			} else {
-				startPoint = action.mousePos;
-			}
+			lastPos = action.mousePos;
 			CreateConnectionStore.emitChange();
 		break;
 
 		case constants.CANCEL_CONNECTION:
 		case constants.FINISH_CONNECTION:
 			// TODO: perhaps not the best idea to modify the DOM from here
-			document.body.classList.remove('s-create-connection-from-filter');
-			document.body.classList.remove('s-create-connection-from-pipe');
+			document.body.classList.remove('s-new-connection-from-filter-output');
+			document.body.classList.remove('s-new-connection-from-filter-input');
+			document.body.classList.remove('s-new-connection-from-pipe-output');
+			document.body.classList.remove('s-new-connection-from-pipe-input');
 
 			isDragging = false;
 			CreateConnectionStore.emitChange();

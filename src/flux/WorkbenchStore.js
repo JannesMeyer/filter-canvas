@@ -369,6 +369,8 @@ addFilter('WorkFilterExample', 20,  230);
 addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
 addFilter('WorkFilterExample', 60,  380);
 addPipe('ForwardPipe', 350, 250);
+addPipe('ForwardPipe', 450, 250);
+addFilter('WorkFilterExample', 400,  380);
 
 addConnection([0, 1, 0], [4, 0, 0]);
 addConnection([1, 1, 0], [4, 0, 1]);

@@ -50,6 +50,7 @@ var WorkbenchItems = React.createClass({
 				var frame  = WorkbenchLayout.getConnectionFrame(startPoint, endPoint);
 				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint);
 
+				// TODO: calculate frame and bezier inside the wire
 				wires.push(<WorkbenchWire key={from.toString()} frame={frame} bezier={bezier} width={wireWidth} />);
 			});
 		});

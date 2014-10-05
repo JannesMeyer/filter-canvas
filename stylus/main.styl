@@ -182,7 +182,8 @@ body
 	button
 		margin-right: 3px
 
-.s-create-connection-from-pipe .filter .connector.unconnected,
-.s-create-connection-from-filter .pipe .connector.unconnected
-	// background: red !important
-	box-shadow: 0 0 10px #33f
+.s-new-connection-from-pipe-output .filter > .inputs > .unconnected,
+.s-new-connection-from-pipe-input .filter > .outputs > .unconnected,
+.s-new-connection-from-filter-output .pipe > .inputs > .unconnected,
+.s-new-connection-from-filter-input .pipe > .outputs > .unconnected
+	box-shadow: 0 0 10px 4px #ff9c00
