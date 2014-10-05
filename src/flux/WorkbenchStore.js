@@ -219,7 +219,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 				break;
 			}
 
-			setData(data.withMutations(data => {
+			setData(data.updateIn(['items'], items => items.withMutations(items => {
 				// TODO: deleting items leads to a sparse array
 				// TODO: should old IDs be reused?
 
@@ -232,17 +232,14 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 				});
 				clearConnectors.forEach(c => {
 					if (!c || deleteItems.has(c[0])) { return; }
-					data.updateIn(['items', c[0], (c[1] ? 'outputs' : 'inputs'), c[2]], () => undefined);
+					items.updateIn([c[0], (c[1] ? 'outputs' : 'inputs'), c[2]], () => undefined);
 				});
 
 				// Delete items
-				data.updateIn(['items'], items => {
-					deleteItems.forEach(itemId => {
-						items = items.remove(itemId);
-					});
-					return items;
+				deleteItems.forEach(itemId => {
+					items.remove(itemId);
 				});
-			}));
+			})));
 		break;
 
 		case constants.UNDO:
