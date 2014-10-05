@@ -8,17 +8,18 @@ var SelectionStore; // late import
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
+var loadComplete = false;
+
 // Data
 var data = immutable.Map({
 	items: immutable.Vector()
 });
-var connectorOffsets = {};
 var undoStack = [];
 var redoStack = [];
-
 var isDragging = false;
-var itemPositions = immutable.Map();
 var startMousePos;
+var itemPositions = immutable.Map();
+var connectorOffsets = {};
 
 /**
  * Modify the data object
@@ -28,7 +29,7 @@ function setData(newData) {
 	undoStack.push(data);
 	redoStack = [];
 
-	if (process.env.NODE_ENV !== 'production') {
+	if (process.env.NODE_ENV !== 'production' && loadComplete) {
 		console.log(newData.get('items').toJS());
 	}
 
@@ -378,3 +379,5 @@ addConnection([4, 1, 1], [2, 0, 1]);
 addConnection([4, 1, 2], [5, 0, 0]);
 addConnection([5, 1, 0], [6, 0, 0]);
 addConnection([6, 1, 0], [2, 0, 2]);
+
+loadComplete = true;

@@ -84,14 +84,18 @@ Rect.fromTwoPoints = function createWithPoints(a, b) {
 	}
 	var x, y, xfar, yfar;
 	if (a.x < b.x) {
-		x = a.x; xfar = b.x;
+		x = a.x;
+		xfar = b.x;
 	} else {
-		x = b.x; xfar = a.x;
+		x = b.x;
+		xfar = a.x;
 	}
 	if (a.y < b.y) {
-		y = a.y; yfar = b.y;
+		y = a.y;
+		yfar = b.y;
 	} else {
-		y = b.y; yfar = a.y;
+		y = b.y;
+		yfar = a.y;
 	}
 	return new Rect(x, y, xfar - x, yfar - y);
 }

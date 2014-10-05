@@ -40,14 +40,14 @@ var WorkbenchWire = React.createClass({
 
 	componentDidUpdate(prevProps, prevState) {
 		// TODO: fix these weird conditions
-		if (this.props.frame && prevProps.frame && this.shouldComponentRedraw(prevProps)) {
+		if (this.props.bezier && prevProps.bezier && this.shouldComponentRedraw(prevProps)) {
 			this.draw();
 		}
 	},
 
 	componentDidMount() {
 		// TODO: fix these weird conditions
-		if (this.props.frame) {
+		if (this.props.bezier) {
 			this.draw();
 		}
 	},
