@@ -339,6 +339,15 @@ function addPipe(name, x, y, params) {
 
 
 function addConnection(output, input) {
+	var p1 = data.getIn(['items', output[0], 'outputs', output[2]]);
+	var p2 = data.getIn(['items', input[0], 'outputs', input[2]]);
+	if (p1) {
+		throw new Error('The connector ' + p1 + ' already has a connection');
+	}
+	if (p2) {
+		throw new Error('The connector ' + p2 + ' already has a connection');
+	}
+
 	setData(data.withMutations(data => {
 		data.updateIn(['items', output[0], 'outputs', output[2]], () => input);
 		data.updateIn(['items', input[0],  'inputs',  input[2]],  () => output);
@@ -358,6 +367,7 @@ addFilter('EndFilter', 508, 141);
 addFilter('WorkFilterExample', 20,  230);
 addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
 addFilter('WorkFilterExample', 60,  380);
+addPipe('ForwardPipe', 350, 250);
 
 addConnection([0, 1, 0], [4, 0, 0]);
 addConnection([1, 1, 0], [4, 0, 1]);
@@ -366,3 +376,5 @@ addConnection([3, 1, 0], [4, 0, 2]);
 addConnection([4, 1, 0], [2, 0, 0]);
 addConnection([4, 1, 1], [2, 0, 1]);
 addConnection([4, 1, 2], [5, 0, 0]);
+addConnection([5, 1, 0], [6, 0, 0]);
+addConnection([6, 1, 0], [2, 0, 2]);
