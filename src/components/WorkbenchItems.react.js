@@ -1,8 +1,7 @@
 var SelectionStore = require('../flux/SelectionStore');
-var EtherMovementStore = require('../flux/EtherMovementStore');
 var WorkbenchStore = require('../flux/WorkbenchStore');
-var WPath = require('../lib/WPath');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
+var WPath = require('../lib/WPath');
 
 var WorkbenchItem = require('./WorkbenchItem.react');
 var WorkbenchWire = require('./WorkbenchWire.react');
@@ -12,73 +11,60 @@ module.exports = React.createClass({
 	getInitialState() {
 		return {
 			items: WorkbenchStore.getAllItems(),
-			isDragging: EtherMovementStore.isDragging()
+			isDragging: WorkbenchStore.isDragging()
 		};
 	},
 
 	componentDidMount() {
 		WorkbenchStore.addChangeListener(this._handleChange);
-		EtherMovementStore.addChangeListener(this._handleChange);
 		SelectionStore.addChangeListener(this._handleChange);
 	},
 
 	componentWillUnmount() {
 		WorkbenchStore.removeChangeListener(this._handleChange);
-		EtherMovementStore.removeChangeListener(this._handleChange);
 		SelectionStore.removeChangeListener(this._handleChange);
 	},
 
 	render() {
-		var items = this.state.items.toArray();
-		var isDragging = this.state.isDragging;
 		var wireWidth = WorkbenchLayout.getWireWidth();
+		var wires = [];
+		var items = [];
 
-		var wireElements = [];
-		var itemElements = items.map((item, itemId) => {
-			var frame = null;
+		this.state.items.forEach((item, itemId) => {
+			var frame = WorkbenchStore.getItemPosition(itemId);
 			var isSelected = SelectionStore.isItemSelected(itemId);
-			if (isSelected && isDragging) {
-				frame = EtherMovementStore.getItemPosition(itemId);
-			}
+			items.push(<WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />);
 
+			// Any outputs connected?
 			var from = new WPath(itemId, 1);
-			item.get('outputs').forEach((to, fromConnector) => {
+			item.get('outputs').forEach((to, outputId) => {
 				if (!to) {
+					// This particular output is not connected yet
 					return;
 				}
+				// The "address" of the target connector
+				// var from = [itemId, 1, outputId];
 
+				// TODO: remove WPath
 				// Enhance the path object
-				from.connector = fromConnector;
+				from.connector = outputId;
 
-				// TODO: Remove EtherMovementStore
-				if (isSelected && isDragging) {
-					var frame1 = EtherMovementStore.getItemPosition(itemId);
-				} else {
-					var frame1 = WorkbenchStore.getItemPosition(itemId);
-				}
+				var filterPos1 = WorkbenchStore.getItemPosition(itemId);
+				var filterPos2 = WorkbenchStore.getItemPosition(to.item);
+				var startPoint = filterPos1.moveBy(WorkbenchStore.getConnectorOffset(from));
+				var endPoint = filterPos2.moveBy(WorkbenchStore.getConnectorOffset(to));
 
-				var isOtherSelected = SelectionStore.isItemSelected(to.item);
-				if (isOtherSelected && isDragging) {
-					var frame2 = EtherMovementStore.getItemPosition(to.item);
-				} else {
-					var frame2 = WorkbenchStore.getItemPosition(to.item);
-				}
-
-				var startPoint = frame1.moveBy(WorkbenchStore.getConnectorOffset(from));
-				var endPoint = frame2.moveBy(WorkbenchStore.getConnectorOffset(to));
-				var frame = WorkbenchLayout.getConnectionFrame(startPoint, endPoint);
+				var frame  = WorkbenchLayout.getConnectionFrame(startPoint, endPoint);
 				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint);
 
-				wireElements.push(<WorkbenchWire key={from.toString()} frame={frame} bezier={bezier} width={wireWidth} />);
+				wires.push(<WorkbenchWire key={from.toString()} frame={frame} bezier={bezier} width={wireWidth} />);
 			});
-
-			return <WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />;
 		});
 
 		return (
 			<div className="m-workbench-items">
-				{wireElements}
-				{itemElements}
+				{wires}
+				{items}
 			</div>
 		);
 	},

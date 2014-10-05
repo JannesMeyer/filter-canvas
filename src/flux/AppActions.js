@@ -1,7 +1,6 @@
 var Point = require('../lib/ImmutablePoint');
 
 var WorkbenchStore = require('./WorkbenchStore');
-var EtherMovementStore = require('./EtherMovementStore');
 var	SelectionStore = require('./SelectionStore');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
@@ -109,7 +108,7 @@ var AppActions = {
 		dispatcher.dispatch({ actionType: constants.FINISH_MOVING_SELECTED_ITEMS });
 
 		var mousePos = new Point(event.clientX, event.clientY);
-		var delta = EtherMovementStore.getAmountDragged(mousePos);
+		var delta = WorkbenchStore.getAmountDragged(mousePos);
 
 		// Only a click
 		if (delta.isZero()) {

@@ -5,9 +5,9 @@ var constants = require('../flux/constants');
 module.exports = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return nextProps.frame !== null ||
-		       this.props.isSelected !== nextProps.isSelected ||
-		       this.props.item       !== nextProps.item;
+		return this.props.isSelected !== nextProps.isSelected ||
+		       this.props.item       !== nextProps.item ||
+		       this.props.frame      !== nextProps.frame;
 	},
 
 	handleMouseDown(ev) {
@@ -31,7 +31,7 @@ module.exports = React.createClass({
 
 	render() {
 		var item = this.props.item;
-		var frame = this.props.frame || item.get('rect');
+		var frame = this.props.frame;
 		var type = item.get('type');
 		var inputs = item.get('inputs').toArray();
 		var outputs = item.get('outputs').toArray();

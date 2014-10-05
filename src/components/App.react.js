@@ -1,7 +1,7 @@
 var AppActions = require('../flux/AppActions');
 var SelectionStore = require('../flux/SelectionStore');
 var CreateConnectionStore = require('../flux/CreateConnectionStore');
-var EtherMovementStore = require('../flux/EtherMovementStore');
+var WorkbenchStore = require('../flux/WorkbenchStore');
 var keypress = require('../lib/keypress-tool');
 
 var Workbench = require('./Workbench.react');
@@ -12,7 +12,7 @@ var Actions = require('./Actions.react');
 module.exports = React.createClass({
 
 	handleMouseMove(ev) {
-		if (EtherMovementStore.isDragging()) {
+		if (WorkbenchStore.isDragging()) {
 			AppActions.moveSelectedItems(ev.clientX, ev.clientY);
 		} else if (SelectionStore.isSelecting()) {
 			AppActions.resizeSelection(ev.clientX, ev.clientY);
@@ -24,7 +24,7 @@ module.exports = React.createClass({
 	handleMouseUp(ev) {
 		if (ev.button !== 0) { return; }
 
-		if (EtherMovementStore.isDragging()) {
+		if (WorkbenchStore.isDragging()) {
 			AppActions.finishMovingSelectedItems(ev);
 		} else if (SelectionStore.isSelecting()) {
 			AppActions.finishSelection(ev);

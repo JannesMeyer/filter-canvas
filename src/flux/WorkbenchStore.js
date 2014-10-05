@@ -1,10 +1,12 @@
 var immutable = require('immutable');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
+var Rect = require('../lib/ImmutableRect');
 var WPath = require('../lib/WPath');
 
 var BaseStore = require('../lib/BaseStore');
-var RepositoryStore = require('./RepositoryStore');
+var RepositoryStore; // late import
+var SelectionStore; // late import
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
@@ -16,6 +18,14 @@ var connectorOffsets = {};
 var undoStack = [];
 var redoStack = [];
 var isLoading = true;
+
+var isDragging = false;
+var itemPositions = immutable.Map();
+var startMousePos;
+// var requestId;
+// var requestAnimationFrame = window.requestAnimationFrame ||
+//                             window.mozRequestAnimationFrame ||
+//                             window.webkitRequestAnimationFrame;
 
 /**
  * Modify the data object
@@ -112,7 +122,27 @@ var WorkbenchStore = BaseStore.createStore({
 	 * returns an ImmutableRect
 	 */
 	getItemPosition(id) {
+		// TODO: this also depends on whether the item is selected
+		if (isDragging && itemPositions.has(id)) {
+			return itemPositions.get(id);
+		}
+
 		return data.getIn(['items', id, 'rect']);
+	},
+
+	/**
+	 * Calculates the movement vector
+	 */
+	// TODO: why not use deltaPos?
+	getAmountDragged(mousePos) {
+		return mousePos.subtract(startMousePos);
+	},
+
+	/**
+	 * returns whether any items are being moved right now
+	 */
+	isDragging() {
+		return isDragging;
 	},
 
 	/**
@@ -214,12 +244,42 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		case constants.REDO:
 			redo();
 		break;
+
+		case constants.START_MOVING_SELECTED_ITEMS:
+			isDragging = true;
+			startMousePos = action.mousePos;
+			itemPositions = SelectionStore.getSelectedItemIds().map(id => {
+				return data.getIn(['items', id, 'rect']);
+			}).toMap();
+		break;
+
+		case constants.MOVING_SELECTED_ITEMS:
+			var delta = action.mousePos.subtract(startMousePos);
+
+			itemPositions = SelectionStore.getSelectedItemIds().map(id => {
+				return data.getIn(['items', id, 'rect']).moveBy(delta);
+			}).toMap();
+
+			// TODO: emit a special signal
+			WorkbenchStore.emitChange();
+
+			// if (requestId) { return; }
+			// requestId = requestAnimationFrame(function() {});
+		break;
+
+		case constants.FINISH_MOVING_SELECTED_ITEMS:
+			isDragging = false;
+			itemPositions = immutable.Map();
+			// requestId = null;
+		break;
 	}
 });
 
 module.exports = WorkbenchStore;
 
-
+// Requiring after the export prevents problems with circular dependencies
+RepositoryStore = require('./RepositoryStore');
+SelectionStore = require('./SelectionStore');
 
 
 
