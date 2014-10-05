@@ -1,7 +1,7 @@
 var cx = require('react/lib/cx');
 var Rect = require('../lib/ImmutableRect');
 
-module.exports = React.createClass({
+var WorkbenchWire = React.createClass({
 
 	context: null,
 
@@ -69,3 +69,4 @@ module.exports = React.createClass({
 	}
 
 });
+module.exports = WorkbenchWire;

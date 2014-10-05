@@ -9,7 +9,7 @@ var RepositoryPane = require('./RepositoryPane.react');
 var DetailPane = require('./DetailPane.react');
 var Actions = require('./Actions.react');
 
-module.exports = React.createClass({
+var App = React.createClass({
 
 	handleMouseMove(ev) {
 		if (WorkbenchStore.isDragging()) {
@@ -80,3 +80,4 @@ module.exports = React.createClass({
 		);
 	}
 });
+module.exports = App;

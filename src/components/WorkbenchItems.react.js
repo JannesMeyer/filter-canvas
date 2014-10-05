@@ -5,7 +5,7 @@ var WorkbenchLayout = require('../interface/WorkbenchLayout');
 var WorkbenchItem = require('./WorkbenchItem.react');
 var WorkbenchWire = require('./WorkbenchWire.react');
 
-module.exports = React.createClass({
+var WorkbenchItems = React.createClass({
 
 	getInitialState() {
 		return {
@@ -68,3 +68,4 @@ module.exports = React.createClass({
 	}
 
 });
+module.exports = WorkbenchItems;

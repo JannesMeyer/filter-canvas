@@ -4,7 +4,7 @@ var Point = require('../lib/ImmutablePoint');
 
 var WorkbenchWire = require('./WorkbenchWire.react');
 
-module.exports = React.createClass({
+var CreateConnection = React.createClass({
 
 	getInitialState() {
 		var {startPoint, endPoint} = CreateConnectionStore.getPoints();
@@ -37,3 +37,4 @@ module.exports = React.createClass({
 	}
 
 });
+module.exports = CreateConnection;

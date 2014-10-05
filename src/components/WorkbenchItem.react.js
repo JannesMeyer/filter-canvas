@@ -2,7 +2,7 @@ var cx = require('react/lib/cx');
 var AppActions = require('../flux/AppActions');
 var constants = require('../flux/constants');
 
-module.exports = React.createClass({
+var WorkbenchItem = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.isSelected !== nextProps.isSelected ||
@@ -69,3 +69,4 @@ module.exports = React.createClass({
 	}
 
 });
+module.exports = WorkbenchItem;

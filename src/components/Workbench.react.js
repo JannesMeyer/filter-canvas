@@ -3,7 +3,7 @@ var WorkbenchItems = require('./WorkbenchItems.react');
 var CreateSelection = require('./CreateSelection.react');
 var CreateConnection = require('./CreateConnection.react');
 
-module.exports = React.createClass({
+var Workbench = React.createClass({
 
 	handleDragOver(ev) {
 		ev.preventDefault();
@@ -39,3 +39,4 @@ module.exports = React.createClass({
 	}
 
 });
+module.exports = Workbench;

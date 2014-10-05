@@ -12,4 +12,7 @@ if (process.env.NODE_ENV !== 'production' && typeof window !== 'undefined') {
 	window.Rect = require('./lib/ImmutableRect');
 	window.Point = require('./lib/ImmutablePoint');
 	window.Size = require('./lib/ImmutableSize');
+	var Perf = require('react/lib/ReactDefaultPerf');
+	Perf.start();
+	window.print = Perf.printWasted.bind(Perf);
 }

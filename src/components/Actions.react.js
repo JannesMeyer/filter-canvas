@@ -2,7 +2,7 @@ var AppActions = require('../flux/AppActions');
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var keypress = require('../lib/keypress-tool');
 
-module.exports = React.createClass({
+var Actions = React.createClass({
 
 	getInitialState() {
 		return {
@@ -98,3 +98,4 @@ module.exports = React.createClass({
 	}
 
 });
+module.exports = Actions;

@@ -1,6 +1,6 @@
 var	SelectionStore = require('../flux/SelectionStore');
 
-module.exports = React.createClass({
+var CreateSelection = React.createClass({
 
 	getInitialState() {
 		return {
@@ -34,3 +34,4 @@ module.exports = React.createClass({
 	}
 
 });
+module.exports = CreateSelection;

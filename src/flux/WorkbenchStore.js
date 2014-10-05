@@ -219,10 +219,9 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 				break;
 			}
 
+			// TODO: deleting items leads to a sparse array
+			// TODO: should old IDs be reused?
 			setData(data.updateIn(['items'], items => items.withMutations(items => {
-				// TODO: deleting items leads to a sparse array
-				// TODO: should old IDs be reused?
-
 				// Clear connections (they work similar to doubly linked lists)
 				var clearConnectors = immutable.Sequence();
 				deleteItems.forEach(itemId => {
