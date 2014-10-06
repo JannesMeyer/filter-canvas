@@ -19,6 +19,9 @@ class Point {
 	add(point) {
 		return new Point(this.x + point.x, this.y + point.y);
 	}
+	addValues(x, y) {
+		return new Point(this.x + x, this.y + y);
+	}
 	/**
 	 * Subtract a Point or anything point-like (i.e. it has an `x` and a `y`)
 	 */

@@ -77,6 +77,8 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 			var offset = WorkbenchStore.getConnectorOffset(action.connector);
 
 			origin = frame.moveBy(offset);
+			// TODO: workbenchlayout (linewidth/2)
+			action.mousePos.y -= 4;
 			lastPos = action.mousePos;
 			isDragging = true;
 
@@ -109,6 +111,8 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.RESIZE_CONNECTION:
+			// TODO: workbenchlayout (linewidth/2)
+			action.mousePos.y -= 4;
 			lastPos = action.mousePos;
 			// TODO: put this in WorkbenchLayout
 			// TODO: use a rect function for the collision check
