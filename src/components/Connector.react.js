@@ -4,7 +4,8 @@ var Connector = React.createClass({
 
 	getInitialState: function() {
 		return {
-			eligibleTarget: CreateConnectionStore.isEligibleTarget(this.props.address)
+			eligibleTarget: CreateConnectionStore.isEligibleTarget(this.props.address),
+			mouseOver: CreateConnectionStore.isMouseOver(this.props.address)
 		};
 	},
 
@@ -20,6 +21,9 @@ var Connector = React.createClass({
 		var classes = "connector";
 		if (this.state.eligibleTarget) {
 			classes += ' glow';
+		}
+		if (this.state.mouseOver) {
+			classes += ' mouseover';
 		}
 		return <div className={classes} onMouseDown={this.props.onMouseDown} />;
 	},

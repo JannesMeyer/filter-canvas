@@ -42,15 +42,12 @@ var WorkbenchItems = React.createClass({
 				// The "address" of the target connector
 				var from = [itemId, 1, outputId];
 
-				var filterPos1 = WorkbenchStore.getItemPosition(from[0]);
-				var filterPos2 = WorkbenchStore.getItemPosition(to[0]);
-				var startPoint = filterPos1.moveBy(WorkbenchStore.getConnectorOffset(from));
-				var endPoint   = filterPos2.moveBy(WorkbenchStore.getConnectorOffset(to));
-
+				var startPoint = WorkbenchStore.getConnectorPosition(from);
+				var endPoint = WorkbenchStore.getConnectorPosition(to);
+				// TODO: calculate frame and bezier inside the wire
 				var frame  = WorkbenchLayout.getConnectionFrame(startPoint, endPoint);
 				var bezier = WorkbenchLayout.getBezierPoints(frame, startPoint, endPoint);
 
-				// TODO: calculate frame and bezier inside the wire
 				wires.push(<WorkbenchWire key={from.toString()} frame={frame} bezier={bezier} width={wireWidth} />);
 			});
 		});

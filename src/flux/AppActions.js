@@ -2,6 +2,7 @@ var Point = require('../lib/ImmutablePoint');
 
 var WorkbenchStore = require('./WorkbenchStore');
 var	SelectionStore = require('./SelectionStore');
+var CreateConnectionStore = require('./CreateConnectionStore');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
@@ -142,10 +143,19 @@ var AppActions = {
 	},
 
 	finishConnection(clientX, clientY) {
-		dispatcher.dispatch({
-			actionType: constants.FINISH_CONNECTION,
-			mousePos: new Point(clientX, clientY)
-		});
+		if (CreateConnectionStore.isComplete()) {
+			var [from, to] = CreateConnectionStore.getAddresses();
+			console.log('from', from);
+			console.log('to', to);
+			dispatcher.dispatch({
+				actionType: constants.FINISH_CONNECTION,
+				mousePos: new Point(clientX, clientY),
+				from,
+				to
+			});
+		} else {
+			dispatcher.dispatch({ actionType: constants.CANCEL_CONNECTION });
+		}
 	},
 
 	selectAll() {

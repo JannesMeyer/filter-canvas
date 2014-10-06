@@ -169,6 +169,11 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 		return connectorOffsets[cnrPath] = WorkbenchLayout.getConnectorOffset(frame, numConnectors, isOutput, connectorId);
 	},
 
+	getConnectorPosition(address) {
+		var itemPos = this.getItemPosition(address[0]);
+		return itemPos.moveBy(this.getConnectorOffset(address));
+	},
+
 	/**
 	 * returns a boolean
 	 */
@@ -265,6 +270,10 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			isDragging = false;
 			itemPositions = immutable.Map();
 		break;
+
+		case constants.FINISH_CONNECTION:
+			addConnection(action.from, action.to);
+		break;
 	}
 });
 
@@ -340,8 +349,12 @@ function addPipe(name, x, y, params) {
 
 
 function addConnection(output, input) {
+	// If they arrive in reverse order swap them
+	if (!output[1] && input[1]) {
+		[input, output] = [output, input];
+	}
 	var p1 = data.getIn(['items', output[0], 'outputs', output[2]]);
-	var p2 = data.getIn(['items', input[0], 'outputs', input[2]]);
+	var p2 = data.getIn(['items', input[0], 'inputs', input[2]]);
 	if (p1) {
 		throw new Error('The connector ' + p1 + ' already has a connection');
 	}
