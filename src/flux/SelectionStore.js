@@ -31,7 +31,7 @@ var isMacPlatform = Boolean(typeof navigator !== 'undefined' && navigator.platfo
  * SelectionStore single object
  * (like a singleton)
  */
-var SelectionStore = BaseStore.createStore({
+var SelectionStore = BaseStore.createEventEmitter(['change'], {
 
 	/**
 	 * Helper-function to determine what kind of action should happen
@@ -39,7 +39,8 @@ var SelectionStore = BaseStore.createStore({
 	getSelectionType(ctrlKey, metaKey, itemId) {
 		// Continue with the existing selection if the user is
 		// pressing the platform-specific key for continuing a selection
-		if ((isMacPlatform && metaKey) || (!isMacPlatform && ctrlKey)) {
+		if (!isMacPlatform && ctrlKey ||
+		     isMacPlatform && metaKey) {
 			return constants.SELECTION_TYPE_EXTEND;
 		}
 

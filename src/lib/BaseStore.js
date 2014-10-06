@@ -1,21 +1,24 @@
-var events = require('events');
+var EventEmitter = require('events').EventEmitter;
 var merge = require('react/lib/merge');
 
-var CHANGE_EVENT = 'change';
-var BaseStore = merge(events.EventEmitter.prototype, {
-	emitChange() {
-		this.emit(CHANGE_EVENT);
-	},
-	addChangeListener(callback) {
-		this.on(CHANGE_EVENT, callback);
-	},
-	removeChangeListener(callback) {
-		this.removeListener(CHANGE_EVENT, callback);
-	}
-});
+var BaseStore = {
 
-module.exports = {
-	createStore: function(extensions) {
-		return merge(BaseStore, extensions);
+	createEventEmitter(eventNames, extensions) {
+		eventNames.forEach(eventName => {
+			var Name = eventName.charAt(0).toUpperCase() + eventName.substr(1);
+			extensions['emit' + Name] = function() {
+				this.emit(eventName);
+			};
+			extensions['add' + Name + 'Listener'] = function(callback) {
+				this.on(eventName, callback);
+			};
+			extensions['remove' + Name + 'Listener'] = function(callback) {
+				this.removeListener(eventName, callback);
+			};
+		});
+
+		return merge(EventEmitter.prototype, extensions);
 	}
+
 };
+module.exports = BaseStore;

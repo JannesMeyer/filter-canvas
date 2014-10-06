@@ -8,7 +8,7 @@ var pipes = require('../interface/PipeRepo');
  * RepositoryStore single object
  * (like a singleton)
  */
-var RepositoryStore = BaseStore.createStore({
+var RepositoryStore = BaseStore.createEventEmitter(['change'], {
 
 	getAllFilters() {
 		return filters;

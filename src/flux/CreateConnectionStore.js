@@ -5,6 +5,7 @@ var constants = require('./constants');
 
 // Data
 var isDragging = false;
+var eligibleConnectors = [];
 var isOutput;
 var origin;
 var lastPos;
@@ -13,7 +14,7 @@ var lastPos;
  * CreateConnectionStore single object
  * (like a singleton)
  */
-var CreateConnectionStore = BaseStore.createStore({
+var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 
 	isDragging() {
 		return isDragging;
@@ -31,6 +32,7 @@ var CreateConnectionStore = BaseStore.createStore({
 
 CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
+
 		case constants.START_CONNECTION:
 			var itemId = action.connector[0];
 			isOutput = action.connector[1];
@@ -45,6 +47,23 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 			origin = frame.moveBy(offset);
 			lastPos = action.mousePos;
 			isDragging = true;
+
+			// Find eligible target connectors
+			// TODO: use flatMap() here as soon as the new version of immutable comes out
+			eligibleConnectors = [];
+			WorkbenchStore.getAllItems().forEach((item, itemId) => {
+				// Find opposites
+				if (type === item.get('type')) {
+					return;
+				}
+				item.get(isOutput ? 'inputs' : 'outputs').forEach((connectedTo, connectorId) => {
+					if (connectedTo) {
+						return;
+					}
+					eligibleConnectors.push([itemId, Number(!isOutput), connectorId]);
+				});
+			});
+			console.log(eligibleConnectors);
 
 			// TODO: perhaps not the best idea to modify the DOM from here
 			if (isFilter) {
@@ -83,6 +102,7 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 			isDragging = false;
 			CreateConnectionStore.emitChange();
 		break;
+
 	}
 });
 

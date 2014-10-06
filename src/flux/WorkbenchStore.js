@@ -70,7 +70,7 @@ function redo() {
  * WorkbenchStore single object
  * (like a singleton)
  */
-var WorkbenchStore = BaseStore.createStore({
+var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 
 	/**
 	 * returns an immutable.Vector
