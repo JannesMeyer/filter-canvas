@@ -68,9 +68,11 @@ body
 				height: 8px
 				margin-top: 4px
 				margin-bottom: 4px
-				// background: #000
 				background: #0886D6
 				cursor: pointer
+			> .connector.glow
+				cursor: default
+				box-shadow: 0 0 10px 4px #ff9c00
 
 		> .inputs
 			left: 0
@@ -181,16 +183,3 @@ body
 
 	button
 		margin-right: 3px
-
-
-.s-new-connection-from-pipe-output .connector,
-.s-new-connection-from-pipe-input .connector,
-.s-new-connection-from-filter-output .connector,
-.s-new-connection-from-filter-input .connector
-	cursor: default !important
-
-.s-new-connection-from-pipe-output .filter > .inputs > .unconnected,
-.s-new-connection-from-pipe-input .filter > .outputs > .unconnected,
-.s-new-connection-from-filter-output .pipe > .inputs > .unconnected,
-.s-new-connection-from-filter-input .pipe > .outputs > .unconnected
-	box-shadow: 0 0 10px 4px #ff9c00

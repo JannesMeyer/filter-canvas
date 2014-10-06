@@ -17,7 +17,7 @@ var BaseStore = {
 			};
 		});
 
-		return merge(EventEmitter.prototype, extensions);
+		return merge(EventEmitter.prototype, extensions).setMaxListeners(0);
 	}
 
 };

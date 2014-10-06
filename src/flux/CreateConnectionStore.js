@@ -14,10 +14,22 @@ var lastPos;
  * CreateConnectionStore single object
  * (like a singleton)
  */
-var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
+var CreateConnectionStore = BaseStore.createEventEmitter(['stateChange', 'change'], {
 
 	isDragging() {
 		return isDragging;
+	},
+
+	isEligibleTarget(address) {
+		for (var i = 0; i < eligibleConnectors.length; i++) {
+			var connector = eligibleConnectors[i];
+			if (connector[0] === address[0] &&
+			    connector[1] === address[1] &&
+			    connector[2] === address[2]) {
+				return true;
+			}
+		}
+		return false;
 	},
 
 	getPoints() {
@@ -63,23 +75,8 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 					eligibleConnectors.push([itemId, Number(!isOutput), connectorId]);
 				});
 			});
-			console.log(eligibleConnectors);
 
-			// TODO: perhaps not the best idea to modify the DOM from here
-			if (isFilter) {
-				if (isOutput) {
-					document.body.classList.add('s-new-connection-from-filter-output');
-				} else {
-					document.body.classList.add('s-new-connection-from-filter-input');
-				}
-			} else if (isPipe) {
-				if (isOutput) {
-					document.body.classList.add('s-new-connection-from-pipe-output');
-				} else {
-					document.body.classList.add('s-new-connection-from-pipe-input');
-				}
-			}
-
+			CreateConnectionStore.emitStateChange();
 			CreateConnectionStore.emitChange();
 		break;
 
@@ -93,13 +90,9 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 		case constants.CANCEL_CONNECTION:
 		case constants.FINISH_CONNECTION:
 			// TODO: In case of finish, use action.mousePos
-			// TODO: perhaps not the best idea to modify the DOM from here
-			document.body.classList.remove('s-new-connection-from-filter-output');
-			document.body.classList.remove('s-new-connection-from-filter-input');
-			document.body.classList.remove('s-new-connection-from-pipe-output');
-			document.body.classList.remove('s-new-connection-from-pipe-input');
-
 			isDragging = false;
+			eligibleConnectors = [];
+			CreateConnectionStore.emitStateChange();
 			CreateConnectionStore.emitChange();
 		break;
 
