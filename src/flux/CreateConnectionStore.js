@@ -44,6 +44,7 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 
 			origin = frame.moveBy(offset);
 			lastPos = action.mousePos;
+			isDragging = true;
 
 			// TODO: perhaps not the best idea to modify the DOM from here
 			if (isFilter) {
@@ -60,17 +61,19 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 				}
 			}
 
-			isDragging = true;
 			CreateConnectionStore.emitChange();
 		break;
 
 		case constants.RESIZE_CONNECTION:
 			lastPos = action.mousePos;
+			// TODO: find mouseover (WorkbenchLayout)
+
 			CreateConnectionStore.emitChange();
 		break;
 
 		case constants.CANCEL_CONNECTION:
 		case constants.FINISH_CONNECTION:
+			// TODO: In case of finish, use action.mousePos
 			// TODO: perhaps not the best idea to modify the DOM from here
 			document.body.classList.remove('s-new-connection-from-filter-output');
 			document.body.classList.remove('s-new-connection-from-filter-input');

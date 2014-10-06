@@ -11,7 +11,10 @@ var WorkbenchItem = React.createClass({
 	},
 
 	handleMouseDown(ev) {
-		AppActions.startMovingSelectedItems(this.props.key, ev);
+		if (ev.button !== 0) { return; }
+		AppActions.startMovingSelectedItems(this.props.key, ev.ctrlKey, ev.metaKey, ev.clientX, ev.clientY);
+		ev.preventDefault();
+		ev.stopPropagation();
 	},
 
 	handleConnectorMouseDown(isOutput, id, connectedTo, ev) {

@@ -5,38 +5,6 @@ var	SelectionStore = require('./SelectionStore');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
-// TODO: move this to `lib/mouse-tool.js` or something like that
-/**
- * Usually user agent checking is a bad practice. But in this case we're using it to determine
- * which key has to be pressed to trigger multiple selection.
- *
- * On OSX systems the expected behavior is to use metaKey
- * On all other systems the expected behavior is to use ctrlKey
- */
-var isMacSystem = !!(typeof navigator !== 'undefined' && navigator.platform && navigator.platform.indexOf('Mac') !== -1);
-
-function getSelectionType(ev, isItemSelected) {
-	// Only let left-clicks through
-	if (ev.button !== 0 || isMacSystem && ev.ctrlKey) {
-		return null;
-	}
-
-	// Keep the existing selection if the user is
-	// going to drag a part of it
-	if (isItemSelected) {
-		return constants.SELECTION_TYPE_EXTEND;
-	}
-
-	// Continue with the existing selection if the user is
-	// pressing the OS-specific key
-	if (isMacSystem && ev.metaKey ||
-		 !isMacSystem && ev.ctrlKey) {
-		return constants.SELECTION_TYPE_EXTEND;
-	}
-
-	return constants.SELECTION_TYPE_NEW;
-}
-
 /**
  * AppActions single object (like a singleton)
  */
@@ -77,24 +45,23 @@ var AppActions = {
 		});
 	},
 
-	startMovingSelectedItems(id, event) {
-		var selected = SelectionStore.isItemSelected(id);
-		var selectionType = getSelectionType(event, selected);
-		if (selectionType === null) {
-			return;
-		}
-		if (selectionType === constants.SELECTION_TYPE_NEW) {
-			dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
-		}
+	startMovingSelectedItems(id, ctrlKey, metaKey, clientX, clientY) {
+		// TODO: protect from double-start
+		var selectionType = SelectionStore.getSelectionType(ctrlKey, metaKey, id);
+		switch(selectionType) {
 
-		dispatcher.dispatch({
-			actionType: constants.START_MOVING_SELECTED_ITEMS,
-			id,
-			mousePos: new Point(event.clientX, event.clientY)
-		});
+			case constants.SELECTION_TYPE_NEW:
+				dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
+				// Fall through!
 
-		event.preventDefault();
-		event.stopPropagation();
+			case constants.SELECTION_TYPE_EXTEND:
+				dispatcher.dispatch({
+					actionType: constants.START_MOVING_SELECTED_ITEMS,
+					id,
+					mousePos: new Point(clientX, clientY)
+				});
+
+		}
 	},
 
 	moveSelectedItems(clientX, clientY) {
@@ -104,14 +71,15 @@ var AppActions = {
 		});
 	},
 
-	finishMovingSelectedItems(event) {
+	finishMovingSelectedItems(clientX, clientY) {
 		dispatcher.dispatch({ actionType: constants.FINISH_MOVING_SELECTED_ITEMS });
 
-		var mousePos = new Point(event.clientX, event.clientY);
+		var mousePos = new Point(clientX, clientY);
 		var delta = WorkbenchStore.getAmountDragged(mousePos);
 
 		// Only a click
 		if (delta.isZero()) {
+			// TODO: should reset the selection to only the clicked item
 			return;
 		}
 
@@ -120,29 +88,25 @@ var AppActions = {
 			selectedItems: SelectionStore.getSelectedItemIds(),
 			delta: delta
 		});
-
-		event.preventDefault();
-		event.stopPropagation();
 	},
 
-	startSelection(scrollLeft, scrollTop, event) {
-		var selectionType = getSelectionType(event);
-		if (!selectionType) {
-			return;
+	startSelection(ctrlKey, metaKey, scrollLeft, scrollTop, clientX, clientY) {
+		// TODO: protect from double-start
+		var selectionType = SelectionStore.getSelectionType(ctrlKey, metaKey);
+		switch(selectionType) {
+
+			case constants.SELECTION_TYPE_NEW:
+				dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
+				// Fall through!
+
+			case constants.SELECTION_TYPE_EXTEND:
+				dispatcher.dispatch({
+					actionType: constants.START_SELECTION,
+					scrollPos: new Point(scrollLeft, scrollTop),
+					mousePos: new Point(clientX, clientY)
+				});
+
 		}
-
-		if (selectionType === constants.SELECTION_TYPE_NEW) {
-			dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
-		}
-
-		dispatcher.dispatch({
-			actionType: constants.START_SELECTION,
-			scrollPos: new Point(scrollLeft, scrollTop),
-			mousePos: new Point(event.clientX, event.clientY)
-		});
-
-		event.preventDefault();
-		event.stopPropagation();
 	},
 
 	resizeSelection(clientX, clientY) {
@@ -152,22 +116,20 @@ var AppActions = {
 		});
 	},
 
-	finishSelection(event) {
+	finishSelection() {
+		// TODO: use the last x/y values
 		if (SelectionStore.isClick()) {
 			dispatcher.dispatch({ actionType: constants.CANCEL_SELECTION });
 		} else {
 			dispatcher.dispatch({ actionType: constants.FINISH_SELECTION });
 		}
-
-		event.preventDefault();
-		event.stopPropagation();
 	},
 
 	startConnection(connector, clientX, clientY) {
+		// TODO: protect from double-start
 		dispatcher.dispatch({
 			actionType: constants.START_CONNECTION,
 			connector,
-			// scrollPos: new Point(scrollLeft, scrollRight),
 			mousePos: new Point(clientX, clientY)
 		});
 	},

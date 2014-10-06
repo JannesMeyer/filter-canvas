@@ -25,13 +25,20 @@ var App = React.createClass({
 		if (ev.button !== 0) { return; }
 
 		if (WorkbenchStore.isDragging()) {
-			AppActions.finishMovingSelectedItems(ev);
+			// Move selected items
+			AppActions.finishMovingSelectedItems(ev.clientX, ev.clientY);
+			event.preventDefault();
+			event.stopPropagation();
 		} else if (SelectionStore.isSelecting()) {
-			AppActions.finishSelection(ev);
-		} else if (CreateConnectionStore.isDragging()) {
-			AppActions.finishConnection(ev.clientX, ev.clientY);
-			ev.stopPropagation();
+			// Hide selection rectangle
+			AppActions.finishSelection();
 			ev.preventDefault();
+			ev.stopPropagation();
+		} else if (CreateConnectionStore.isDragging()) {
+			// Create a connection between an input and an output
+			AppActions.finishConnection(ev.clientX, ev.clientY);
+			ev.preventDefault();
+			ev.stopPropagation();
 		}
 	},
 

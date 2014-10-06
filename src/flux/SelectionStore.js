@@ -14,9 +14,43 @@ var startPos;
 var lastPos;
 
 /**
+ * We're using this information to determine which key has to be pressed
+ * to trigger multiple selection.
+ *
+ * On OSX systems the expected behavior is to use metaKey
+ * On all other systems the expected behavior is to use ctrlKey
+ */
+var isMacPlatform = Boolean(typeof navigator !== 'undefined' && navigator.platform && navigator.platform.indexOf('Mac') !== -1);
+
+// TODO: Improve every (ev.button !== 0) check in the codebase with this
+// if (ev.button !== 0 || isMacPlatform && ev.ctrlKey) {
+// 	return;
+// }
+
+/**
  * SelectionStore single object
+ * (like a singleton)
  */
 var SelectionStore = BaseStore.createStore({
+
+	/**
+	 * Helper-function to determine what kind of action should happen
+	 */
+	getSelectionType(ctrlKey, metaKey, itemId) {
+		// Continue with the existing selection if the user is
+		// pressing the platform-specific key for continuing a selection
+		if ((isMacPlatform && metaKey) || (!isMacPlatform && ctrlKey)) {
+			return constants.SELECTION_TYPE_EXTEND;
+		}
+
+		// Keep the existing selection if the user is
+		// going to drag a part of it
+		if (this.isItemSelected(itemId)) {
+			return constants.SELECTION_TYPE_EXTEND;
+		}
+
+		return constants.SELECTION_TYPE_NEW;
+	},
 
 	getSelectionRect() {
 		return Rect.fromTwoPoints(startPos, lastPos);
@@ -31,7 +65,6 @@ var SelectionStore = BaseStore.createStore({
 	},
 
 	isItemSelected(id) {
-		// TODO: remove type and make ids unique
 		return selectedItems.contains(id) || itemsInsideSelection.contains(id);
 	},
 
