@@ -126,6 +126,10 @@ var AppActions = {
 		}
 	},
 
+	deleteConnection(connector1, connector2) {
+		dispatcher.dispatch({ actionType: constants.DELETE_CONNECTION, connector1, connector2 });
+	},
+
 	startConnection(connector, clientX, clientY) {
 		// TODO: protect from double-start
 		dispatcher.dispatch({
@@ -143,16 +147,10 @@ var AppActions = {
 	},
 
 	finishConnection(clientX, clientY) {
+		// TODO: use last clientX and clientY for this check
 		if (CreateConnectionStore.isComplete()) {
 			var [from, to] = CreateConnectionStore.getAddresses();
-			console.log('from', from);
-			console.log('to', to);
-			dispatcher.dispatch({
-				actionType: constants.FINISH_CONNECTION,
-				mousePos: new Point(clientX, clientY),
-				from,
-				to
-			});
+			dispatcher.dispatch({ actionType: constants.FINISH_CONNECTION, from, to });
 		} else {
 			dispatcher.dispatch({ actionType: constants.CANCEL_CONNECTION });
 		}

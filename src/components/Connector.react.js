@@ -10,11 +10,11 @@ var Connector = React.createClass({
 	},
 
 	componentDidMount() {
-		CreateConnectionStore.addStateChangeListener(this._handleChange);
+		CreateConnectionStore.addChangeListener(this._handleChange);
 	},
 
 	componentWillUnmount() {
-		CreateConnectionStore.removeStateChangeListener(this._handleChange);
+		CreateConnectionStore.removeChangeListener(this._handleChange);
 	},
 
 	render() {

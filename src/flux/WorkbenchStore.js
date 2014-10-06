@@ -239,6 +239,19 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			})));
 		break;
 
+		case constants.FINISH_CONNECTION:
+			addConnection(action.from, action.to);
+		break;
+
+		case constants.DELETE_CONNECTION:
+			var c1 = action.connector1;
+			var c2 = action.connector2;
+			setData(data.withMutations(data => {
+				data.updateIn(['items', c1[0], (c1[1] ? 'outputs' : 'inputs'), c1[2]], () => undefined);
+				data.updateIn(['items', c2[0], (c2[1] ? 'outputs' : 'inputs'), c2[2]], () => undefined);
+			}));
+		break;
+
 		case constants.UNDO:
 			undo();
 		break;
@@ -269,10 +282,6 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		case constants.FINISH_MOVING_SELECTED_ITEMS:
 			isDragging = false;
 			itemPositions = immutable.Map();
-		break;
-
-		case constants.FINISH_CONNECTION:
-			addConnection(action.from, action.to);
 		break;
 	}
 });

@@ -26,6 +26,7 @@ module.exports = keyMirror({
 	RESIZE_CONNECTION: null,
 	FINISH_CONNECTION: null,
 	CANCEL_CONNECTION: null,
+	DELETE_CONNECTION: null,
 
 	ITEM_TYPE_FILTER: null,
 	ITEM_TYPE_PIPE: null,

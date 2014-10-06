@@ -13,23 +13,23 @@ var WorkbenchItem = React.createClass({
 
 	handleMouseDown(ev) {
 		if (ev.button !== 0) { return; }
-		AppActions.startMovingSelectedItems(this.props.key, ev.ctrlKey, ev.metaKey, ev.clientX, ev.clientY);
 		ev.preventDefault();
 		ev.stopPropagation();
+		AppActions.startMovingSelectedItems(this.props.key, ev.ctrlKey, ev.metaKey, ev.clientX, ev.clientY);
 	},
 
-	handleConnectorMouseDown(isOutput, id, connectedTo, ev) {
+	handleConnectorMouseDown(isOutput, connectorId, connectedTo, ev) {
 		if (ev.button !== 0) { return; }
 		ev.stopPropagation();
 		ev.preventDefault();
 
-		if (connectedTo) {
-			// TODO: erase the old connection?
-			return;
-		}
+		var connector = [this.props.key, isOutput, connectorId];
 
-		// Path format: [itemId, isOutput, connectorId]
-		var connector = [this.props.key, isOutput, id];
+		// Erase the old connection
+		if (connectedTo) {
+			AppActions.deleteConnection(connector, connectedTo);
+		}
+		// Start dragging a new connection
 		AppActions.startConnection(connector, ev.clientX, ev.clientY);
 	},
 

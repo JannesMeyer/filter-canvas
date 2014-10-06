@@ -1,5 +1,5 @@
 var Rect = require('../lib/ImmutableRect');
-var WorkbenchStore; // late import
+var WorkbenchStore = require('../flux/WorkbenchStore'); // late import
 var BaseStore = require('../lib/BaseStore');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
@@ -17,7 +17,7 @@ var lastPos;
  * CreateConnectionStore single object
  * (like a singleton)
  */
-var CreateConnectionStore = BaseStore.createEventEmitter(['stateChange', 'change'], {
+var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 
 	isDragging() {
 		return isDragging;
@@ -105,7 +105,6 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 				return new Rect(pos.x - 6, pos.y - 2 - 4, 12+12, 8 + 4);
 			});
 
-			CreateConnectionStore.emitStateChange();
 			CreateConnectionStore.emitChange();
 		break;
 
@@ -121,26 +120,22 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 				            frame.y < lastPos.y &&
 				            frame.y + frame.height > lastPos.y;
 				if (mouseOverConnector !== null) {
-					alert('double match');
+					console.warn('double match');
 				}
 				if (check) {
 					mouseOverConnector = eligibleConnectors[id];
 				}
 			});
 
-			CreateConnectionStore.emitStateChange();
 			CreateConnectionStore.emitChange();
 		break;
 
 		case constants.FINISH_CONNECTION:
-			// TODO: use action.mousePos
-			// Fall through!!!
 		case constants.CANCEL_CONNECTION:
 			isDragging = false;
 			eligibleConnectors = [];
 			connectorFrames = [];
 			mouseOverConnector = null;
-			CreateConnectionStore.emitStateChange();
 			CreateConnectionStore.emitChange();
 		break;
 
@@ -148,4 +143,3 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 });
 
 module.exports = CreateConnectionStore;
-WorkbenchStore = require('../flux/WorkbenchStore');
