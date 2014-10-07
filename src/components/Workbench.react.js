@@ -67,11 +67,13 @@ var Workbench = React.createClass({
 
 	componentDidMount() {
 		this.getDOMNode().addEventListener('mousewheel', this.handleMouseWheel);
+		// Replace the getScrollOffset function of the WorkbenchStore
 		WorkbenchStore.getScrollOffset = this.getScrollOffset;
 	},
 
 	componentWillUnmount() {
 		this.getDOMNode().removeEventListener('mousewheel', this.handleMouseWheel);
+		// Reset the getScrollOffset function
 		WorkbenchStore.getScrollOffset = undefined;
 	},
 
