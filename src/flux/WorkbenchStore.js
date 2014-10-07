@@ -1,4 +1,5 @@
 var immutable = require('immutable');
+var Point = require('../lib/ImmutablePoint');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
@@ -9,6 +10,7 @@ var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
 var loadComplete = false;
+var workbenchNode;
 
 // Data
 var data = immutable.Map({
@@ -186,7 +188,14 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 	 */
 	hasRedoSteps() {
 		return redoStack.length !== 0;
-	}
+	},
+
+	/**
+	 * Will be replaced by a function that returns the scroll offset
+	 * of the Workbench that was initialized most recently (there
+	 * should be only one Workbench anyway)
+	 */
+	getScrollOffset: undefined
 
 });
 
@@ -194,9 +203,9 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 		case constants.CREATE_ITEM:
 			if (action.type === constants.ITEM_TYPE_FILTER) {
-				addFilter(action.id, action.x, action.y);
+				addFilter(action.id, action.position);
 			} else if (action.type === constants.ITEM_TYPE_PIPE) {
-				addPipe(action.id, action.x, action.y);
+				addPipe(action.id, action.position);
 			} else {
 				throw new Error('Invalid type');
 			}
@@ -303,7 +312,7 @@ SelectionStore = require('./SelectionStore');
  * Item adding
  *************************************************************************/
 
-function addFilter(name, x, y, params) {
+function addFilter(name, pos, params) {
 	var baseFilter = RepositoryStore.getFilter(name);
 	if (!baseFilter) {
 		throw new Error('The filter class doesn\'t exist');
@@ -319,13 +328,13 @@ function addFilter(name, x, y, params) {
 		inputs: immutable.Vector.from(new Array(inputs)),
 		outputs: immutable.Vector.from(new Array(outputs)),
 		parameter: immutable.Map(parameter),
-		rect: WorkbenchLayout.getFilterFrame(x, y, name, inputs, outputs)
+		rect: WorkbenchLayout.getFilterFrame(pos.x, pos.y, name, inputs, outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
 }
 
 
-function addPipe(name, x, y, params) {
+function addPipe(name, pos, params) {
 	var basePipe = RepositoryStore.getPipe(name);
 	if (!basePipe) {
 		throw new Error('The pipe class doesn\'t exist');
@@ -351,7 +360,7 @@ function addPipe(name, x, y, params) {
 		inputs: immutable.Vector.from(new Array(inputs)),
 		outputs: immutable.Vector.from(new Array(outputs)),
 		parameter: immutable.Map(parameter),
-		rect: WorkbenchLayout.getPipeFrame(x, y, name, inputs, outputs)
+		rect: WorkbenchLayout.getPipeFrame(pos.x, pos.y, name, inputs, outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
 }
@@ -384,15 +393,15 @@ function addConnection(output, input) {
  * Testing
  *************************************************************************/
 
-addFilter('SourceFilterExample', 20,  20);
-addFilter('WorkFilterExample', 20,  90);
-addFilter('EndFilter', 508, 141);
-addFilter('WorkFilterExample', 20,  230);
-addPipe('ForwardPipe', 300, 150, { pipelines: 3 });
-addFilter('WorkFilterExample', 60,  380);
-addPipe('ForwardPipe', 350, 250);
-addPipe('ForwardPipe', 450, 250);
-addFilter('WorkFilterExample', 400,  380);
+addFilter('SourceFilterExample', new Point(20, 20));
+addFilter('WorkFilterExample',   new Point(20, 90));
+addFilter('EndFilter',           new Point(508, 141));
+addFilter('WorkFilterExample',   new Point(20,  230));
+addPipe('ForwardPipe',           new Point(300, 150), { pipelines: 3 });
+addFilter('WorkFilterExample',   new Point(60, 380));
+addPipe('ForwardPipe',           new Point(350, 250));
+addPipe('ForwardPipe',           new Point(450, 250));
+addFilter('WorkFilterExample',   new Point(400,  380));
 
 addConnection([0, 1, 0], [4, 0, 0]);
 addConnection([1, 1, 0], [4, 0, 1]);

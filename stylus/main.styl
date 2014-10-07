@@ -4,6 +4,37 @@
 .hidden
 	display: none
 
+@font-face {
+  font-family: 'custom-font'
+  src: url('/fonts/custom-font.eot?17392834')
+  src: url('/fonts/custom-font.eot?17392834#iefix') format('embedded-opentype'), url('/fonts/custom-font.woff?17392834') format('woff'), url('/fonts/custom-font.ttf?17392834') format('truetype'), url('/fonts/custom-font.svg?17392834#custom-font') format('svg')
+  font-weight: normal
+  font-style: normal
+}
+
+.icon:before
+	font-family: "custom-font"
+	font-style: normal
+	font-weight: normal
+	speak: none
+
+	display: inline-block
+	text-decoration: inherit
+	width: 1em
+	text-align: center
+	margin-right: 0.2em
+
+	/* For safety - reset parent styles, that can break glyph codes*/
+	font-variant: normal
+	text-transform: none
+
+.icon-open:before { content: '\e805' }
+.icon-save:before { content: '\e804' }
+.icon-back:before { content: '\e800' }
+.icon-forward:before { content: '\e801' }
+.icon-undo:before { content: '\e802' }
+.icon-redo:before { content: '\e803' }
+
 html,
 body,
 .m-container

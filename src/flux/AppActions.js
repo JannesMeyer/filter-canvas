@@ -31,8 +31,8 @@ var AppActions = {
 		dispatcher.dispatch({ actionType: constants.REDO });
 	},
 
-	createItem(type, id, x, y) {
-		dispatcher.dispatch({ actionType: constants.CREATE_ITEM, type, id, x, y });
+	createItem(type, id, position) {
+		dispatcher.dispatch({ actionType: constants.CREATE_ITEM, type, id, position });
 	},
 
 	updateItemParams(id, params) {
@@ -46,36 +46,26 @@ var AppActions = {
 		});
 	},
 
-	startMovingSelectedItems(id, ctrlKey, metaKey, clientX, clientY) {
+	startMovingSelectedItems(id, ctrlKey, metaKey, mousePos) {
 		// TODO: protect from double-start
 		var selectionType = SelectionStore.getSelectionType(ctrlKey, metaKey, id);
 		switch(selectionType) {
-
 			case constants.SELECTION_TYPE_NEW:
 				dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
 				// Fall through!
-
 			case constants.SELECTION_TYPE_EXTEND:
-				dispatcher.dispatch({
-					actionType: constants.START_MOVING_SELECTED_ITEMS,
-					id,
-					mousePos: new Point(clientX, clientY)
-				});
-
+				dispatcher.dispatch({ actionType: constants.START_MOVING_SELECTED_ITEMS, id, mousePos });
+			break;
 		}
 	},
 
-	moveSelectedItems(clientX, clientY) {
-		dispatcher.dispatch({
-			actionType: constants.MOVING_SELECTED_ITEMS,
-			mousePos: new Point(clientX, clientY)
-		});
+	moveSelectedItems(mousePos) {
+		dispatcher.dispatch({ actionType: constants.MOVING_SELECTED_ITEMS, mousePos });
 	},
 
-	finishMovingSelectedItems(clientX, clientY) {
+	finishMovingSelectedItems(mousePos) {
 		dispatcher.dispatch({ actionType: constants.FINISH_MOVING_SELECTED_ITEMS });
 
-		var mousePos = new Point(clientX, clientY);
 		var delta = WorkbenchStore.getAmountDragged(mousePos);
 
 		// Only a click
@@ -91,7 +81,7 @@ var AppActions = {
 		});
 	},
 
-	startSelection(ctrlKey, metaKey, scrollLeft, scrollTop, clientX, clientY) {
+	startSelection(ctrlKey, metaKey, scrollPos, position) {
 		// TODO: protect from double-start
 		var selectionType = SelectionStore.getSelectionType(ctrlKey, metaKey);
 		switch(selectionType) {
@@ -101,20 +91,13 @@ var AppActions = {
 				// Fall through!
 
 			case constants.SELECTION_TYPE_EXTEND:
-				dispatcher.dispatch({
-					actionType: constants.START_SELECTION,
-					scrollPos: new Point(scrollLeft, scrollTop),
-					mousePos: new Point(clientX, clientY)
-				});
+				dispatcher.dispatch({ actionType: constants.START_SELECTION, scrollPos, position });
 
 		}
 	},
 
-	resizeSelection(clientX, clientY) {
-		dispatcher.dispatch({
-			actionType: constants.RESIZE_SELECTION,
-			mousePos: new Point(clientX, clientY)
-		});
+	resizeSelection(mousePos) {
+		dispatcher.dispatch({ actionType: constants.RESIZE_SELECTION, mousePos });
 	},
 
 	finishSelection() {
@@ -130,24 +113,17 @@ var AppActions = {
 		dispatcher.dispatch({ actionType: constants.DELETE_CONNECTION, connector1, connector2 });
 	},
 
-	startConnection(connector, clientX, clientY) {
+	startConnection(connector, mousePos) {
 		// TODO: protect from double-start
-		dispatcher.dispatch({
-			actionType: constants.START_CONNECTION,
-			connector,
-			mousePos: new Point(clientX, clientY)
-		});
+		dispatcher.dispatch({ actionType: constants.START_CONNECTION, connector, mousePos });
 	},
 
-	resizeConnection(clientX, clientY) {
-		dispatcher.dispatch({
-			actionType: constants.RESIZE_CONNECTION,
-			mousePos: new Point(clientX, clientY)
-		});
+	resizeConnection(absMousePos) {
+		dispatcher.dispatch({ actionType: constants.RESIZE_CONNECTION, absMousePos });
 	},
 
-	finishConnection(clientX, clientY) {
-		// TODO: use last clientX and clientY for this check
+	finishConnection(absMousePos) {
+		// TODO: use last absMousePos for this check
 		if (CreateConnectionStore.isComplete()) {
 			var [from, to] = CreateConnectionStore.getAddresses();
 			dispatcher.dispatch({ actionType: constants.FINISH_CONNECTION, from, to });

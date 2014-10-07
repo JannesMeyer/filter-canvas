@@ -84,8 +84,9 @@ SelectionStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.START_SELECTION:
+			// TODO: don't save scrollpos
 			startScrollPos = action.scrollPos;
-			startPos = lastPos = startScrollPos.add(action.mousePos);
+			startPos = lastPos = action.position;
 			isSelecting = true;
 		break;
 

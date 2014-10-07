@@ -28,6 +28,9 @@ class Point {
 	subtract(point) {
 		return new Point(this.x - point.x, this.y - point.y);
 	}
+	subtractValues(x, y) {
+		return new Point(this.x - x, this.y - y);
+	}
 	/**
 	 * Checks if a Point or anything point-like (i.e. it has an `x` and a `y`)
 	 * equals to this Point

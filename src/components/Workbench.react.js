@@ -1,4 +1,7 @@
 var AppActions = require('../flux/AppActions');
+var WorkbenchStore = require('../flux/WorkbenchStore');
+var Point = require('../lib/ImmutablePoint');
+
 var WorkbenchItems = require('./WorkbenchItems.react');
 var CreateSelection = require('./CreateSelection.react');
 var CreateConnection = require('./CreateConnection.react');
@@ -22,10 +25,10 @@ var Workbench = React.createClass({
 		var data = JSON.parse(ev.dataTransfer.getData('application/json'));
 
 		// Create item
-		var [scrollX, scrollY] = this.getScrollOffset();
-		var filterX = scrollX + ev.clientX - data.clickX;
-		var filterY = scrollY + ev.clientY - data.clickY;
-		AppActions.createItem(data.type, data.id, filterX, filterY);
+		var position = this.getScrollOffset()
+			.addValues(ev.clientX, ev.clientY)
+			.subtractValues(data.clickX, data.clickY);
+		AppActions.createItem(data.type, data.id, position);
 
 		ev.stopPropagation(); // Stops some browsers from redirecting
 		ev.preventDefault();
@@ -37,18 +40,39 @@ var Workbench = React.createClass({
 	 */
 	handleMouseDown(ev) {
 		if (ev.button !== 0) { return; }
-		var [scrollX, scrollY] = this.getScrollOffset();
-		AppActions.startSelection(ev.ctrlKey, ev.metaKey, scrollX, scrollY, ev.clientX, ev.clientY);
+		var scrollOffset = this.getScrollOffset();
+		var position = scrollOffset.addValues(ev.clientX, ev.clientY);
+		AppActions.startSelection(ev.ctrlKey, ev.metaKey, scrollOffset, position);
 		ev.preventDefault();
 		ev.stopPropagation();
 	},
 
 	/**
-	 * Returns the scroll position as an array of [x, y]
+	 * Returns the scroll offset as a Point
 	 */
 	getScrollOffset() {
 		var node = this.getDOMNode();
-		return [node.scrollLeft, node.scrollTop];
+		return new Point(node.scrollLeft, node.scrollTop);
+	},
+
+	/**
+	 * Enables horizontal scrolling with the mouse wheel
+	 */
+	handleMouseWheel(ev) {
+		// TODO: don't mess with touchpad scrolling
+		// TODO: invert scrolling instead of redirecting the vertical scrolling
+		this.getDOMNode().scrollLeft += ev.wheelDeltaY - ev.wheelDeltaX;
+		ev.preventDefault();
+	},
+
+	componentDidMount() {
+		this.getDOMNode().addEventListener('mousewheel', this.handleMouseWheel);
+		WorkbenchStore.getScrollOffset = this.getScrollOffset;
+	},
+
+	componentWillUnmount() {
+		this.getDOMNode().removeEventListener('mousewheel', this.handleMouseWheel);
+		WorkbenchStore.getScrollOffset = undefined;
 	},
 
 	/**

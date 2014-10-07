@@ -2,6 +2,7 @@ var AppActions = require('../flux/AppActions');
 var SelectionStore = require('../flux/SelectionStore');
 var CreateConnectionStore = require('../flux/CreateConnectionStore');
 var WorkbenchStore = require('../flux/WorkbenchStore');
+var Point = require('../lib/ImmutablePoint');
 var keypress = require('../lib/keypress-tool');
 
 var Workbench = require('./Workbench.react');
@@ -13,11 +14,14 @@ var App = React.createClass({
 
 	handleMouseMove(ev) {
 		if (WorkbenchStore.isDragging()) {
-			AppActions.moveSelectedItems(ev.clientX, ev.clientY);
+			var mousePos = new Point(ev.clientX, ev.clientY);
+			AppActions.moveSelectedItems(mousePos);
 		} else if (SelectionStore.isSelecting()) {
-			AppActions.resizeSelection(ev.clientX, ev.clientY);
+			var mousePos = new Point(ev.clientX, ev.clientY);
+			AppActions.resizeSelection(mousePos);
 		} else if (CreateConnectionStore.isDragging()) {
-			AppActions.resizeConnection(ev.clientX, ev.clientY);
+			var absMousePos = WorkbenchStore.getScrollOffset().addValues(ev.clientX, ev.clientY);
+			AppActions.resizeConnection(absMousePos);
 		}
 	},
 
@@ -28,8 +32,9 @@ var App = React.createClass({
 			event.preventDefault();
 			event.stopPropagation();
 
-			// Move selected items
-			AppActions.finishMovingSelectedItems(ev.clientX, ev.clientY);
+			// Finish selection
+			var mousePos = new Point(ev.clientX, ev.clientY);
+			AppActions.finishMovingSelectedItems(mousePos);
 		} else if (SelectionStore.isSelecting()) {
 			ev.preventDefault();
 			ev.stopPropagation();
@@ -41,7 +46,8 @@ var App = React.createClass({
 			ev.stopPropagation();
 
 			// Create a connection between an input and an output
-			AppActions.finishConnection(ev.clientX, ev.clientY);
+			var absMousePos = WorkbenchStore.getScrollOffset().addValues(ev.clientX, ev.clientY);
+			AppActions.finishConnection(absMousePos);
 		}
 	},
 

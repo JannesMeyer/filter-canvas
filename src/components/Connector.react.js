@@ -18,7 +18,7 @@ var Connector = React.createClass({
 	},
 
 	render() {
-		var classes = "connector";
+		var classes = 'connector';
 		if (this.state.eligibleTarget) {
 			classes += ' glow';
 		}

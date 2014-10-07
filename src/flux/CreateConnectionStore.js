@@ -112,8 +112,8 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.RESIZE_CONNECTION:
 			// TODO: workbenchlayout (linewidth/2)
-			action.mousePos.y -= 4;
-			lastPos = action.mousePos;
+			action.absMousePos.y -= 4;
+			lastPos = action.absMousePos;
 			// TODO: put this in WorkbenchLayout
 			// TODO: use a rect function for the collision check
 

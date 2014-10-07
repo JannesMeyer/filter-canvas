@@ -1,6 +1,8 @@
 var cx = require('react/lib/cx');
 var constants = require('../flux/constants');
 var AppActions = require('../flux/AppActions');
+var WorkbenchStore = require('../flux/WorkbenchStore');
+var Point = require('../lib/ImmutablePoint');
 var Connector = require('./Connector.react');
 
 var WorkbenchItem = React.createClass({
@@ -15,7 +17,8 @@ var WorkbenchItem = React.createClass({
 		if (ev.button !== 0) { return; }
 		ev.preventDefault();
 		ev.stopPropagation();
-		AppActions.startMovingSelectedItems(this.props.key, ev.ctrlKey, ev.metaKey, ev.clientX, ev.clientY);
+		var mousePos = new Point(ev.clientX, ev.clientY);
+		AppActions.startMovingSelectedItems(this.props.key, ev.ctrlKey, ev.metaKey, mousePos);
 	},
 
 	handleConnectorMouseDown(isOutput, connectorId, connectedTo, ev) {
@@ -30,7 +33,8 @@ var WorkbenchItem = React.createClass({
 			AppActions.deleteConnection(connector, connectedTo);
 		}
 		// Start dragging a new connection
-		AppActions.startConnection(connector, ev.clientX, ev.clientY);
+		var position = WorkbenchStore.getScrollOffset().addValues(ev.clientX, ev.clientY);
+		AppActions.startConnection(connector, position);
 	},
 
 	render() {
