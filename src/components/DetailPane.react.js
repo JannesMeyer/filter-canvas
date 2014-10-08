@@ -24,7 +24,7 @@ var DetailPane = React.createClass({
 		return this.state.items !== nextState.items ||
 		       this.state.showParameterPopup !== nextState.showParameterPopup ||
 		      !this.state.selectedItems.equals(nextState.selectedItems) ||
-		      (!nextProps.changedParameter && this.state.changedParameter);
+		      (!this.state.changedParameter && nextState.changedParameter);
 	},
 
 	componentDidMount() {
@@ -41,7 +41,7 @@ var DetailPane = React.createClass({
 		if (ev.which === 8) {
 			var input = ev.target;
 			if (input.type === 'checkbox' || input.value === '') {
-				// TODO: this totally skips over all other changes that haven't been saved yet
+				// TODO: this totally skips over all changes that haven't been saved yet
 				AppActions.removeItemParam(this.state.itemId, paramName);
 				ev.preventDefault();
 			}
