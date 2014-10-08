@@ -74,6 +74,10 @@ var AppActions = {
 		dispatcher.dispatch({ actionType: constants.SET_ITEM_PARAMS, id, params });
 	},
 
+	removeItemParam(id, param) {
+		dispatcher.dispatch({ actionType: constants.REMOVE_ITEM_PARAM, id, param });
+	},
+
 	deleteSelectedItems() {
 		dispatcher.dispatch({
 			actionType: constants.DELETE_SELECTED_ITEMS,

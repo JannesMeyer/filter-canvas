@@ -316,6 +316,10 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			setData(data.updateIn(['items', action.id, 'parameter'], params => params.merge(action.params)));
 		break;
 
+		case constants.REMOVE_ITEM_PARAM:
+			setData(data.updateIn(['items', action.id, 'parameter'], params => params.remove(action.param)));
+		break;
+
 		case constants.MOVE_SELECTED_ITEMS_BY:
 			setData(data.withMutations(data => {
 				action.selectedItems.forEach((_, id) => {
@@ -326,6 +330,9 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.DELETE_SELECTED_ITEMS:
+			// TODO: Why is this necessary? It's probably because of the DetailPane
+			dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
 				break;

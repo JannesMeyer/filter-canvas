@@ -1,7 +1,7 @@
-var immutable = require('immutable');
 var AppActions = require('../flux/AppActions');
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var SelectionStore = require('../flux/SelectionStore');
+var keypress = require('../lib/keypress-tool');
 
 var DetailPane = React.createClass({
 
@@ -25,6 +25,27 @@ var DetailPane = React.createClass({
 		       this.state.showParameterPopup !== nextState.showParameterPopup ||
 		      !this.state.selectedItems.equals(nextState.selectedItems) ||
 		      (!nextProps.changedParameter && this.state.changedParameter);
+	},
+
+	componentDidMount() {
+		SelectionStore.addChangeListener(this._handleChange);
+		WorkbenchStore.addChangeListener(this._handleChange);
+	},
+
+	componentWillUnmount() {
+		SelectionStore.removeChangeListener(this._handleChange);
+		WorkbenchStore.removeChangeListener(this._handleChange);
+	},
+
+	handleKeyDown(paramName, ev) {
+		if (ev.which === 8) {
+			var input = ev.target;
+			if (input.type === 'checkbox' || input.value === '') {
+				// TODO: this totally skips over all other changes that haven't been saved yet
+				AppActions.removeItemParam(this.state.itemId, paramName);
+				ev.preventDefault();
+			}
+		}
 	},
 
 	handleChange(field, ev) {
@@ -135,16 +156,6 @@ var DetailPane = React.createClass({
 		}
 	},
 
-	componentDidMount() {
-		SelectionStore.addChangeListener(this._handleChange);
-		WorkbenchStore.addChangeListener(this._handleChange);
-	},
-
-	componentWillUnmount() {
-		SelectionStore.removeChangeListener(this._handleChange);
-		WorkbenchStore.removeChangeListener(this._handleChange);
-	},
-
 	render() {
 		console.log('Render DetailPane');
 		var changedParameter = this.state.changedParameter;
@@ -172,11 +183,11 @@ var DetailPane = React.createClass({
 					var onChange = this.handleChange.bind(this, key);
 					var input;
 					if (typeof value === 'boolean') {
-						input = <input type="checkbox" ref={key} defaultChecked={value} onChange={onChange} />;
+						input = <input type="checkbox" ref={key} defaultChecked={value} onChange={onChange} onKeyDown={this.handleKeyDown.bind(this, key)} />;
 					} else if (typeof value === 'number') {
-						input = <input type="number" ref={key} defaultValue={value} onChange={onChange} step="any" />;
+						input = <input type="number" ref={key} defaultValue={value} onChange={onChange} onKeyDown={this.handleKeyDown.bind(this, key)} step="any" />;
 					} else {
-						input = <input type="text" ref={key} defaultValue={value} onChange={onChange} />;
+						input = <input type="text" ref={key} defaultValue={value} onChange={onChange} onKeyDown={this.handleKeyDown.bind(this, key)} />;
 					}
 					params.push(<label key={this.state.itemId+'-'+key}><span>{key}</span>{input}</label>);
 				});
@@ -184,9 +195,19 @@ var DetailPane = React.createClass({
 
 		return (
 			<div className="m-detail-pane">
-
 				<h3>{title}</h3>
-
+				<form id="defaultDialog"
+					className={!showDialog ?'':'hidden'}
+					onSubmit={this.handleParamValuesSubmit.bind(this, this.state.itemId)}
+					>
+					{params}
+					<div className="actions">
+						{changedParameter && <button type="submit" accessKey="s">Übernehmen</button>}
+						{count === 1      && <button type="button" onClick={this.handleNewParamClick} accessKey="n">Neuer Parameter</button>}
+						{count > 1        && <button type="button" onClick={this.handleSaveAsClick}>Als komplexen Filter speichern</button>}
+						{count > 0        && <button type="button" onClick={this.handleDeleteClick} className="red-button">Element löschen</button>}
+					</div>
+				</form>
 				<form id="newParameterDialog" className={showDialog ?'':'hidden'} onSubmit={this.handleNewParamSubmit}>
 					<input name="paramName" ref="paramName" type="text" placeholder="Parametername" />
 					<label><input type="radio" name="inputType" value="text" defaultChecked />Text</label>
@@ -197,17 +218,6 @@ var DetailPane = React.createClass({
 						<button type="button" accessKey="a" onClick={this.handleCancelClick}>Abbrechen</button>
 					</div>
 				</form>
-
-				<form id="defaultDialog" className={!showDialog ?'':'hidden'} onSubmit={this.handleParamValuesSubmit.bind(this, this.state.itemId)}>
-					{params}
-					<div className="actions">
-						{changedParameter && <button type="submit" accessKey="s">Übernehmen</button>}
-						{count === 1      && <button type="button" onClick={this.handleNewParamClick} accessKey="n">Neuer Parameter</button>}
-						{count > 1        && <button type="button" onClick={this.handleSaveAsClick}>Als komplexen Filter speichern</button>}
-						{count > 0        && <button type="button" onClick={this.handleDeleteClick} className="red-button">Element löschen</button>}
-					</div>
-				</form>
-
 			</div>
 		);
 	},
