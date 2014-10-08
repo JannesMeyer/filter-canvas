@@ -6,6 +6,7 @@ module.exports = keyMirror({
 	UNDO: null,
 	REDO: null,
 	CREATE_ITEM: null,
+	SET_ITEM_PARAMS: null,
 	SELECT_ALL: null,
 
 	START_MOVING_SELECTED_ITEMS: null,

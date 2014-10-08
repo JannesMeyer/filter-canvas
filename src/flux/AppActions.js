@@ -22,24 +22,31 @@ var AppActions = {
 	 * on the user interface inside the DOM.
 	 */
 	exportFile() {
-		// TODO: check for unconnected connectors
+		// TODO: check for unconnected connectors and warn the user that the configuration is incomplete
 		var text = JSON.stringify(WorkbenchStore.export());
 
 		if (!saveAs || typeof Blob === 'undefined') {
-			prompt('Ihr Browser unterstützt leider keine HTML5-Downloads.\n\nHier ist der Inhalt, der in die Datei gespeichert worden wäre:', text);
+			prompt(
+				'Ihr Browser unterstützt leider keine HTML5-Downloads.\n\n'+
+				'Hier ist der Inhalt, der in die Datei gespeichert worden wäre:',
+				text
+			);
 			return;
 		}
 
 		if (process.NODE_ENV !== 'production') {
 			// Log file contents
-			console.log('config export:\n' + text);
+			console.log('config export:\n\n' + text);
+			// TODO: remove this `return`
+			return;
 		}
 
 		// Generate blob
-		// Browser compatiblity: https://developer.mozilla.org/en/docs/Web/API/Blob
+		// Browser compatiblity:
+		// https://developer.mozilla.org/en/docs/Web/API/Blob
 		var blob = new Blob([text], { type: 'application/json;charset=utf-8' });
 
-		// Download the generated file (can have issues in Safari)
+		// Download the generated file (has issues in Safari)
 		// Browser compatibility:
 		// https://github.com/eligrey/FileSaver.js
 		saveAs(blob, 'Konfiguration.json');
@@ -63,8 +70,8 @@ var AppActions = {
 		dispatcher.dispatch({ actionType: constants.CREATE_ITEM, type, id, position });
 	},
 
-	updateItemParams(id, params) {
-		// TODO
+	setItemParams(id, params) {
+		dispatcher.dispatch({ actionType: constants.SET_ITEM_PARAMS, id, params });
 	},
 
 	deleteSelectedItems() {

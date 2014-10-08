@@ -312,6 +312,10 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			}
 		break;
 
+		case constants.SET_ITEM_PARAMS:
+			setData(data.updateIn(['items', action.id, 'parameter'], params => params.merge(action.params)));
+		break;
+
 		case constants.MOVE_SELECTED_ITEMS_BY:
 			setData(data.withMutations(data => {
 				action.selectedItems.forEach((_, id) => {

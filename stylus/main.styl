@@ -182,17 +182,36 @@ body
 	> .m-detail-pane
 		padding: 20px
 
-		> .details
-			> h3
-				margin-top: 0
-				margin-bottom: 8px
+		> h3
+			font-size: 1.1em
+			margin-top: 0
+			margin-bottom: 12px
+
+		> #defaultDialog
 			> label
 				display: block
-				height: 24px
+				clear: right
+			> label > span
+				display: inline-block
+				padding-top: 2px
 			> label > input
+				display: inline-block
 				float: right
 
-		> .actions > button
+		> #newParameterDialog
+			> input
+				width: 100%
+			> label
+				display: block
+				margin-top: 5px
+				margin-bottom: 5px
+			> label > input
+				margin-right: 5px
+
+		.actions
+			margin-top: 12px
+
+		button
 			display: block
 			width: 100%
 			background: #e7e7e7
@@ -201,10 +220,11 @@ body
 			margin-bottom: 5px
 			padding: 5px
 
-		> .actions > button.red-button
+		button.red-button
 			background: #f22
 			color: #fff
 			font-weight: bold
+
 
 .m-actions
 	position: absolute
