@@ -85,10 +85,10 @@ var Actions = React.createClass({
 		return (
 			<div className="m-actions">
 				<input type="file" className="hidden" onChange={this.handleFileChange} ref="fileInput" />
-				<button onClick={this.handleImport} className="icon icon-open">Import</button>
-				<button onClick={this.handleExport} className="icon icon-save">Export</button>
-				<button onClick={this.handleUndo} className="icon icon-undo" disabled={!this.state.undoSteps}>Undo</button>
-				<button onClick={this.handleRedo} className="icon icon-redo" disabled={!this.state.redoSteps}>Redo</button>
+				<button onClick={this.handleImport} className="icon icon-open">Importieren</button>
+				<button onClick={this.handleExport} className="icon icon-save">Exportieren</button>
+				<button onClick={this.handleUndo} className="icon icon-undo" disabled={!this.state.undoSteps}>Rückgängig</button>
+				<button onClick={this.handleRedo} className="icon icon-redo" disabled={!this.state.redoSteps}>Wiederholen</button>
 			</div>
 		);
 	},

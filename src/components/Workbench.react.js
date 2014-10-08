@@ -56,25 +56,26 @@ var Workbench = React.createClass({
 	},
 
 	/**
-	 * Enables horizontal scrolling with the mouse wheel
+	 * Enables horizontal scrolling using the mouse wheel
+	 *
+	 * Causes artifacts in some versions of Chrome after scrolling
+	 * Messes with two-finger touchpad scrolling, which is already 2-dimensional
 	 */
 	handleMouseWheel(ev) {
-		// TODO: don't mess with touchpad scrolling
-		// TODO: invert scrolling instead of redirecting the vertical scrolling
 		this.getDOMNode().scrollLeft += ev.wheelDeltaY - ev.wheelDeltaX;
 		ev.preventDefault();
 	},
 
 	componentDidMount() {
-		this.getDOMNode().addEventListener('mousewheel', this.handleMouseWheel);
 		// Replace the getScrollOffset function of the WorkbenchStore
 		WorkbenchStore.getScrollOffset = this.getScrollOffset;
+		// this.getDOMNode().addEventListener('mousewheel', this.handleMouseWheel);
 	},
 
 	componentWillUnmount() {
-		this.getDOMNode().removeEventListener('mousewheel', this.handleMouseWheel);
 		// Reset the getScrollOffset function
 		WorkbenchStore.getScrollOffset = undefined;
+		// this.getDOMNode().removeEventListener('mousewheel', this.handleMouseWheel);
 	},
 
 	/**

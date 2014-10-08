@@ -1,3 +1,4 @@
+var saveAs = require('browser-saveas');
 var Point = require('../lib/ImmutablePoint');
 
 var WorkbenchStore = require('./WorkbenchStore');
@@ -7,7 +8,8 @@ var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
 /**
- * AppActions single object (like a singleton)
+ * AppActions single object
+ * (like a singleton)
  */
 var AppActions = {
 
@@ -15,8 +17,34 @@ var AppActions = {
 		console.log('TODO: import file');
 	},
 
+	/**
+	 * This action triggers a direct download. It doesn't have any effect
+	 * on the user interface inside the DOM.
+	 */
 	exportFile() {
-		console.log('TODO: export file');
+		// TODO: check for unconnected connectors
+		var text = JSON.stringify(WorkbenchStore.export());
+
+		if (!saveAs || typeof Blob === 'undefined') {
+			prompt('Ihr Browser unterstützt leider keine HTML5-Downloads.\n\nHier ist der Inhalt, der in die Datei gespeichert worden wäre:', text);
+			return;
+		}
+
+		if (process.NODE_ENV !== 'production') {
+			// Log file contents
+			console.log('config export:\n' + text);
+		}
+
+		// Generate blob
+		// Browser compatiblity: https://developer.mozilla.org/en/docs/Web/API/Blob
+		var blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+
+		// Download the generated file (can have issues in Safari)
+		// Browser compatibility:
+		// https://github.com/eligrey/FileSaver.js
+		saveAs(blob, 'Konfiguration.json');
+
+		// URL.createObjectURL(blob)
 	},
 
 	saveSelectedItemsAsFilter() {

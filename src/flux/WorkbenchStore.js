@@ -24,6 +24,27 @@ var itemPositions = immutable.Map();
 var connectorOffsets = {};
 
 /**
+ * Inverts the key/value pairs of an object
+ */
+// function invert(obj) {
+//   var newObject = {}, prop;
+//   for (prop in obj) {
+//     if (obj.hasOwnProperty(prop)) {
+//       newObject[obj[prop]] = prop;
+//     }
+//   }
+//   return newObject;
+// }
+
+function makeArray(n, value) {
+	var arr = [];
+	for (var i = 0; i < n; ++i) {
+	  arr.push(value);
+	}
+	return arr;
+}
+
+/**
  * Modify the data object
  */
 function setData(newData) {
@@ -195,7 +216,87 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 	 * of the Workbench that was initialized most recently (there
 	 * should be only one Workbench anyway)
 	 */
-	getScrollOffset: undefined
+	getScrollOffset: null,
+
+	/**
+	 * Exports the current state as a single, portable object that can
+	 * be saved to JSON, for example.
+	 */
+	export() {
+		var obj = {
+			factoryVersion: '0.2'
+		};
+
+		var items = data.get('items').toJS();
+		var inputCounter = 1;
+		var outputCounter = 1;
+		// Filters
+		var filterIndexes = {};
+		obj.filters = items
+			.filter((item, index) => {
+				// Preserve the original index, because after filtering out some
+				// elements, the remaining element's indexes will have changed
+				item.itemId = index;
+				return item.type === constants.ITEM_TYPE_FILTER;
+			})
+			.map((filter, index) => {
+				filterIndexes[filter.itemId] = index;
+				return {
+	        filterID: filter.itemId,
+	        class: filter.class,
+	        parameter: [ filter.parameter ],
+	        inputs: filter.inputs.map(cTo => ({ inputID: inputCounter++, type: null })), // TODO: type
+	        outputs: filter.outputs.map(cTo => ({ outputID: outputCounter++, type: null }))
+				};
+			});
+
+		obj.pipes = items
+			.filter(item => item.type === constants.ITEM_TYPE_PIPE)
+			.map((pipe, index) => {
+				var mappings = [];
+				var numInputs = pipe.inputs.length;
+				var numOutputs = pipe.outputs.length;
+
+				// Equalize the number of inputs and outputs
+				if (numInputs === 1 && numInputs < numOutputs) {
+					// SplitPipe
+					pipe.inputs = makeArray(numOutputs, pipe.inputs[0]);
+					numInputs = numOutputs;
+				} else if (numOutputs === 1 && numInputs > numOutputs) {
+					// JoinPipe
+					pipe.outputs = makeArray(numInputs, pipe.outputs[0]);
+					numOutputs = numInputs;
+				} else if (numInputs !== numOutputs) {
+					throw new Error('Unsupported pipe configuration');
+				}
+
+				// Populate the mappings array
+				for (var i = 0; i < numInputs; ++i) {
+					var inputTo = pipe.inputs[i];
+					var outputTo = pipe.outputs[i];
+					if (!inputTo || !outputTo) {
+						console.warn('Unconnected pipe connector');
+						continue;
+					}
+					// These names are a bit weird, but that's how the file format is specified
+					var inFilter = inputTo[0];
+					var output = obj.filters[filterIndexes[inFilter]].outputs[inputTo[2]].outputID;
+					var outFilter = outputTo[0];
+					var input = obj.filters[filterIndexes[outFilter]].inputs[outputTo[2]].inputID;
+					mappings.push({ inFilter, output, outFilter, input });
+				}
+
+				// Return pipe
+				return {
+					pipeID: index,
+					type: pipe.class,
+					parameter: [ pipe.parameter ],
+					mappings
+				};
+			});
+
+		return obj;
+	}
 
 });
 
@@ -342,15 +443,18 @@ function addPipe(name, pos, params) {
 	var inputs = basePipe.inputs || 0;
 	var outputs = basePipe.outputs || 0;
 	var parameter = merge(basePipe.parameter, params);
+	// JoinPipe
 	if (parameter.inputs !== undefined) {
 		inputs += parameter.inputs;
 	}
+	// SplitPipe
 	if (parameter.outputs !== undefined) {
 		outputs += parameter.outputs;
 	}
-	if (parameter.pipelines !== undefined) {
-		inputs += parameter.pipelines;
-		outputs += parameter.pipelines;
+	// ForwardPipe
+	if (parameter.cardinality !== undefined) {
+		inputs += parameter.cardinality;
+		outputs += parameter.cardinality;
 	}
 
 	var item = immutable.Map({
@@ -397,7 +501,7 @@ addFilter('SourceFilterExample', new Point(20, 20));
 addFilter('WorkFilterExample',   new Point(20, 90));
 addFilter('EndFilter',           new Point(508, 141));
 addFilter('WorkFilterExample',   new Point(20,  230));
-addPipe('ForwardPipe',           new Point(300, 150), { pipelines: 3 });
+addPipe('ForwardPipe',           new Point(300, 150), { cardinality: 3 });
 addFilter('WorkFilterExample',   new Point(60, 380));
 addPipe('ForwardPipe',           new Point(350, 250));
 addPipe('ForwardPipe',           new Point(450, 250));

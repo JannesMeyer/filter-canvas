@@ -53,8 +53,20 @@ var DetailPane = React.createClass({
 			itemClass = item.get('class');
 			itemParams = item.get('parameter').map((value, key) => {
 				var id = itemId + ',' + key;
-				var type = (typeof value === 'number') ? 'number' : 'text';
-				return <label key={id}>{key}<input type={type} defaultValue={value} /></label>;
+				var input;
+				switch(typeof value) {
+					case 'boolean':
+						input = <input type="checkbox" defaultChecked={value} />;
+					break;
+
+					case 'number':
+						input = <input type="number" defaultValue={value} />;
+					break;
+
+					default:
+						input = <input type="text" defaultValue={value} />;
+				}
+				return <label key={id}>{key}{input}</label>;
 			}).toArray();
 		}
 
@@ -66,9 +78,9 @@ var DetailPane = React.createClass({
 					{itemParams}
 				</div>
 				<div className="actions">
-					{itemParams.length > 0 && <button onClick={this.handleUpdateClick}>Update parameters</button>}
-					{items.length > 1      && <button onClick={this.handleSaveAsClick}>Save as complex filter</button>}
-					{items.length > 0      && <button onClick={this.handleDeleteClick} className="red-button">Delete</button>}
+					{itemParams.length > 0 && <button onClick={this.handleUpdateClick}>Parameter übernehmen</button>}
+					{items.length > 1      && <button onClick={this.handleSaveAsClick}>Als komplexen Filter speichern</button>}
+					{items.length > 0      && <button onClick={this.handleDeleteClick} className="red-button">Löschen</button>}
 				</div>
 			</div>
 		);

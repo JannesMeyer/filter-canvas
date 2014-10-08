@@ -36,6 +36,8 @@ var RepositoryPane = React.createClass({
 				<div className="filter-repository">
 					<h3>Filters</h3>
 					{filters.map(id => <RepositoryItem key={id} type={constants.ITEM_TYPE_FILTER} />)}
+					<h3>Complex filters</h3>
+					<div>some filters</div>
 				</div>
 			</div>
 		);
