@@ -14,7 +14,7 @@ var DetailPane = React.createClass({
 		}
 		return {
 			items, selectedItems, item, itemId,
-			changedParameter: {},
+			changedParameter: null,
 			newParameterName: null,
 			showParameterPopup: false
 		};
@@ -23,7 +23,8 @@ var DetailPane = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state.items !== nextState.items ||
 		       this.state.showParameterPopup !== nextState.showParameterPopup ||
-		      !this.state.selectedItems.equals(nextState.selectedItems);
+		      !this.state.selectedItems.equals(nextState.selectedItems) ||
+		      (!nextProps.changedParameter && this.state.changedParameter);
 	},
 
 	handleChange(field, ev) {
@@ -38,19 +39,21 @@ var DetailPane = React.createClass({
 			value = inputEl.value;
 		}
 
-		this.state.changedParameter[field] = value;
-		// this.setState(this.state);
+		var changedParameter = this.state.changedParameter;
+		if (!changedParameter) {
+			changedParameter = {};
+		}
+		changedParameter[field] = value;
+		this.setState({ changedParameter });
 	},
 
 	handleParamValuesSubmit(itemId, ev) {
 		ev.preventDefault();
 
-		var params = this.state.changedParameter;
-		if (Object.keys(params).length === 0) {
+		if (!this.state.changedParameter) {
 			return;
 		}
-
-		AppActions.setItemParams(itemId, params);
+		AppActions.setItemParams(itemId, this.state.changedParameter);
 	},
 
 	handleSaveAsClick(ev) {
@@ -77,12 +80,10 @@ var DetailPane = React.createClass({
 			this.refs.paramName.getDOMNode().focus();
 			return;
 		}
-
-		// Reset form
-		form.paramName.value = '';
+		// TODO: show a warning if the parameter name is already taken
 
 		// Update changedParameter
-		var changedParameter = this.state.changedParameter;
+		var changedParameter = this.state.changedParameter || {};
 		if (inputType === 'number') {
 			changedParameter[name] = 0;
 		} else if (inputType === 'checkbox') {
@@ -91,6 +92,7 @@ var DetailPane = React.createClass({
 			changedParameter[name] = '';
 		}
 
+		form.reset();
 		this.setState({
 			showParameterPopup: false,
 			newParameterName: name,
@@ -99,17 +101,37 @@ var DetailPane = React.createClass({
 	},
 
 	handleCancelClick(ev) {
+		document.forms.newParameterDialog.reset();
 		this.setState({ showParameterPopup: false });
 	},
 
 	componentDidUpdate(prevProps, prevState) {
+		var state = this.state;
 		// When the parameter popup appears
-		if (!prevState.showParameterPopup && this.state.showParameterPopup) {
+		if (!prevState.showParameterPopup &&
+		    state.showParameterPopup) {
 			this.refs.paramName.getDOMNode().focus();
 		} else
 		// When the popup disappears
-		if (prevState.showParameterPopup && !this.state.showParameterPopup) {
-			this.refs[this.state.newParameterName].getDOMNode().focus();
+		if (!state.showParameterPopup &&
+		    prevState.showParameterPopup &&
+		    state.newParameterName !== null) {
+			this.refs[state.newParameterName].getDOMNode().focus();
+		}
+
+		// Manually update those freakin' values whenever the item data changes
+		if (state.item && prevState.item) {
+			var params = state.item.get('parameter');
+			if (params !== prevState.item.get('parameter')) {
+				params.forEach((value, id) => {
+					var input = this.refs[id].getDOMNode();
+					if (input.type === 'checkbox') {
+						input.checked = value;
+					} else {
+						input.value = value;
+					}
+				});
+			}
 		}
 	},
 
@@ -124,6 +146,8 @@ var DetailPane = React.createClass({
 	},
 
 	render() {
+		console.log('Render DetailPane');
+		var changedParameter = this.state.changedParameter;
 		var showDialog = this.state.showParameterPopup;
 		var items = this.state.selectedItems;
 		var count = items.length;
@@ -136,29 +160,26 @@ var DetailPane = React.createClass({
 		} else if (count === 0) {
 			title = 'Keine Objekte markiert';
 		} else if (count === 1) {
-			var item = this.state.item;
-			var itemId = this.state.itemId;
-			var changedParameter = this.state.changedParameter;
+			if (showDialog) {
+				title = 'Neuer Parameter';
+			} else {
+				title = this.state.item.get('class');
+			}
 
-			title = item.get('class');
-			params = item.get('parameter')
-				.merge(changedParameter)
-				.map((value, paramId) => {
-					var onChange = this.handleChange.bind(this, paramId);
+			var parameter = this.state.item.get('parameter').merge(changedParameter);
+			parameter.keySeq().sort().forEach(key => {
+					var value = parameter.get(key);
+					var onChange = this.handleChange.bind(this, key);
 					var input;
 					if (typeof value === 'boolean') {
-						input = <input type="checkbox" ref={paramId} defaultChecked={value} onChange={onChange} />;
+						input = <input type="checkbox" ref={key} defaultChecked={value} onChange={onChange} />;
 					} else if (typeof value === 'number') {
-						input = <input type="number" ref={paramId} defaultValue={value} onChange={onChange} step="any" />;
+						input = <input type="number" ref={key} defaultValue={value} onChange={onChange} step="any" />;
 					} else {
-						input = <input type="text" ref={paramId} defaultValue={value} onChange={onChange} />;
+						input = <input type="text" ref={key} defaultValue={value} onChange={onChange} />;
 					}
-					return <label key={itemId+'-'+paramId}><span>{paramId}</span>{input}</label>;
-				})
-				.toArray();
-		}
-		if (showDialog) {
-			title = 'Neuer Parameter';
+					params.push(<label key={this.state.itemId+'-'+key}><span>{key}</span>{input}</label>);
+				});
 		}
 
 		return (
@@ -180,10 +201,10 @@ var DetailPane = React.createClass({
 				<form id="defaultDialog" className={!showDialog ?'':'hidden'} onSubmit={this.handleParamValuesSubmit.bind(this, this.state.itemId)}>
 					{params}
 					<div className="actions">
-						{params.length > 0 && <button type="submit" accessKey="s">Parameter übernehmen</button>}
-						{count === 1       && <button type="button" onClick={this.handleNewParamClick} accessKey="n">Neuer Parameter</button>}
-						{count > 1         && <button type="button" onClick={this.handleSaveAsClick}>Als komplexen Filter speichern</button>}
-						{count > 0         && <button type="button" onClick={this.handleDeleteClick} className="red-button">Element löschen</button>}
+						{changedParameter && <button type="submit" accessKey="s">Übernehmen</button>}
+						{count === 1      && <button type="button" onClick={this.handleNewParamClick} accessKey="n">Neuer Parameter</button>}
+						{count > 1        && <button type="button" onClick={this.handleSaveAsClick}>Als komplexen Filter speichern</button>}
+						{count > 0        && <button type="button" onClick={this.handleDeleteClick} className="red-button">Element löschen</button>}
 					</div>
 				</form>
 
