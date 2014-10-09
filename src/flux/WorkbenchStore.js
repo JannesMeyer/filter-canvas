@@ -357,7 +357,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.DELETE_SELECTED_ITEMS:
 			// TODO: Why is this necessary? It's probably because of the DetailPane
-			dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+			// dispatcher.waitFor([ SelectionStore.dispatchToken ]);
 
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
@@ -407,10 +407,12 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.UNDO:
 			undo();
+			WorkbenchStore.emitParamChange();
 		break;
 
 		case constants.REDO:
 			redo();
+			WorkbenchStore.emitParamChange();
 		break;
 
 		case constants.START_MOVING_SELECTED_ITEMS:
