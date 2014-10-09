@@ -28,6 +28,7 @@ var DetailPane = React.createClass({
 	},
 
 	componentDidMount() {
+		// TODO: what if both of these fire at the same time? (DELETE_SELECTED_ITEMS)
 		SelectionStore.addChangeListener(this._handleChange);
 		WorkbenchStore.addChangeListener(this._handleChange);
 	},

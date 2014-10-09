@@ -1,3 +1,4 @@
+var { Vector } = require('immutable');
 var SelectionStore = require('../flux/SelectionStore');
 var WorkbenchStore = require('../flux/WorkbenchStore');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
@@ -40,7 +41,7 @@ var WorkbenchItems = React.createClass({
 					return;
 				}
 				// The "address" of the target connector
-				var from = [itemId, 1, outputId];
+				var from = Vector(itemId, 1, outputId);
 
 				var startPoint = WorkbenchStore.getConnectorPosition(from);
 				var endPoint = WorkbenchStore.getConnectorPosition(to);

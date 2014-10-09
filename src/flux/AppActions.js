@@ -14,7 +14,7 @@ var constants = require('./constants');
 var AppActions = {
 
 	importFile(contents) {
-		console.log('TODO: import file');
+		dispatcher.dispatch({ actionType: constants.IMPORT_FILE, contents });
 	},
 
 	/**

@@ -1,4 +1,4 @@
-var immutable = require('immutable');
+var { Set } = require('immutable');
 var Rect = require('../lib/ImmutableRect');
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore; // late import
@@ -6,8 +6,8 @@ var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
 // Data
-var selectedItems = immutable.Set();
-var itemsInsideSelection = immutable.Set();
+var selectedItems = Set();
+var itemsInsideSelection = Set();
 var isSelecting = false;
 var startScrollPos;
 var startPos;
@@ -101,14 +101,14 @@ SelectionStore.dispatchToken = dispatcher.register(function(action) {
 		case constants.FINISH_SELECTION:
 			// Transfer itemsInsideSelection
 			selectedItems = selectedItems.union(itemsInsideSelection);
-			itemsInsideSelection = immutable.Set();
+			itemsInsideSelection = Set();
 			isSelecting = false;
 			SelectionStore.emitChange();
 		break;
 
 		// TODO: emitChange, because it could be cancelled for other reason than just no movement
 		case constants.CANCEL_SELECTION:
-			itemsInsideSelection = immutable.Set();
+			itemsInsideSelection = Set();
 			isSelecting = false;
 		break;
 
@@ -117,14 +117,14 @@ SelectionStore.dispatchToken = dispatcher.register(function(action) {
 			if (selectedItems.length === 0) {
 				break;
 			}
-			selectedItems = immutable.Set();
+			selectedItems = Set();
 			SelectionStore.emitChange();
 		break;
 
 		case constants.CREATE_ITEM:
 			// Select the item after the it was created
 			dispatcher.waitFor([ WorkbenchStore.dispatchToken ]);
-			selectedItems = immutable.Set(WorkbenchStore.getLastIndex());
+			selectedItems = Set(WorkbenchStore.getLastIndex());
 			SelectionStore.emitChange();
 		break;
 

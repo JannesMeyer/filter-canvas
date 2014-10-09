@@ -1,6 +1,7 @@
+var { Vector } = require('immutable');
 var Rect = require('../lib/ImmutableRect');
-var WorkbenchStore = require('../flux/WorkbenchStore'); // late import
 var BaseStore = require('../lib/BaseStore');
+var WorkbenchStore = require('../flux/WorkbenchStore');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
@@ -26,9 +27,9 @@ var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 	isEligibleTarget(address) {
 		for (var i = 0; i < eligibleConnectors.length; i++) {
 			var connector = eligibleConnectors[i];
-			if (connector[0] === address[0] &&
-			    connector[1] === address[1] &&
-			    connector[2] === address[2]) {
+			if (connector.get(0) === address.get(0) &&
+			    connector.get(1) === address.get(1) &&
+			    connector.get(2) === address.get(2)) {
 				return true;
 			}
 		}
@@ -37,9 +38,9 @@ var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 
 	isMouseOver(address) {
 		return mouseOverConnector &&
-			mouseOverConnector[0] === address[0] &&
-			mouseOverConnector[1] === address[1] &&
-			mouseOverConnector[2] === address[2];
+			mouseOverConnector.get(0) === address.get(0) &&
+			mouseOverConnector.get(1) === address.get(1) &&
+			mouseOverConnector.get(2) === address.get(2);
 	},
 
 	isComplete() {
@@ -53,7 +54,7 @@ var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 
 	getPoints() {
 		// Output or input?
-		if (address && address[1]) {
+		if (address && address.get(1)) {
 			return { startPoint: origin, endPoint: lastPos };
 		} else {
 			return { startPoint: lastPos, endPoint: origin };
@@ -66,17 +67,13 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 
 		case constants.START_CONNECTION:
-			address = action.connector;
-			var isOutput = address[1];
+			address = immutable.Vector.from(action.connector);
+			var isOutput = address.get(1);
 
-			var item = WorkbenchStore.getItem(address[0]);
-			var frame = item.get('rect');
+			var item = WorkbenchStore.getItem(address.get(0));
 			var type = item.get('type');
-			var isFilter = (type === constants.ITEM_TYPE_FILTER);
-			var isPipe = (type === constants.ITEM_TYPE_PIPE);
-			var offset = WorkbenchStore.getConnectorOffset(action.connector);
 
-			origin = frame.moveBy(offset);
+			origin = WorkbenchStore.getConnectorPosition(address);
 			// TODO: workbenchlayout (linewidth/2)
 			action.mousePos.y -= 4;
 			lastPos = action.mousePos;
@@ -95,7 +92,7 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 					if (connectedTo) {
 						return;
 					}
-					eligibleConnectors.push([itemId, Number(!isOutput), connectorId]);
+					eligibleConnectors.push(Vector(itemId, Number(!isOutput), connectorId));
 				});
 			});
 

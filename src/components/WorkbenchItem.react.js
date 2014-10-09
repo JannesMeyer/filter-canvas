@@ -1,3 +1,4 @@
+var { Vector } = require('immutable');
 var cx = require('react/lib/cx');
 var constants = require('../flux/constants');
 var AppActions = require('../flux/AppActions');
@@ -26,7 +27,7 @@ var WorkbenchItem = React.createClass({
 		ev.stopPropagation();
 		ev.preventDefault();
 
-		var connector = [this.props.key, isOutput, connectorId];
+		var connector = Vector(this.props.key, isOutput, connectorId);
 
 		// Erase the old connection
 		if (connectedTo) {
@@ -64,13 +65,13 @@ var WorkbenchItem = React.createClass({
 
 				<div className="inputs">
 					{inputs.map((connectedTo, id) =>
-						<Connector key={id} address={[itemId, 0, id]} onMouseDown={this.handleConnectorMouseDown.bind(this, 0, id, connectedTo)} />
+						<Connector key={id} address={Vector(itemId, 0, id)} onMouseDown={this.handleConnectorMouseDown.bind(this, 0, id, connectedTo)} />
 					)}
 				</div>
 
 				<div className="outputs">
 					{outputs.map((connectedTo, id) =>
-						<Connector key={id} address={[itemId, 1, id]} onMouseDown={this.handleConnectorMouseDown.bind(this, 1, id, connectedTo)} />
+						<Connector key={id} address={Vector(itemId, 1, id)} onMouseDown={this.handleConnectorMouseDown.bind(this, 1, id, connectedTo)} />
 					)}
 				</div>
 			</div>

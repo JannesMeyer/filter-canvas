@@ -1,4 +1,5 @@
 var immutable = require('immutable');
+var { Map, Vector } = immutable;
 var Point = require('../lib/ImmutablePoint');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
@@ -9,18 +10,15 @@ var SelectionStore; // late import
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 
-var loadComplete = false;
-var workbenchNode;
-
 // Data
-var data = immutable.Map({
-	items: immutable.Vector()
+var data = Map({
+	items: Vector()
 });
 var undoStack = [];
 var redoStack = [];
 var isDragging = false;
 var startMousePos;
-var itemPositions = immutable.Map();
+var itemPositions = Map();
 var connectorOffsets = {};
 
 /**
@@ -52,9 +50,9 @@ function setData(newData) {
 	undoStack.push(data);
 	redoStack = [];
 
-	if (process.env.NODE_ENV !== 'production' && loadComplete) {
-		console.log(newData.get('items').toJS());
-	}
+	// if (process.env.NODE_ENV !== 'production') {
+	// 	console.log(newData.get('items').toJS());
+	// }
 
 	// Change the data object
 	data = newData;
@@ -162,20 +160,20 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 
 	/**
 	 * Caches the offset values from `WorkbenchLayout.getConnectorOffset()`
-	 * c: Path (in array form) of a connector
+	 * c: Address (as immutable.Vector) of a connector
 	 */
-	getConnectorOffset(cnrPath) {
-		// Implicitly calls cnrPath.toString(), because only Strings
+	getConnectorOffset(address) {
+		// Implicitly calls address.toString(), because only Strings
 		// can be keys of an Object
-		var offset = connectorOffsets[cnrPath];
+		var offset = connectorOffsets[address];
 		if (offset) {
 			// Return the cached value
 			return offset;
 		}
 
-		var itemId = cnrPath[0];
-		var isOutput = cnrPath[1];
-		var connectorId = cnrPath[2];
+		var itemId = address.get(0);
+		var isOutput = address.get(1);
+		var connectorId = address.get(2);
 
 		// Calculate the offset value
 		var item = data.getIn(['items', itemId]);
@@ -189,11 +187,11 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 		}
 
 		// Save it to the cache and return it
-		return connectorOffsets[cnrPath] = WorkbenchLayout.getConnectorOffset(frame, numConnectors, isOutput, connectorId);
+		return connectorOffsets[address] = WorkbenchLayout.getConnectorOffset(frame, numConnectors, isOutput, connectorId);
 	},
 
 	getConnectorPosition(address) {
-		var itemPos = this.getItemPosition(address[0]);
+		var itemPos = this.getItemPosition(address.get(0));
 		return itemPos.moveBy(this.getConnectorOffset(address));
 	},
 
@@ -251,7 +249,12 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 			});
 
 		obj.pipes = items
-			.filter(item => item.type === constants.ITEM_TYPE_PIPE)
+			.filter((item, index) => {
+				// Preserve the original index, because after filtering out some
+				// elements, the remaining element's indexes will have changed
+				item.itemId = index;
+				return item.type === constants.ITEM_TYPE_PIPE;
+			})
 			.map((pipe, index) => {
 				var mappings = [];
 				var numInputs = pipe.inputs.length;
@@ -288,7 +291,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 
 				// Return pipe
 				return {
-					pipeID: index,
+					pipeID: pipe.itemId,
 					type: pipe.class,
 					parameter: [ pipe.parameter ],
 					mappings
@@ -302,6 +305,11 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 
 WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
+
+		case constants.IMPORT_FILE:
+			importFile(action.contents);
+		break;
+
 		case constants.CREATE_ITEM:
 			if (action.type === constants.ITEM_TYPE_FILTER) {
 				addFilter(action.id, action.position);
@@ -348,9 +356,9 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 					clearConnectors = clearConnectors.concat(item.get('inputs'));
 					clearConnectors = clearConnectors.concat(item.get('outputs'));
 				});
-				clearConnectors.forEach(c => {
-					if (!c || deleteItems.has(c[0])) { return; }
-					items.updateIn([c[0], (c[1] ? 'outputs' : 'inputs'), c[2]], () => undefined);
+				clearConnectors.forEach(address => {
+					if (!address || deleteItems.has(address.get(0))) { return; }
+					items.updateIn([address.get(0), (address.get(1) ? 'outputs' : 'inputs'), address.get(2)], () => undefined);
 				});
 
 				// Delete items
@@ -368,8 +376,8 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			var c1 = action.connector1;
 			var c2 = action.connector2;
 			setData(data.withMutations(data => {
-				data.updateIn(['items', c1[0], (c1[1] ? 'outputs' : 'inputs'), c1[2]], () => undefined);
-				data.updateIn(['items', c2[0], (c2[1] ? 'outputs' : 'inputs'), c2[2]], () => undefined);
+				data.updateIn(['items', c1.get(0), (c1.get(1) ? 'outputs' : 'inputs'), c1.get(2)], () => undefined);
+				data.updateIn(['items', c2.get(0), (c2.get(1) ? 'outputs' : 'inputs'), c2.get(2)], () => undefined);
 			}));
 		break;
 
@@ -402,7 +410,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.FINISH_MOVING_SELECTED_ITEMS:
 			isDragging = false;
-			itemPositions = immutable.Map();
+			itemPositions = Map();
 		break;
 	}
 });
@@ -424,6 +432,77 @@ SelectionStore = require('./SelectionStore');
  * Item adding
  *************************************************************************/
 
+function importFile(obj) {
+	var items = [];
+	var outputIDToConnector = {};
+	var inputIDToConnector = {};
+
+	// TODO: check for position and use it if available
+	obj.filters.forEach(filter => {
+		var id = items.length;
+		var name = filter.class;
+		var inputs = filter.inputs.length;
+		var outputs = filter.outputs.length;
+
+		items[id] = {
+			type: constants.ITEM_TYPE_FILTER,
+			class: name,
+			parameter: filter.parameter[0] || {},
+			inputs: new Array(filter.inputs.length),
+			outputs: new Array(filter.outputs.length),
+			rect: WorkbenchLayout.getFilterFrame(100, 100, name, inputs, outputs)
+		};
+
+		filter.inputs.forEach((input, connectorId) => {
+			inputIDToConnector[input.inputID] = [id, 0, connectorId];
+		});
+		filter.outputs.forEach((output, connectorId) => {
+			outputIDToConnector[output.outputID] = [id, 1, connectorId];
+		});
+	});
+
+	obj.pipes.forEach(pipe => {
+		var id = items.length;
+		var name = pipe.type;
+		var inputs = pipe.mappings.length; // TODO: TO BE DETERMINED for split/join pipes
+		var outputs = pipe.mappings.length; // TODO: TO BE DETERMINED for split/join pipes
+
+		items[id] = {
+			type: constants.ITEM_TYPE_PIPE,
+			class: name,
+			parameter: pipe.parameter[0] || {},
+			inputs: new Array(inputs),
+			outputs: new Array(outputs),
+			rect: WorkbenchLayout.getPipeFrame(200, 200, name, inputs, outputs)
+		};
+
+		pipe.mappings.forEach((mapping, connectorId) => {
+			var filterOut = outputIDToConnector[mapping.output];
+			var pipeIn    = [id, 0, connectorId];
+			var pipeOut   = [id, 1, connectorId];
+			var filterIn  = inputIDToConnector[mapping.input];
+
+			// Check for double connection
+			var p1 = items[filterOut[0]].outputs[filterOut[2]];
+			var p2 = items[filterIn[0]].inputs[filterIn[2]];
+			if (p1 || p2) {
+				throw new Error('already has a connection. handle split/join pipes');
+			}
+
+			items[filterOut[0]].outputs[filterOut[2]] = pipeIn;
+			items[pipeIn[0]].inputs[pipeIn[2]] = filterOut;
+
+			items[pipeOut[0]].outputs[pipeOut[2]] = filterIn;
+			items[filterIn[0]].inputs[filterIn[2]] = pipeOut;
+		});
+	});
+
+	// Load data into the store
+	setData(data.updateIn(['items'], _ => immutable.fromJS(items)));
+	undoStack = [];
+	redoStack = [];
+}
+
 function addFilter(name, pos, params) {
 	var baseFilter = RepositoryStore.getFilter(name);
 	if (!baseFilter) {
@@ -434,17 +513,16 @@ function addFilter(name, pos, params) {
 	var outputs = baseFilter.outputs;
 	var parameter = merge(baseFilter.parameter, params);
 
-	var item = immutable.Map({
+	var item = Map({
 		type: constants.ITEM_TYPE_FILTER,
 		class: name,
-		inputs: immutable.Vector.from(new Array(inputs)),
-		outputs: immutable.Vector.from(new Array(outputs)),
-		parameter: immutable.Map(parameter),
+		inputs: Vector.from(new Array(inputs)),
+		outputs: Vector.from(new Array(outputs)),
+		parameter: Map(parameter),
 		rect: WorkbenchLayout.getFilterFrame(pos.x, pos.y, name, inputs, outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
 }
-
 
 function addPipe(name, pos, params) {
 	var basePipe = RepositoryStore.getPipe(name);
@@ -468,13 +546,13 @@ function addPipe(name, pos, params) {
 		outputs += parameter.cardinality;
 	}
 
-	var item = immutable.Map({
+	var item = Map({
 		type: constants.ITEM_TYPE_PIPE,
 		class: name,
 		// inputs: immutable.Range(0, inputs).map(val => null).toVector(),
-		inputs: immutable.Vector.from(new Array(inputs)),
-		outputs: immutable.Vector.from(new Array(outputs)),
-		parameter: immutable.Map(parameter),
+		inputs: Vector.from(new Array(inputs)),
+		outputs: Vector.from(new Array(outputs)),
+		parameter: Map(parameter),
 		rect: WorkbenchLayout.getPipeFrame(pos.x, pos.y, name, inputs, outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
@@ -483,11 +561,12 @@ function addPipe(name, pos, params) {
 
 function addConnection(output, input) {
 	// If they arrive in reverse order swap them
-	if (!output[1] && input[1]) {
+	if (!output.get(1) && input.get(1)) {
 		[input, output] = [output, input];
 	}
-	var p1 = data.getIn(['items', output[0], 'outputs', output[2]]);
-	var p2 = data.getIn(['items', input[0], 'inputs', input[2]]);
+
+	var p1 = data.getIn(['items', output.get(0), 'outputs', output.get(2)]);
+	var p2 = data.getIn(['items', input.get(0), 'inputs', input.get(2)]);
 	if (p1) {
 		throw new Error('The connector ' + p1 + ' already has a connection');
 	}
@@ -496,8 +575,8 @@ function addConnection(output, input) {
 	}
 
 	setData(data.withMutations(data => {
-		data.updateIn(['items', output[0], 'outputs', output[2]], () => input);
-		data.updateIn(['items', input[0],  'inputs',  input[2]],  () => output);
+		data.updateIn(['items', output.get(0), 'outputs', output.get(2)], () => Vector.from(input));
+		data.updateIn(['items', input.get(0), 'inputs', input.get(2)], () => Vector.from(output));
 	}));
 }
 
@@ -508,24 +587,24 @@ function addConnection(output, input) {
  * Testing
  *************************************************************************/
 
-addFilter('SourceFilterExample', new Point(20, 20));
-addFilter('WorkFilterExample',   new Point(20, 90));
-addFilter('EndFilter',           new Point(508, 141));
-addFilter('WorkFilterExample',   new Point(20,  230));
-addPipe('ForwardPipe',           new Point(300, 150), { cardinality: 3 });
-addFilter('WorkFilterExample',   new Point(60, 380));
-addPipe('ForwardPipe',           new Point(350, 250));
-addPipe('ForwardPipe',           new Point(450, 250));
-addFilter('WorkFilterExample',   new Point(400,  380));
+// addFilter('SourceFilterExample', new Point(20, 20));
+// addFilter('WorkFilterExample',   new Point(20, 90));
+// addFilter('EndFilter',           new Point(508, 141));
+// addFilter('WorkFilterExample',   new Point(20,  230));
+// addPipe('ForwardPipe',           new Point(300, 150), { cardinality: 3 });
+// addFilter('WorkFilterExample',   new Point(60, 380));
+// addPipe('ForwardPipe',           new Point(350, 250));
+// addPipe('ForwardPipe',           new Point(450, 250));
+// addFilter('WorkFilterExample',   new Point(400,  380));
 
-addConnection([0, 1, 0], [4, 0, 0]);
-addConnection([1, 1, 0], [4, 0, 1]);
-addConnection([3, 1, 0], [4, 0, 2]);
+// addConnection(Vector(0, 1, 0), Vector(4, 0, 0));
+// addConnection(Vector(1, 1, 0), Vector(4, 0, 1));
+// addConnection(Vector(3, 1, 0), Vector(4, 0, 2));
 
-addConnection([4, 1, 0], [2, 0, 0]);
-addConnection([4, 1, 1], [2, 0, 1]);
-addConnection([4, 1, 2], [5, 0, 0]);
-addConnection([5, 1, 0], [6, 0, 0]);
-addConnection([6, 1, 0], [2, 0, 2]);
+// addConnection(Vector(4, 1, 0), Vector(2, 0, 0));
+// addConnection(Vector(4, 1, 1), Vector(2, 0, 1));
+// addConnection(Vector(4, 1, 2), Vector(5, 0, 0));
+// addConnection(Vector(5, 1, 0), Vector(6, 0, 0));
+// addConnection(Vector(6, 1, 0), Vector(2, 0, 2));
 
-loadComplete = true;
+importFile(JSON.parse('{"factoryVersion":"0.2","filters":[{"filterID":0,"class":"SourceFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[],"outputs":[{"outputID":1,"type":null}]},{"filterID":2,"class":"EndFilter","parameter":[{}],"inputs":[{"inputID":1,"type":null},{"inputID":2,"type":null},{"inputID":3,"type":null}],"outputs":[]},{"filterID":5,"class":"WorkFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[{"inputID":4,"type":null}],"outputs":[{"outputID":2,"type":null}]},{"filterID":9,"class":"SourceFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[],"outputs":[{"outputID":3,"type":null}]},{"filterID":10,"class":"SourceFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[],"outputs":[{"outputID":4,"type":null}]}],"pipes":[{"pipeID":0,"type":"ForwardPipe","parameter":[{"cardinality":3,"sync":true}],"mappings":[{"inFilter":0,"output":1,"outFilter":2,"input":1},{"inFilter":9,"output":3,"outFilter":2,"input":2},{"inFilter":10,"output":4,"outFilter":5,"input":4}]},{"pipeID":1,"type":"ForwardPipe","parameter":[{"cardinality":1,"sync":true}],"mappings":[{"inFilter":5,"output":2,"outFilter":2,"input":3}]}]}'));
