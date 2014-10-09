@@ -30,12 +30,12 @@ var DetailPane = React.createClass({
 	componentDidMount() {
 		// TODO: what if both of these fire at the same time? (DELETE_SELECTED_ITEMS)
 		SelectionStore.addChangeListener(this._handleChange);
-		WorkbenchStore.addChangeListener(this._handleChange);
+		WorkbenchStore.addParamChangeListener(this._handleChange);
 	},
 
 	componentWillUnmount() {
 		SelectionStore.removeChangeListener(this._handleChange);
-		WorkbenchStore.removeChangeListener(this._handleChange);
+		WorkbenchStore.removeParamChangeListener(this._handleChange);
 	},
 
 	handleKeyDown(paramName, ev) {

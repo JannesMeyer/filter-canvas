@@ -18,6 +18,7 @@ module.exports = keyMirror({
 	SAVE_SELECTED_ITEMS_AS_FILTER: null,
 	DELETE_SELECTED_ITEMS: null,
 	CLEAR_SELECTED_ITEMS: null,
+	DELETE_ALL_ITEMS: null,
 
 	START_SELECTION: null,
 	RESIZE_SELECTION: null,

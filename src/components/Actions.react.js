@@ -6,66 +6,46 @@ var Actions = React.createClass({
 
 	getInitialState() {
 		return {
-			undoSteps: WorkbenchStore.hasUndoSteps(),
-			redoSteps: WorkbenchStore.hasRedoSteps()
+			hasUndoSteps: WorkbenchStore.hasUndoSteps(),
+			hasRedoSteps: WorkbenchStore.hasRedoSteps()
 		};
 	},
 
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.state.undoSteps !== nextState.undoSteps ||
-		       this.state.redoSteps !== nextState.redoSteps;
+		return this.state.hasUndoSteps !== nextState.hasUndoSteps ||
+		       this.state.hasRedoSteps !== nextState.hasRedoSteps;
 	},
 
-	pickImportFile() {
-		this.refs.fileInput.getDOMNode().click();
-	},
-
-	handleImport(ev) {
-		if (ev.button !== 0) { return; }
-		this.pickImportFile();
+	selectFile() {
+		this.refs.file.getDOMNode().click();
 	},
 
 	handleFileChange(ev) {
-		var files = this.refs.fileInput.getDOMNode().files;
+		var files = this.refs.file.getDOMNode().files;
 		if (files.length === 0) {
 			return;
 		}
-		if (files[0].type !== 'application/json') {
-			return alert('Please select a JSON file.');
-		}
 
-		// Read JSON file
+		// Setup
 		var reader = new FileReader();
-		reader.addEventListener('load', function(ev) {
-			var importObj;
-			try {
-				importObj = JSON.parse(reader.result);
-			} catch (err) {
-				return alert('JSON syntax error:\n\n' + err.message);
-			}
-			AppActions.importFile(importObj);
-		});
+		reader.addEventListener('load', this.handleFileLoaded);
+
+		// Read file
 		reader.readAsText(files[0]);
 	},
 
-	handleExport(ev) {
-		if (ev.button !== 0) { return; }
-		AppActions.exportFile();
-	},
-
-	handleUndo(ev) {
-		if (ev.button !== 0) { return; }
-		AppActions.undo();
-	},
-
-	handleRedo(ev) {
-		if (ev.button !== 0) { return; }
-		AppActions.redo();
+	handleFileLoaded(ev) {
+		var reader = ev.currentTarget;
+		try {
+			AppActions.importFile(reader.result);
+		} catch (err) {
+			alert('Ungültige Datei\n\n' + err.message);
+		}
 	},
 
 	componentDidMount() {
 		WorkbenchStore.addChangeListener(this._handleChange);
-		keypress.on('o', ['ctrl'],         this.pickImportFile);
+		keypress.on('o', ['ctrl'],         this.selectFile);
 		keypress.on('s', ['ctrl'],         AppActions.exportFile);
 		keypress.on('z', ['ctrl'],         AppActions.undo);
 		keypress.on('z', ['ctrl','shift'], AppActions.redo);
@@ -74,7 +54,7 @@ var Actions = React.createClass({
 
 	componentWillUnmount() {
 		WorkbenchStore.removeChangeListener(this._handleChange);
-		keypress.off('o', ['ctrl'],         this.pickImportFile);
+		keypress.off('o', ['ctrl'],         this.selectFile);
 		keypress.off('s', ['ctrl'],         AppActions.exportFile);
 		keypress.off('z', ['ctrl'],         AppActions.undo);
 		keypress.off('z', ['ctrl','shift'], AppActions.redo);
@@ -84,11 +64,12 @@ var Actions = React.createClass({
 	render() {
 		return (
 			<div className="m-actions">
-				<input type="file" className="hidden" onChange={this.handleFileChange} ref="fileInput" />
-				<button onClick={this.handleImport} className="icon icon-open">Importieren</button>
-				<button onClick={this.handleExport} className="icon icon-save">Exportieren</button>
-				<button onClick={this.handleUndo} className="icon icon-undo" disabled={!this.state.undoSteps}>Rückgängig</button>
-				<button onClick={this.handleRedo} className="icon icon-redo" disabled={!this.state.redoSteps}>Wiederholen</button>
+				<input className="hidden" type="file" ref="file" accept="application/json" onChange={this.handleFileChange} />
+				<button onClick={AppActions.deleteAllItems}>Neu</button>
+				<button onClick={this.selectFile} className="icon icon-open">Importieren</button>
+				<button onClick={AppActions.exportFile} className="icon icon-save">Exportieren</button>
+				<button onClick={AppActions.undo} className="icon icon-undo" disabled={!this.state.hasUndoSteps}>Rückgängig</button>
+				<button onClick={AppActions.redo} className="icon icon-redo" disabled={!this.state.hasRedoSteps}>Wiederholen</button>
 			</div>
 		);
 	},

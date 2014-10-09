@@ -16,11 +16,13 @@ var WorkbenchItems = React.createClass({
 	},
 
 	componentDidMount() {
+		WorkbenchStore.addPreliminaryPositionListener(this._handleChange);
 		WorkbenchStore.addChangeListener(this._handleChange);
 		SelectionStore.addChangeListener(this._handleChange);
 	},
 
 	componentWillUnmount() {
+		WorkbenchStore.removePreliminaryPositionListener(this._handleChange);
 		WorkbenchStore.removeChangeListener(this._handleChange);
 		SelectionStore.removeChangeListener(this._handleChange);
 	},

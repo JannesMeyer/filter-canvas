@@ -13,8 +13,12 @@ var constants = require('./constants');
  */
 var AppActions = {
 
-	importFile(contents) {
-		dispatcher.dispatch({ actionType: constants.IMPORT_FILE, contents });
+	/**
+	 * Imports a JSON configuration file
+	 * Could throw a SyntaxError
+	 */
+	importFile(text) {
+		dispatcher.dispatch({ actionType: constants.IMPORT_FILE, obj: JSON.parse(text) });
 	},
 
 	/**
@@ -83,6 +87,10 @@ var AppActions = {
 			actionType: constants.DELETE_SELECTED_ITEMS,
 			selectedItems: SelectionStore.getSelectedItemIds()
 		});
+	},
+
+	deleteAllItems() {
+		dispatcher.dispatch({ actionType: constants.DELETE_ALL_ITEMS });
 	},
 
 	startMovingSelectedItems(id, ctrlKey, metaKey, mousePos) {

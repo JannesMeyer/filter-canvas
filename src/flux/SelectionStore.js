@@ -114,11 +114,12 @@ SelectionStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.CLEAR_SELECTED_ITEMS:
 		case constants.DELETE_SELECTED_ITEMS:
-			if (selectedItems.length === 0) {
-				break;
+		case constants.DELETE_ALL_ITEMS:
+		case constants.IMPORT_FILE:
+			if (selectedItems.length > 0) {
+				selectedItems = selectedItems.clear();
+				SelectionStore.emitChange();
 			}
-			selectedItems = Set();
-			SelectionStore.emitChange();
 		break;
 
 		case constants.CREATE_ITEM:

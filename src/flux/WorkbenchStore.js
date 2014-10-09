@@ -14,12 +14,13 @@ var constants = require('./constants');
 var data = Map({
 	items: Vector()
 });
+var connectorOffsets = {};
 var undoStack = [];
 var redoStack = [];
+
 var isDragging = false;
 var startMousePos;
 var itemPositions = Map();
-var connectorOffsets = {};
 
 /**
  * Inverts the key/value pairs of an object
@@ -42,21 +43,37 @@ function makeArray(n, value) {
 	return arr;
 }
 
+
+
+
+
+
 /**
  * Modify the data object
  */
-function setData(newData) {
-	// Push the current state onto the undo stack and clear the redo stack
-	undoStack.push(data);
+function setData(newData, options) {
+	var options = options || {};
+	if (options.undoable === undefined) {
+		options.undoable = true;
+	}
+	if (options.emit === undefined) {
+		options.emit = true;
+	}
+
+	// Push the current state onto the undo stack
+	if (options.undoable) {
+		undoStack.push(data);
+	} else {
+		undoStack = [];
+	}
 	redoStack = [];
 
-	// if (process.env.NODE_ENV !== 'production') {
-	// 	console.log(newData.get('items').toJS());
-	// }
-
-	// Change the data object
+	// Replace the data
 	data = newData;
-	WorkbenchStore.emitChange();
+
+	if (options.emit) {
+		WorkbenchStore.emitChange();
+	}
 }
 
 /**
@@ -91,7 +108,7 @@ function redo() {
  * WorkbenchStore single object
  * (like a singleton)
  */
-var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
+var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPosition', 'paramChange'], {
 
 	/**
 	 * returns an immutable.Vector
@@ -160,7 +177,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change'], {
 
 	/**
 	 * Caches the offset values from `WorkbenchLayout.getConnectorOffset()`
-	 * c: Address (as immutable.Vector) of a connector
+	 * address: (immutable.Vector) of a connector
 	 */
 	getConnectorOffset(address) {
 		// Implicitly calls address.toString(), because only Strings
@@ -307,7 +324,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 	switch(action.actionType) {
 
 		case constants.IMPORT_FILE:
-			importFile(action.contents);
+			importFile(action.obj);
 		break;
 
 		case constants.CREATE_ITEM:
@@ -316,16 +333,18 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			} else if (action.type === constants.ITEM_TYPE_PIPE) {
 				addPipe(action.id, action.position);
 			} else {
-				throw new Error('Invalid type');
+				throw new Error('Invalid item type');
 			}
 		break;
 
 		case constants.SET_ITEM_PARAMS:
 			setData(data.updateIn(['items', action.id, 'parameter'], params => params.merge(action.params)));
+			WorkbenchStore.emitParamChange();
 		break;
 
 		case constants.REMOVE_ITEM_PARAM:
 			setData(data.updateIn(['items', action.id, 'parameter'], params => params.remove(action.param)));
+			WorkbenchStore.emitParamChange();
 		break;
 
 		case constants.MOVE_SELECTED_ITEMS_BY:
@@ -334,7 +353,6 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 					data.updateIn(['items', id, 'rect'], rect => rect.moveBy(action.delta));
 				});
 			}));
-			// TODO: redraw wires?
 		break;
 
 		case constants.DELETE_SELECTED_ITEMS:
@@ -366,6 +384,12 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 					items.remove(itemId);
 				});
 			})));
+		break;
+
+		case constants.DELETE_ALL_ITEMS:
+			setData(data.updateIn(['items'], items => items.clear()));
+			// Clear all the rest
+			connectorOffsets = {};
 		break;
 
 		case constants.FINISH_CONNECTION:
@@ -404,13 +428,12 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 				return data.getIn(['items', id, 'rect']).moveBy(delta);
 			}).toMap();
 
-			// TODO: emit a special signal
-			WorkbenchStore.emitChange();
+			WorkbenchStore.emitPreliminaryPosition();
 		break;
 
 		case constants.FINISH_MOVING_SELECTED_ITEMS:
 			isDragging = false;
-			itemPositions = Map();
+			itemPositions = itemPositions.clear();
 		break;
 	}
 });
@@ -499,8 +522,8 @@ function importFile(obj) {
 
 	// Load data into the store
 	setData(data.updateIn(['items'], _ => immutable.fromJS(items)));
-	undoStack = [];
-	redoStack = [];
+	// Clear all the rest
+	connectorOffsets = {};
 }
 
 function addFilter(name, pos, params) {
