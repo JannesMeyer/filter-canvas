@@ -38,13 +38,6 @@ var AppActions = {
 			return;
 		}
 
-		if (process.NODE_ENV !== 'production') {
-			// Log file contents
-			console.log('config export:\n\n' + text);
-			// TODO: remove this `return`
-			return;
-		}
-
 		// Generate blob
 		// Browser compatiblity:
 		// https://developer.mozilla.org/en/docs/Web/API/Blob

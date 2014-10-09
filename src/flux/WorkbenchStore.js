@@ -356,16 +356,17 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		case constants.DELETE_SELECTED_ITEMS:
-			// TODO: Why is this necessary? It's probably because of the DetailPane
-			// dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+			// Wait for the SelectionStore to clear the selectedItems first, because otherwise
+			// when we WorkbenchStore.emitChange() over here, the stuff in the DetailPane will
+			// try to re-render while the SelectionStore still points to elements that don't exist
+			// anymore.
+			dispatcher.waitFor([ SelectionStore.dispatchToken ]);
 
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
 				break;
 			}
 
-			// TODO: deleting items leads to a sparse array
-			// TODO: should old IDs be reused?
 			setData(data.updateIn(['items'], items => items.withMutations(items => {
 				// Clear connections (they work similar to doubly linked lists)
 				var clearConnectors = immutable.Sequence();
@@ -418,18 +419,13 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		case constants.START_MOVING_SELECTED_ITEMS:
 			isDragging = true;
 			startMousePos = action.mousePos;
-			itemPositions = SelectionStore.getSelectedItemIds().map(id => {
-				return data.getIn(['items', id, 'rect']);
-			}).toMap();
 		break;
 
 		case constants.MOVING_SELECTED_ITEMS:
 			var delta = action.mousePos.subtract(startMousePos);
-
 			itemPositions = SelectionStore.getSelectedItemIds().map(id => {
 				return data.getIn(['items', id, 'rect']).moveBy(delta);
 			}).toMap();
-
 			WorkbenchStore.emitPreliminaryPosition();
 		break;
 

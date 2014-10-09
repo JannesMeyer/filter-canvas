@@ -167,9 +167,9 @@ var DetailPane = React.createClass({
 		var params = [];
 
 		if (count > 1) {
-			title = count + ' Objekte markiert';
+			title = count + ' Elemente markiert';
 		} else if (count === 0) {
-			title = 'Keine Objekte markiert';
+			title = 'Keine Elemente markiert';
 		} else if (count === 1) {
 			if (showDialog) {
 				title = 'Neuer Parameter';
@@ -193,6 +193,12 @@ var DetailPane = React.createClass({
 				});
 		}
 
+		var deleteText;
+		if (count > 1) {
+			deleteText = 'Elemente löschen';
+		} else if (count === 1) {
+			deleteText = 'Element löschen'
+		}
 		return (
 			<div className="m-detail-pane">
 				<h3>{title}</h3>
@@ -205,7 +211,7 @@ var DetailPane = React.createClass({
 						{changedParameter && <button type="submit" accessKey="s">Übernehmen</button>}
 						{count === 1      && <button type="button" onClick={this.handleNewParamClick} accessKey="n">Neuer Parameter</button>}
 						{count > 1        && <button type="button" onClick={this.handleSaveAsClick}>Als komplexen Filter speichern</button>}
-						{count > 0        && <button type="button" onClick={this.handleDeleteClick} className="red-button">Element löschen</button>}
+						{count > 0        && <button type="button" onClick={this.handleDeleteClick} className="red-button">{deleteText}</button>}
 					</div>
 				</form>
 				<form id="newParameterDialog" className={showDialog ?'':'hidden'} onSubmit={this.handleNewParamSubmit}>
