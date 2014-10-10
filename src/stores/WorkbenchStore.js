@@ -358,13 +358,13 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.DELETE_SELECTED_ITEMS:
-			// In case somebody is subscribed to WorkbenchStore and SelectionStore
-			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
-
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
 				break;
 			}
+
+			// In case somebody is subscribed to WorkbenchStore and SelectionStore
+			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
 
 			setData(data.updateIn(['items'], items => items.withMutations(items => {
 				// Clear connections (they work similar to doubly linked lists)
@@ -640,6 +640,7 @@ if (window.localStorage && localStorage.dataBackup) {
 
 		// Restore the ImmutableRect objects
 		obj.items.forEach(item => {
+			if (!item) { return; }
 			item.rect = Rect.fromObject(item.rect);
 		});
 
@@ -648,6 +649,7 @@ if (window.localStorage && localStorage.dataBackup) {
 	} catch (e) {
 		// Start with an empty canvas
 		localStorage.removeItem('dataBackup');
+		console.warn(e);
 	}
 }
 

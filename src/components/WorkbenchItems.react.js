@@ -33,6 +33,11 @@ var WorkbenchItems = React.createClass({
 		var items = [];
 
 		this.state.items.forEach((item, itemId) => {
+			// The Vector could be contain some `null` elements because of deleted items.
+			// And the immutable library tries to iterate over `null` values.
+			if (!item) {
+				return;
+			}
 			var frame = WorkbenchStore.getItemPosition(itemId);
 			var isSelected = SelectionStore.isItemSelected(itemId);
 			items.push(<WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />);

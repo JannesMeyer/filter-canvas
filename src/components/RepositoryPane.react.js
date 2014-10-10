@@ -64,7 +64,6 @@ var RepositoryPane = React.createClass({
 			});
 		}
 
-		console.log(this.state.complexFilters);
 		if (!this.state.complexFilters) {
 			complexFilters = spinner;
 		} else if(isEmptyObject(this.state.complexFilters)) {
