@@ -351,12 +351,6 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.DELETE_SELECTED_ITEMS:
-			// Wait for the SelectionStore to clear the selectedItems first, because otherwise
-			// when we WorkbenchStore.emitChange() over here, the stuff in the DetailPane will
-			// try to re-render while the SelectionStore still points to elements that don't exist
-			// anymore.
-			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
-
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
 				break;

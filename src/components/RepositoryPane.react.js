@@ -3,6 +3,13 @@ var AppActions = require('../flux/AppActions');
 var RepositoryStore = require('../stores/RepositoryStore');
 var RepositoryItem = require('./RepositoryItem.react');
 
+function isEmptyObject(obj) {
+	for (var name in obj) {
+		return false;
+	}
+	return true;
+}
+
 var RepositoryPane = React.createClass({
 
 	getInitialState() {
@@ -39,6 +46,8 @@ var RepositoryPane = React.createClass({
 
 		if (!this.state.pipes) {
 			pipes = spinner;
+		} else if(isEmptyObject(this.state.pipes)) {
+			pipes = <p>Keine Pipes vorhanden</p>;
 		} else {
 			pipes = Object.keys(this.state.pipes).map(id => {
 				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_PIPE} />;
@@ -47,14 +56,19 @@ var RepositoryPane = React.createClass({
 
 		if (!this.state.filters) {
 			filters = spinner;
+		} else if(isEmptyObject(this.state.filters)) {
+			pipes = <p>Keine Filter vorhanden</p>;
 		} else {
 			filters = Object.keys(this.state.filters).map(id => {
 				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_FILTER} />;
 			});
 		}
 
+		console.log(this.state.complexFilters);
 		if (!this.state.complexFilters) {
 			complexFilters = spinner;
+		} else if(isEmptyObject(this.state.complexFilters)) {
+			complexFilters = <p>Keine Filter vorhanden</p>;
 		} else {
 			complexFilters = [];
 		}

@@ -72,6 +72,8 @@ var SelectionStore = BaseStore.createEventEmitter(['change'], {
 	getSelectedItemIds() {
 		// TODO: don't recalculate this union everytime
 		return selectedItems.union(itemsInsideSelection);
+		// Guard against deleted items
+		// .intersect(WorkbenchStore.getAllItems().keySeq())
 	}
 
 });
@@ -123,7 +125,7 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.CREATE_ITEM:
-			// Select the item after the it was created
+			// Select the item after it was created
 			Dispatcher.waitFor([ WorkbenchStore.dispatchToken ]);
 			selectedItems = Set(WorkbenchStore.getLastIndex());
 			SelectionStore.emitChange();

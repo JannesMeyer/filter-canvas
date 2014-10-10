@@ -51,7 +51,7 @@ RepositoryStore.dispatchToken = Dispatcher.register(action => {
 });
 
 function reload() {
-	// Signal loading
+	// Signal that loading has started
 	pipes = filters = complexFilters = null;
 	RepositoryStore.emitChange();
 
