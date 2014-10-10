@@ -163,7 +163,11 @@ body
 	background: #f6f6f6
 	border-bottom: 1px solid #ccc
 
-	> div:first-child > h3:first-child
+	h3
+		margin-bottom: 6px
+		margin-top: 18px
+
+	> div:first-child > h3
 		margin-top: 0
 
 	> .filter-repository > .item,
@@ -240,3 +244,50 @@ body
 
 	button
 		margin-right: 3px
+
+
+// Third-party spinner styles
+// Source: http://tobiasahlin.com/spinkit/
+
+.spinner
+	width: 50px
+	height: 20px
+
+	> div
+		background-color: #bbb
+		height: 100%
+		width: 6px
+		margin-right: 1px
+		display: inline-block
+		-webkit-animation: stretchdelay 1.2s infinite ease-in-out
+		animation: stretchdelay 1.2s infinite ease-in-out
+
+	.rect2
+		-webkit-animation-delay: -1.1s
+		animation-delay: -1.1s
+
+	.rect3
+		-webkit-animation-delay: -1.0s
+		animation-delay: -1.0s
+
+	.rect4
+		-webkit-animation-delay: -0.9s
+		animation-delay: -0.9s
+
+	.rect5
+		-webkit-animation-delay: -0.8s
+		animation-delay: -0.8s
+
+@-webkit-keyframes stretchdelay
+	0%, 40%, 100%
+		-webkit-transform: scaleY(0.4)
+	20%
+		-webkit-transform: scaleY(1.0)
+
+@keyframes stretchdelay
+	0%, 40%, 100%
+		transform: scaleY(0.4)
+		-webkit-transform: scaleY(0.4)
+	20%
+		transform: scaleY(1.0)
+		-webkit-transform: scaleY(1.0)

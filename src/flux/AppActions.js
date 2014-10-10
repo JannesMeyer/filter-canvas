@@ -13,6 +13,10 @@ var Constants = require('./Constants');
  */
 var AppActions = {
 
+	reloadRepository() {
+		Dispatcher.dispatch({ actionType: Constants.RELOAD_REPOSITORY })
+	},
+
 	/**
 	 * Imports a JSON configuration file
 	 * Could throw a SyntaxError
