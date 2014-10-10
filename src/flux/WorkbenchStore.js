@@ -405,11 +405,13 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.UNDO:
 			undo();
+			// It's possible that one of the parameters changed
 			WorkbenchStore.emitParamChange();
 		break;
 
 		case constants.REDO:
 			redo();
+			// It's possible that one of the parameters changed
 			WorkbenchStore.emitParamChange();
 		break;
 
