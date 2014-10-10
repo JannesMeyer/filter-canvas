@@ -3,6 +3,7 @@ var BaseStore = require('../lib/BaseStore');
 var Dispatcher = require('../flux/Dispatcher');
 var Constants = require('../flux/Constants');
 
+// TODO: don't hardcode this URL
 var serverURL = 'http://127.0.0.1:5984';
 
 // Backed by AJAX requests to CouchDB

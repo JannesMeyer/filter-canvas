@@ -47,7 +47,7 @@ var RepositoryPane = React.createClass({
 		if (!this.state.pipes) {
 			pipes = spinner;
 		} else if(isEmptyObject(this.state.pipes)) {
-			pipes = <p>Keine Pipes vorhanden</p>;
+			pipes = <p>Noch keine Daten</p>;
 		} else {
 			pipes = Object.keys(this.state.pipes).map(id => {
 				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_PIPE} />;
@@ -57,7 +57,7 @@ var RepositoryPane = React.createClass({
 		if (!this.state.filters) {
 			filters = spinner;
 		} else if(isEmptyObject(this.state.filters)) {
-			pipes = <p>Keine Filter vorhanden</p>;
+			pipes = <p>Noch keine Daten</p>;
 		} else {
 			filters = Object.keys(this.state.filters).map(id => {
 				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_FILTER} />;
@@ -68,7 +68,7 @@ var RepositoryPane = React.createClass({
 		if (!this.state.complexFilters) {
 			complexFilters = spinner;
 		} else if(isEmptyObject(this.state.complexFilters)) {
-			complexFilters = <p>Keine Filter vorhanden</p>;
+			complexFilters = <p>Noch keine Daten</p>;
 		} else {
 			complexFilters = [];
 		}
@@ -80,11 +80,11 @@ var RepositoryPane = React.createClass({
 					{pipes}
 				</div>
 				<div className="filter-repository">
-					<h3>Filters</h3>
+					<h3>Filter</h3>
 					{filters}
 				</div>
 				<div className="complex-filter-repository">
-					<h3>Complex Filters</h3>
+					<h3>Komplexe Filter</h3>
 					{complexFilters}
 				</div>
 			</div>
