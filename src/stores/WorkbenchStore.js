@@ -340,7 +340,65 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.SET_ITEM_PARAMS:
-			setData(data.updateIn(['items', action.id, 'parameter'], params => params.merge(action.params)));
+			var id = action.id;
+			var params = action.params;
+			var item = data.getIn(['items', id]);
+			// TODO: delete connections when decreasing the number of connectors
+			setData(data.withMutations(data => {
+				data.updateIn(['items', id, 'parameter'], params => params.merge(action.params));
+
+				// Adjust the number of inputs / outputs
+
+
+				if (item.get('type') === Constants.ITEM_TYPE_PIPE) {
+					var numInputs = item.get('inputs').length;
+					var numOutputs = item.get('outputs').length;
+
+					var deltaInputs = 0;
+					var deltaOutputs = 0;
+
+					if (params.cardinality && params.cardinality > 0) {
+						deltaInputs = params.cardinality - numInputs;
+						deltaOutputs = params.cardinality - numOutputs;
+					} else if (params.inputs && params.inputs > 0) {
+						deltaInputs = params.inputs - numInputs;
+					} else if (params.outputs && params.outputs > 0) {
+						deltaOutputs = params.outputs - numOutputs;
+					}
+
+					// TODO: introduce attributes: variableInputs, variableOutputs
+
+					// Inputs
+					data.updateIn(['items', id, 'inputs'], inputs => inputs.withMutations(inputs => {
+						if (deltaInputs > 0) {
+							for (var i = 0; i < deltaInputs; ++i) {
+								inputs.push(undefined);
+							}
+						} else if (deltaInputs < 0) {
+							for (var i = 0; i < -deltaInputs; ++i) {
+								// TODO
+								if (inputs.last()) { console.log('we have to delete a connection here'); }
+								inputs.pop();
+							}
+						}
+					}));
+
+					// Outputs
+					data.updateIn(['items', id, 'outputs'], outputs => outputs.withMutations(outputs => {
+						if (deltaOutputs > 0) {
+							for (var i = 0; i < deltaOutputs; ++i) {
+								outputs.push(undefined);
+							}
+						} else if (deltaOutputs < 0) {
+							for (var i = 0; i < -deltaOutputs; ++i) {
+								// TODO
+								if (outputs.last()) { console.log('we have to delete a connection here'); }
+								outputs.pop();
+							}
+						}
+					}));
+				}
+			}));
 			WorkbenchStore.emitParamChange();
 		break;
 
