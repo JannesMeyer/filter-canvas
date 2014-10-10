@@ -6,8 +6,8 @@ var BaseStore = require('../lib/BaseStore');
 var WorkbenchLayout = require('../WorkbenchLayout');
 var RepositoryStore; // late import
 var SelectionStore; // late import
-var dispatcher = require('../flux/dispatcher');
-var constants = require('../flux/constants');
+var Dispatcher = require('../flux/Dispatcher');
+var Constants = require('../flux/Constants');
 
 // Data
 var data = Map({
@@ -251,7 +251,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 				// Preserve the original index, because after filtering out some
 				// elements, the remaining element's indexes will have changed
 				item.itemId = index;
-				return item.type === constants.ITEM_TYPE_FILTER;
+				return item.type === Constants.ITEM_TYPE_FILTER;
 			})
 			.map((filter, index) => {
 				filterIndexes[filter.itemId] = index;
@@ -266,7 +266,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 			});
 
 		obj.pipes = items
-			.filter(item => item.type === constants.ITEM_TYPE_PIPE)
+			.filter(item => item.type === Constants.ITEM_TYPE_PIPE)
 			.map((pipe, index) => {
 				var numInputs = pipe.inputs.length;
 				var numOutputs = pipe.outputs.length;
@@ -315,34 +315,34 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 
 });
 
-WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
+WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
 
-		case constants.IMPORT_FILE:
+		case Constants.IMPORT_FILE:
 			importFile(action.obj);
 		break;
 
-		case constants.CREATE_ITEM:
-			if (action.type === constants.ITEM_TYPE_FILTER) {
+		case Constants.CREATE_ITEM:
+			if (action.type === Constants.ITEM_TYPE_FILTER) {
 				addFilter(action.id, action.position);
-			} else if (action.type === constants.ITEM_TYPE_PIPE) {
+			} else if (action.type === Constants.ITEM_TYPE_PIPE) {
 				addPipe(action.id, action.position);
 			} else {
 				throw new Error('Invalid item type');
 			}
 		break;
 
-		case constants.SET_ITEM_PARAMS:
+		case Constants.SET_ITEM_PARAMS:
 			setData(data.updateIn(['items', action.id, 'parameter'], params => params.merge(action.params)));
 			WorkbenchStore.emitParamChange();
 		break;
 
-		case constants.REMOVE_ITEM_PARAM:
+		case Constants.REMOVE_ITEM_PARAM:
 			setData(data.updateIn(['items', action.id, 'parameter'], params => params.remove(action.param)));
 			WorkbenchStore.emitParamChange();
 		break;
 
-		case constants.MOVE_SELECTED_ITEMS_BY:
+		case Constants.MOVE_SELECTED_ITEMS_BY:
 			setData(data.withMutations(data => {
 				action.selectedItems.forEach((_, id) => {
 					data.updateIn(['items', id, 'rect'], rect => rect.moveBy(action.delta).clipNegative());
@@ -350,12 +350,12 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			}));
 		break;
 
-		case constants.DELETE_SELECTED_ITEMS:
+		case Constants.DELETE_SELECTED_ITEMS:
 			// Wait for the SelectionStore to clear the selectedItems first, because otherwise
 			// when we WorkbenchStore.emitChange() over here, the stuff in the DetailPane will
 			// try to re-render while the SelectionStore still points to elements that don't exist
 			// anymore.
-			dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
 
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
@@ -382,17 +382,17 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			})));
 		break;
 
-		case constants.DELETE_ALL_ITEMS:
+		case Constants.DELETE_ALL_ITEMS:
 			setData(data.updateIn(['items'], items => items.clear()));
 			// Since we're resetting the ID namespace, we have to clear the cache
 			connectorOffsets = {};
 		break;
 
-		case constants.FINISH_CONNECTION:
+		case Constants.FINISH_CONNECTION:
 			addConnection(action.from, action.to);
 		break;
 
-		case constants.DELETE_CONNECTION:
+		case Constants.DELETE_CONNECTION:
 			var c1 = action.connector1;
 			var c2 = action.connector2;
 			setData(data.withMutations(data => {
@@ -401,24 +401,24 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			}));
 		break;
 
-		case constants.UNDO:
+		case Constants.UNDO:
 			undo();
 			// It's possible that one of the parameters changed
 			WorkbenchStore.emitParamChange();
 		break;
 
-		case constants.REDO:
+		case Constants.REDO:
 			redo();
 			// It's possible that one of the parameters changed
 			WorkbenchStore.emitParamChange();
 		break;
 
-		case constants.START_MOVING_SELECTED_ITEMS:
+		case Constants.START_MOVING_SELECTED_ITEMS:
 			isDragging = true;
 			startMousePos = action.mousePos;
 		break;
 
-		case constants.MOVING_SELECTED_ITEMS:
+		case Constants.MOVING_SELECTED_ITEMS:
 			var delta = action.mousePos.subtract(startMousePos);
 			itemPositions = SelectionStore.getSelectedItemIds().map(id => {
 				return data.getIn(['items', id, 'rect']).moveBy(delta);
@@ -426,7 +426,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 			WorkbenchStore.emitPreliminaryPosition();
 		break;
 
-		case constants.FINISH_MOVING_SELECTED_ITEMS:
+		case Constants.FINISH_MOVING_SELECTED_ITEMS:
 			isDragging = false;
 			itemPositions = itemPositions.clear();
 			// The actual moving is done in MOVE_SELECTED_ITEMS_BY
@@ -467,7 +467,7 @@ function importFile(obj) {
 			rect = WorkbenchLayout.getFilterFrame(100, 100, filter.class, numInputs, numOuputs);
 		}
 		items[id] = {
-			type: constants.ITEM_TYPE_FILTER,
+			type: Constants.ITEM_TYPE_FILTER,
 			class: filter.class,
 			parameter: filter.parameter[0] || {},
 			inputs: new Array(numInputs),
@@ -493,7 +493,7 @@ function importFile(obj) {
 			rect = WorkbenchLayout.getPipeFrame(200, 200, pipe.type, numMappings, numMappings);
 		}
 		items[id] = {
-			type: constants.ITEM_TYPE_PIPE,
+			type: Constants.ITEM_TYPE_PIPE,
 			class: pipe.type,
 			parameter: pipe.parameter[0] || {},
 			// TODO: inputNum and outputNum TO BE DETERMINED for split/join pipes
@@ -543,7 +543,7 @@ function addFilter(name, pos, params) {
 	var parameter = merge(baseFilter.parameter, params);
 
 	var item = Map({
-		type: constants.ITEM_TYPE_FILTER,
+		type: Constants.ITEM_TYPE_FILTER,
 		class: name,
 		inputs: Vector.from(new Array(inputs)),
 		outputs: Vector.from(new Array(outputs)),
@@ -576,7 +576,7 @@ function addPipe(name, pos, params) {
 	}
 
 	var item = Map({
-		type: constants.ITEM_TYPE_PIPE,
+		type: Constants.ITEM_TYPE_PIPE,
 		class: name,
 		// inputs: immutable.Range(0, inputs).map(val => null).toVector(),
 		inputs: Vector.from(new Array(inputs)),

@@ -4,8 +4,8 @@ var Point = require('../lib/ImmutablePoint');
 var WorkbenchStore = require('../stores/WorkbenchStore');
 var	SelectionStore = require('../stores/SelectionStore');
 var CreateConnectionStore = require('../stores/CreateConnectionStore');
-var dispatcher = require('./dispatcher');
-var constants = require('./constants');
+var Dispatcher = require('./Dispatcher');
+var Constants = require('./Constants');
 
 /**
  * AppActions single object
@@ -18,7 +18,7 @@ var AppActions = {
 	 * Could throw a SyntaxError
 	 */
 	importFile(text) {
-		dispatcher.dispatch({ actionType: constants.IMPORT_FILE, obj: JSON.parse(text) });
+		Dispatcher.dispatch({ actionType: Constants.IMPORT_FILE, obj: JSON.parse(text) });
 	},
 
 	/**
@@ -56,55 +56,55 @@ var AppActions = {
 	},
 
 	undo() {
-		dispatcher.dispatch({ actionType: constants.UNDO });
+		Dispatcher.dispatch({ actionType: Constants.UNDO });
 	},
 
 	redo() {
-		dispatcher.dispatch({ actionType: constants.REDO });
+		Dispatcher.dispatch({ actionType: Constants.REDO });
 	},
 
 	createItem(type, id, position) {
-		dispatcher.dispatch({ actionType: constants.CREATE_ITEM, type, id, position });
+		Dispatcher.dispatch({ actionType: Constants.CREATE_ITEM, type, id, position });
 	},
 
 	setItemParams(id, params) {
-		dispatcher.dispatch({ actionType: constants.SET_ITEM_PARAMS, id, params });
+		Dispatcher.dispatch({ actionType: Constants.SET_ITEM_PARAMS, id, params });
 	},
 
 	removeItemParam(id, param) {
-		dispatcher.dispatch({ actionType: constants.REMOVE_ITEM_PARAM, id, param });
+		Dispatcher.dispatch({ actionType: Constants.REMOVE_ITEM_PARAM, id, param });
 	},
 
 	deleteSelectedItems() {
-		dispatcher.dispatch({
-			actionType: constants.DELETE_SELECTED_ITEMS,
+		Dispatcher.dispatch({
+			actionType: Constants.DELETE_SELECTED_ITEMS,
 			selectedItems: SelectionStore.getSelectedItemIds()
 		});
 	},
 
 	deleteAllItems() {
-		dispatcher.dispatch({ actionType: constants.DELETE_ALL_ITEMS });
+		Dispatcher.dispatch({ actionType: Constants.DELETE_ALL_ITEMS });
 	},
 
 	startMovingSelectedItems(id, ctrlKey, metaKey, mousePos) {
 		// TODO: protect from double-start
 		var selectionType = SelectionStore.getSelectionType(ctrlKey, metaKey, id);
 		switch(selectionType) {
-			case constants.SELECTION_TYPE_NEW:
-				dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
+			case Constants.SELECTION_TYPE_NEW:
+				Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 				// Fall through!
-			case constants.SELECTION_TYPE_EXTEND:
-				dispatcher.dispatch({ actionType: constants.START_MOVING_SELECTED_ITEMS, id, mousePos });
+			case Constants.SELECTION_TYPE_EXTEND:
+				Dispatcher.dispatch({ actionType: Constants.START_MOVING_SELECTED_ITEMS, id, mousePos });
 			break;
 		}
 	},
 
 	moveSelectedItems(mousePos) {
-		dispatcher.dispatch({ actionType: constants.MOVING_SELECTED_ITEMS, mousePos });
+		Dispatcher.dispatch({ actionType: Constants.MOVING_SELECTED_ITEMS, mousePos });
 	},
 
 	finishMovingSelectedItems(mousePos) {
-		dispatcher.dispatch({ actionType: constants.FINISH_MOVING_SELECTED_ITEMS });
+		Dispatcher.dispatch({ actionType: Constants.FINISH_MOVING_SELECTED_ITEMS });
 
 		var delta = WorkbenchStore.getAmountDragged(mousePos);
 
@@ -114,8 +114,8 @@ var AppActions = {
 			return;
 		}
 
-		dispatcher.dispatch({
-			actionType: constants.MOVE_SELECTED_ITEMS_BY,
+		Dispatcher.dispatch({
+			actionType: Constants.MOVE_SELECTED_ITEMS_BY,
 			selectedItems: SelectionStore.getSelectedItemIds(),
 			delta: delta
 		});
@@ -126,64 +126,64 @@ var AppActions = {
 		var selectionType = SelectionStore.getSelectionType(ctrlKey, metaKey);
 		switch(selectionType) {
 
-			case constants.SELECTION_TYPE_NEW:
-				dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
+			case Constants.SELECTION_TYPE_NEW:
+				Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 				// Fall through!
 
-			case constants.SELECTION_TYPE_EXTEND:
-				dispatcher.dispatch({ actionType: constants.START_SELECTION, scrollPos, position });
+			case Constants.SELECTION_TYPE_EXTEND:
+				Dispatcher.dispatch({ actionType: Constants.START_SELECTION, scrollPos, position });
 
 		}
 	},
 
 	resizeSelection(mousePos) {
-		dispatcher.dispatch({ actionType: constants.RESIZE_SELECTION, mousePos });
+		Dispatcher.dispatch({ actionType: Constants.RESIZE_SELECTION, mousePos });
 	},
 
 	finishSelection() {
 		// TODO: use the last x/y values
 		if (SelectionStore.isClick()) {
-			dispatcher.dispatch({ actionType: constants.CANCEL_SELECTION });
+			Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
 		} else {
-			dispatcher.dispatch({ actionType: constants.FINISH_SELECTION });
+			Dispatcher.dispatch({ actionType: Constants.FINISH_SELECTION });
 		}
 	},
 
 	deleteConnection(connector1, connector2) {
-		dispatcher.dispatch({ actionType: constants.DELETE_CONNECTION, connector1, connector2 });
+		Dispatcher.dispatch({ actionType: Constants.DELETE_CONNECTION, connector1, connector2 });
 	},
 
 	startConnection(connector, mousePos) {
 		// TODO: protect from double-start
-		dispatcher.dispatch({ actionType: constants.START_CONNECTION, connector, mousePos });
+		Dispatcher.dispatch({ actionType: Constants.START_CONNECTION, connector, mousePos });
 	},
 
 	resizeConnection(absMousePos) {
-		dispatcher.dispatch({ actionType: constants.RESIZE_CONNECTION, absMousePos });
+		Dispatcher.dispatch({ actionType: Constants.RESIZE_CONNECTION, absMousePos });
 	},
 
 	finishConnection(absMousePos) {
 		// TODO: use last absMousePos for this check
 		if (CreateConnectionStore.isComplete()) {
 			var [from, to] = CreateConnectionStore.getAddresses();
-			dispatcher.dispatch({ actionType: constants.FINISH_CONNECTION, from, to });
+			Dispatcher.dispatch({ actionType: Constants.FINISH_CONNECTION, from, to });
 		} else {
-			dispatcher.dispatch({ actionType: constants.CANCEL_CONNECTION });
+			Dispatcher.dispatch({ actionType: Constants.CANCEL_CONNECTION });
 		}
 	},
 
 	selectAll() {
 		// TODO: ignore during item drag
 		// TODO: ignore during selection drag
-		dispatcher.dispatch({ actionType: constants.SELECT_ALL });
+		Dispatcher.dispatch({ actionType: Constants.SELECT_ALL });
 	},
 
 	cancel() {
 		// TODO: cancel item drag
 		// TODO: cancel selection drag
 		// TODO: clear selected items
-		dispatcher.dispatch({ actionType: constants.CANCEL_SELECTION });
-		dispatcher.dispatch({ actionType: constants.CLEAR_SELECTED_ITEMS });
+		Dispatcher.dispatch({ actionType: Constants.CANCEL_SELECTION });
+		Dispatcher.dispatch({ actionType: Constants.CLEAR_SELECTED_ITEMS });
 	}
 
 };

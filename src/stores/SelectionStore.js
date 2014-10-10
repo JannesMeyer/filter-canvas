@@ -2,8 +2,8 @@ var { Set } = require('immutable');
 var Rect = require('../lib/ImmutableRect');
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore; // late import
-var dispatcher = require('../flux/dispatcher');
-var constants = require('../flux/constants');
+var Dispatcher = require('../flux/Dispatcher');
+var Constants = require('../flux/Constants');
 
 // Data
 var selectedItems = Set();
@@ -41,16 +41,16 @@ var SelectionStore = BaseStore.createEventEmitter(['change'], {
 		// pressing the platform-specific key for continuing a selection
 		if (!isMacPlatform && ctrlKey ||
 		     isMacPlatform && metaKey) {
-			return constants.SELECTION_TYPE_EXTEND;
+			return Constants.SELECTION_TYPE_EXTEND;
 		}
 
 		// Keep the existing selection if the user is
 		// going to drag a part of it
 		if (this.isItemSelected(itemId)) {
-			return constants.SELECTION_TYPE_EXTEND;
+			return Constants.SELECTION_TYPE_EXTEND;
 		}
 
-		return constants.SELECTION_TYPE_NEW;
+		return Constants.SELECTION_TYPE_NEW;
 	},
 
 	getSelectionRect() {
@@ -76,21 +76,21 @@ var SelectionStore = BaseStore.createEventEmitter(['change'], {
 
 });
 
-SelectionStore.dispatchToken = dispatcher.register(function(action) {
+SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
-		case constants.START_MOVING_SELECTED_ITEMS:
+		case Constants.START_MOVING_SELECTED_ITEMS:
 			selectedItems = selectedItems.add(action.id);
 			SelectionStore.emitChange();
 		break;
 
-		case constants.START_SELECTION:
+		case Constants.START_SELECTION:
 			// TODO: don't save scrollpos
 			startScrollPos = action.scrollPos;
 			startPos = lastPos = action.position;
 			isSelecting = true;
 		break;
 
-		case constants.RESIZE_SELECTION:
+		case Constants.RESIZE_SELECTION:
 			// Find itemsInsideSelection
 			lastPos = startScrollPos.add(action.mousePos);
 			var rect = SelectionStore.getSelectionRect();
@@ -98,7 +98,7 @@ SelectionStore.dispatchToken = dispatcher.register(function(action) {
 			SelectionStore.emitChange();
 		break;
 
-		case constants.FINISH_SELECTION:
+		case Constants.FINISH_SELECTION:
 			// Transfer itemsInsideSelection
 			selectedItems = selectedItems.union(itemsInsideSelection);
 			itemsInsideSelection = Set();
@@ -107,29 +107,29 @@ SelectionStore.dispatchToken = dispatcher.register(function(action) {
 		break;
 
 		// TODO: emitChange, because it could be cancelled for other reason than just no movement
-		case constants.CANCEL_SELECTION:
+		case Constants.CANCEL_SELECTION:
 			itemsInsideSelection = Set();
 			isSelecting = false;
 		break;
 
-		case constants.CLEAR_SELECTED_ITEMS:
-		case constants.DELETE_SELECTED_ITEMS:
-		case constants.DELETE_ALL_ITEMS:
-		case constants.IMPORT_FILE:
+		case Constants.CLEAR_SELECTED_ITEMS:
+		case Constants.DELETE_SELECTED_ITEMS:
+		case Constants.DELETE_ALL_ITEMS:
+		case Constants.IMPORT_FILE:
 			if (selectedItems.length > 0) {
 				selectedItems = selectedItems.clear();
 				SelectionStore.emitChange();
 			}
 		break;
 
-		case constants.CREATE_ITEM:
+		case Constants.CREATE_ITEM:
 			// Select the item after the it was created
-			dispatcher.waitFor([ WorkbenchStore.dispatchToken ]);
+			Dispatcher.waitFor([ WorkbenchStore.dispatchToken ]);
 			selectedItems = Set(WorkbenchStore.getLastIndex());
 			SelectionStore.emitChange();
 		break;
 
-		case constants.SELECT_ALL:
+		case Constants.SELECT_ALL:
 			selectedItems = WorkbenchStore.getAllItems().keySeq().toSet();
 			SelectionStore.emitChange();
 		break;

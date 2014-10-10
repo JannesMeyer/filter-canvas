@@ -2,8 +2,8 @@ var { Vector } = require('immutable');
 var Rect = require('../lib/ImmutableRect');
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore = require('./WorkbenchStore');
-var dispatcher = require('../flux/dispatcher');
-var constants = require('../flux/constants');
+var Dispatcher = require('../flux/Dispatcher');
+var Constants = require('../flux/Constants');
 
 // Data
 var isDragging = false;
@@ -63,10 +63,10 @@ var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 
 });
 
-CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
+CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
 
-		case constants.START_CONNECTION:
+		case Constants.START_CONNECTION:
 			address = immutable.Vector.from(action.connector);
 			var isOutput = address.get(1);
 
@@ -107,7 +107,7 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 			CreateConnectionStore.emitChange();
 		break;
 
-		case constants.RESIZE_CONNECTION:
+		case Constants.RESIZE_CONNECTION:
 			// TODO: workbenchlayout (linewidth/2)
 			action.absMousePos.y -= 4;
 			lastPos = action.absMousePos;
@@ -131,8 +131,8 @@ CreateConnectionStore.dispatchToken = dispatcher.register(function(action) {
 			CreateConnectionStore.emitChange();
 		break;
 
-		case constants.FINISH_CONNECTION:
-		case constants.CANCEL_CONNECTION:
+		case Constants.FINISH_CONNECTION:
+		case Constants.CANCEL_CONNECTION:
 			isDragging = false;
 			eligibleConnectors = [];
 			connectorFrames = [];

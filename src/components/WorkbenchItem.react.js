@@ -4,7 +4,7 @@ var Point = require('../lib/ImmutablePoint');
 
 var WorkbenchStore = require('../stores/WorkbenchStore');
 var AppActions = require('../flux/AppActions');
-var constants = require('../flux/constants');
+var Constants = require('../flux/Constants');
 
 var Connector = require('./Connector.react');
 
@@ -47,8 +47,8 @@ var WorkbenchItem = React.createClass({
 		var type = item.get('type');
 		var inputs = item.get('inputs').toArray();
 		var outputs = item.get('outputs').toArray();
-		var isFilter = (type === constants.ITEM_TYPE_FILTER);
-		var isPipe = (type === constants.ITEM_TYPE_PIPE);
+		var isFilter = (type === Constants.ITEM_TYPE_FILTER);
+		var isPipe = (type === Constants.ITEM_TYPE_PIPE);
 
 		var classes = cx({
 			filter: isFilter,
