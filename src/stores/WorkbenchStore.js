@@ -319,7 +319,14 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
 
 		case Constants.IMPORT_FILE:
-			importFile(action.obj);
+			// In case somebody is subscribed to WorkbenchStore and SelectionStore
+			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+
+			// Since we're resetting the ID namespace, we have to clear the cache
+			connectorOffsets = {};
+
+			// Load data
+			setData(importFile(action.obj));
 		break;
 
 		case Constants.CREATE_ITEM:
@@ -351,6 +358,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.DELETE_SELECTED_ITEMS:
+			// In case somebody is subscribed to WorkbenchStore and SelectionStore
+			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
 				break;
@@ -377,6 +387,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.DELETE_ALL_ITEMS:
+			// In case somebody is subscribed to WorkbenchStore and SelectionStore
+			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+
 			setData(data.updateIn(['items'], items => items.clear()));
 			// Since we're resetting the ID namespace, we have to clear the cache
 			connectorOffsets = {};
@@ -397,12 +410,22 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 
 		case Constants.UNDO:
 			undo();
+
+			// Wait for the SelectionStore to update before emitting an event,
+			// because it is possible that a selected item was removed.
+			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+
 			// It's possible that one of the parameters changed
 			WorkbenchStore.emitParamChange();
 		break;
 
 		case Constants.REDO:
 			redo();
+
+			// Wait for the SelectionStore to update before emitting an event,
+			// because it is possible that a selected item was removed.
+			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
+
 			// It's possible that one of the parameters changed
 			WorkbenchStore.emitParamChange();
 		break;
@@ -520,10 +543,7 @@ function importFile(obj) {
 		});
 	});
 
-	// Load data
-	setData(data.updateIn(['items'], _ => immutable.fromJS(items)));
-	// Since we're resetting the ID namespace, we have to clear the cache
-	connectorOffsets = {};
+	return data.updateIn(['items'], _ => immutable.fromJS(items));
 }
 
 function addFilter(name, pos, params) {

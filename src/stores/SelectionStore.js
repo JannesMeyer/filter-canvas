@@ -72,8 +72,6 @@ var SelectionStore = BaseStore.createEventEmitter(['change'], {
 	getSelectedItemIds() {
 		// TODO: don't recalculate this union everytime
 		return selectedItems.union(itemsInsideSelection);
-		// Guard against deleted items
-		// .intersect(WorkbenchStore.getAllItems().keySeq())
 	}
 
 });
@@ -122,6 +120,12 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 				selectedItems = selectedItems.clear();
 				SelectionStore.emitChange();
 			}
+		break;
+
+		case Constants.UNDO:
+		case Constants.REDO:
+			// Remove items from the selection that are gone after the undo/redo
+			selectedItems = selectedItems.intersect(WorkbenchStore.getAllItems().keySeq());
 		break;
 
 		case Constants.CREATE_ITEM:
