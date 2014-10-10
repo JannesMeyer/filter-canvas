@@ -65,7 +65,7 @@ var Actions = React.createClass({
 		return (
 			<div className="m-actions">
 				<input className="hidden" type="file" ref="file" accept="application/json" onChange={this.handleFileChange} />
-				<button onClick={AppActions.deleteAllItems}>Neu</button>
+				<button onClick={AppActions.deleteAllItems} className="icon icon-doc-inv">Neu</button>
 				<button onClick={this.selectFile} className="icon icon-open">Importieren</button>
 				<button onClick={AppActions.exportFile} className="icon icon-save">Exportieren</button>
 				<button onClick={AppActions.undo} className="icon icon-undo" disabled={!this.state.hasUndoSteps}>Rückgängig</button>
