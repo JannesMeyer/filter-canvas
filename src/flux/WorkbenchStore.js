@@ -1,6 +1,7 @@
 var immutable = require('immutable');
 var { Map, Vector } = immutable;
 var Point = require('../lib/ImmutablePoint');
+var Rect = require('../lib/ImmutableRect');
 var merge = require('react/lib/merge');
 var WorkbenchLayout = require('../interface/WorkbenchLayout');
 
@@ -261,22 +262,16 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	        class: filter.class,
 	        parameter: [ filter.parameter ],
 	        inputs: filter.inputs.map(cTo => ({ inputID: inputCounter++, type: null })), // TODO: type
-	        outputs: filter.outputs.map(cTo => ({ outputID: outputCounter++, type: null }))
+	        outputs: filter.outputs.map(cTo => ({ outputID: outputCounter++, type: null })),
+	        rect: filter.rect // Saving this information is optional, but enhances the UX
 				};
 			});
 
 		obj.pipes = items
-			.filter((item, index) => {
-				// Preserve the original index, because after filtering out some
-				// elements, the remaining element's indexes will have changed
-				item.itemId = index;
-				return item.type === constants.ITEM_TYPE_PIPE;
-			})
+			.filter(item => item.type === constants.ITEM_TYPE_PIPE)
 			.map((pipe, index) => {
-				var mappings = [];
 				var numInputs = pipe.inputs.length;
 				var numOutputs = pipe.outputs.length;
-
 				// Equalize the number of inputs and outputs
 				if (numInputs === 1 && numInputs < numOutputs) {
 					// SplitPipe
@@ -291,6 +286,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 				}
 
 				// Populate the mappings array
+				var mappings = [];
 				for (var i = 0; i < numInputs; ++i) {
 					var inputTo = pipe.inputs[i];
 					var outputTo = pipe.outputs[i];
@@ -308,10 +304,11 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 
 				// Return pipe
 				return {
-					pipeID: pipe.itemId,
+					pipeID: index,
 					type: pipe.class,
 					parameter: [ pipe.parameter ],
-					mappings
+					mappings,
+					rect: pipe.rect // Saving this information is optional, but enhances the UX
 				};
 			});
 
@@ -389,7 +386,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 
 		case constants.DELETE_ALL_ITEMS:
 			setData(data.updateIn(['items'], items => items.clear()));
-			// Clear all the rest
+			// Since we're resetting the ID namespace, we have to clear the cache
 			connectorOffsets = {};
 		break;
 
@@ -455,72 +452,82 @@ SelectionStore = require('./SelectionStore');
 
 function importFile(obj) {
 	var items = [];
-	var outputIDToConnector = {};
-	var inputIDToConnector = {};
+	var outputToConnector = {};
+	var inputToConnector = {};
 
-	// TODO: check for position and use it if available
 	obj.filters.forEach(filter => {
 		var id = items.length;
-		var name = filter.class;
-		var inputs = filter.inputs.length;
-		var outputs = filter.outputs.length;
-
+		var numInputs = filter.inputs.length;
+		var numOuputs = filter.outputs.length;
+		var rect;
+		if (filter.rect) {
+			rect = Rect.fromObject(filter.rect);
+		} else {
+			rect = WorkbenchLayout.getFilterFrame(100, 100, filter.class, numInputs, numOuputs);
+		}
 		items[id] = {
 			type: constants.ITEM_TYPE_FILTER,
-			class: name,
+			class: filter.class,
 			parameter: filter.parameter[0] || {},
-			inputs: new Array(filter.inputs.length),
-			outputs: new Array(filter.outputs.length),
-			rect: WorkbenchLayout.getFilterFrame(100, 100, name, inputs, outputs)
+			inputs: new Array(numInputs),
+			outputs: new Array(numOuputs),
+			rect
 		};
-
 		filter.inputs.forEach((input, connectorId) => {
-			inputIDToConnector[input.inputID] = [id, 0, connectorId];
+			inputToConnector[input.inputID] = [id, 0, connectorId];
 		});
 		filter.outputs.forEach((output, connectorId) => {
-			outputIDToConnector[output.outputID] = [id, 1, connectorId];
+			outputToConnector[output.outputID] = [id, 1, connectorId];
 		});
 	});
 
 	obj.pipes.forEach(pipe => {
 		var id = items.length;
-		var name = pipe.type;
-		var inputs = pipe.mappings.length; // TODO: TO BE DETERMINED for split/join pipes
-		var outputs = pipe.mappings.length; // TODO: TO BE DETERMINED for split/join pipes
-
+		var numMappings = pipe.mappings.length;
+		// TODO: recognize split/join pipes
+		var rect;
+		if (pipe.rect) {
+			rect = Rect.fromObject(pipe.rect);
+		} else {
+			rect = WorkbenchLayout.getPipeFrame(200, 200, pipe.type, numMappings, numMappings);
+		}
 		items[id] = {
 			type: constants.ITEM_TYPE_PIPE,
-			class: name,
+			class: pipe.type,
 			parameter: pipe.parameter[0] || {},
-			inputs: new Array(inputs),
-			outputs: new Array(outputs),
-			rect: WorkbenchLayout.getPipeFrame(200, 200, name, inputs, outputs)
+			// TODO: inputNum and outputNum TO BE DETERMINED for split/join pipes
+			inputs: new Array(numMappings),
+			outputs: new Array(numMappings),
+			rect
 		};
 
+		// Create connections out of the mappings
 		pipe.mappings.forEach((mapping, connectorId) => {
-			var filterOut = outputIDToConnector[mapping.output];
+			var filterOut = outputToConnector[mapping.output];
 			var pipeIn    = [id, 0, connectorId];
 			var pipeOut   = [id, 1, connectorId];
-			var filterIn  = inputIDToConnector[mapping.input];
+			var filterIn  = inputToConnector[mapping.input];
 
-			// Check for double connection
+			// Check for duplicate connection
 			var p1 = items[filterOut[0]].outputs[filterOut[2]];
 			var p2 = items[filterIn[0]].inputs[filterIn[2]];
 			if (p1 || p2) {
-				throw new Error('already has a connection. handle split/join pipes');
+				throw new Error('Es wurde versucht, mehrmals den gleichen Input/Output zu verbinden.');
 			}
 
+			// First connection (doubly linked)
 			items[filterOut[0]].outputs[filterOut[2]] = pipeIn;
 			items[pipeIn[0]].inputs[pipeIn[2]] = filterOut;
 
+			// Second connection (doubly linked)
 			items[pipeOut[0]].outputs[pipeOut[2]] = filterIn;
 			items[filterIn[0]].inputs[filterIn[2]] = pipeOut;
 		});
 	});
 
-	// Load data into the store
+	// Load data
 	setData(data.updateIn(['items'], _ => immutable.fromJS(items)));
-	// Clear all the rest
+	// Since we're resetting the ID namespace, we have to clear the cache
 	connectorOffsets = {};
 }
 
@@ -608,6 +615,39 @@ function addConnection(output, input) {
  * Testing
  *************************************************************************/
 
+// Restore from localStore
+if (window.localStorage && localStorage.dataBackup) {
+	console.log('Restoring state from local storage…');
+	try {
+		var obj = JSON.parse(localStorage.dataBackup);
+
+		// Restore the ImmutableRect objects
+		obj.items.forEach(item => {
+			item.rect = Rect.fromObject(item.rect);
+		});
+
+		// Restore the other immutable objects
+		data = immutable.fromJS(obj);
+	} catch (e) {
+		// Nothing, just start empty
+	}
+}
+
+// Save the current state to localStorage whenever the tab is hidden
+// or when it is unloaded
+if (window.localStorage) {
+	var save = function() {
+		console.log('Saving state to local storage…');
+		localStorage.dataBackup = JSON.stringify(data.toJS());
+	};
+	window.addEventListener('unload', save);
+	document.addEventListener('visibilitychange', () => {
+		if (document.hidden || document.msHidden) {
+			save();
+		}
+	});
+}
+
 // addFilter('SourceFilterExample', new Point(20, 20));
 // addFilter('WorkFilterExample',   new Point(20, 90));
 // addFilter('EndFilter',           new Point(508, 141));
@@ -627,5 +667,3 @@ function addConnection(output, input) {
 // addConnection(Vector(4, 1, 2), Vector(5, 0, 0));
 // addConnection(Vector(5, 1, 0), Vector(6, 0, 0));
 // addConnection(Vector(6, 1, 0), Vector(2, 0, 2));
-
-importFile(JSON.parse('{"factoryVersion":"0.2","filters":[{"filterID":0,"class":"SourceFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[],"outputs":[{"outputID":1,"type":null}]},{"filterID":2,"class":"EndFilter","parameter":[{}],"inputs":[{"inputID":1,"type":null},{"inputID":2,"type":null},{"inputID":3,"type":null}],"outputs":[]},{"filterID":5,"class":"WorkFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[{"inputID":4,"type":null}],"outputs":[{"outputID":2,"type":null}]},{"filterID":9,"class":"SourceFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[],"outputs":[{"outputID":3,"type":null}]},{"filterID":10,"class":"SourceFilterExample","parameter":[{"waitMax":500000,"waitMin":10}],"inputs":[],"outputs":[{"outputID":4,"type":null}]}],"pipes":[{"pipeID":0,"type":"ForwardPipe","parameter":[{"cardinality":3,"sync":true}],"mappings":[{"inFilter":0,"output":1,"outFilter":2,"input":1},{"inFilter":9,"output":3,"outFilter":2,"input":2},{"inFilter":10,"output":4,"outFilter":5,"input":4}]},{"pipeID":1,"type":"ForwardPipe","parameter":[{"cardinality":1,"sync":true}],"mappings":[{"inFilter":5,"output":2,"outFilter":2,"input":3}]}]}'));

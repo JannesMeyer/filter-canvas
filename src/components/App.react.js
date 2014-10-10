@@ -83,7 +83,6 @@ var App = React.createClass({
 	},
 
 	render() {
-		console.log('Render App');
 		return (
 			<div className="m-container" onMouseMove={this.handleMouseMove}>
 				<Workbench />

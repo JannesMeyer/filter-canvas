@@ -157,7 +157,6 @@ var DetailPane = React.createClass({
 	},
 
 	render() {
-		console.log('Render DetailPane');
 		var changedParameter = this.state.changedParameter;
 		var showDialog = this.state.showParameterPopup;
 		var items = this.state.selectedItems;

@@ -78,7 +78,13 @@ class Rect {
 
 }
 Rect.Zero = new Rect(0, 0, 0, 0);
-Rect.fromTwoPoints = function createWithPoints(a, b) {
+Rect.fromObject = function(obj) {
+	if (!obj || obj.constructor !== Object) {
+		return;
+	}
+	return new Rect(obj.x, obj.y, obj.width, obj.height);
+};
+Rect.fromTwoPoints = function(a, b) {
 	if (!a || !b) {
 		return Rect.Zero;
 	}
