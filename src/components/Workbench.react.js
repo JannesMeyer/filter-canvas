@@ -1,6 +1,6 @@
-var AppActions = require('../flux/AppActions');
-var WorkbenchStore = require('../flux/WorkbenchStore');
 var Point = require('../lib/ImmutablePoint');
+var AppActions = require('../flux/AppActions');
+var WorkbenchStore = require('../stores/WorkbenchStore');
 
 var WorkbenchItems = require('./WorkbenchItems.react');
 var CreateSelection = require('./CreateSelection.react');

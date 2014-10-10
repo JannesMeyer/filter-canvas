@@ -1,4 +1,4 @@
-var	SelectionStore = require('../flux/SelectionStore');
+var	SelectionStore = require('../stores/SelectionStore');
 
 var CreateSelection = React.createClass({
 

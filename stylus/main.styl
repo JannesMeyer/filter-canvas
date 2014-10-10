@@ -92,6 +92,8 @@ body
 		> .outputs
 			position: absolute
 			top: 50%
+			-webkit-transform: translateY(-50%)
+			-ms-transform: translateY(-50%)
 			transform: translateY(-50%)
 			> .connector
 				position: relative
@@ -153,65 +155,65 @@ body
 	z-index: 10000
 	background: #fff
 
-	> .m-repository-pane
-		height: 60%
-		overflow: auto
-		padding: 20px
-		padding-bottom: 10px
-		background: #f6f6f6
-		border-bottom: 1px solid #ccc
+.m-repository-pane
+	height: 60%
+	overflow: auto
+	padding: 20px
+	padding-bottom: 10px
+	background: #f6f6f6
+	border-bottom: 1px solid #ccc
 
-		> div:first-child > h3:first-child
-			margin-top: 0
+	> div:first-child > h3:first-child
+		margin-top: 0
 
-		> .filter-repository > .item,
-		> .pipe-repository > .item
+	> .filter-repository > .item,
+	> .pipe-repository > .item
+		display: inline-block
+		border: 1px solid #000
+		padding: 8px
+		margin-bottom: 10px
+		margin-right: 6px
+		cursor: move
+
+	> .filter-repository > .item
+		background: #fff
+
+	> .pipe-repository > .item
+		background: #fcfadc
+
+.m-detail-pane
+	padding: 20px
+	height: 40%
+	overflow: auto
+
+	> h3
+		font-size: 1.1em
+		margin-top: 0
+		margin-bottom: 12px
+
+	#defaultDialog
+		> label
+			display: block
+			clear: right
+		> label > span
 			display: inline-block
-			border: 1px solid #000
-			padding: 8px
-			margin-bottom: 10px
-			margin-right: 6px
-			cursor: move
+			padding-top: 2px
+		> label > input
+			display: inline-block
+			float: right
 
-		> .filter-repository > .item
-			background: #fff
+	#newParameterDialog
+		> input
+			width: 100%
+		> label
+			display: block
+			margin-top: 5px
+			margin-bottom: 5px
+		> label > input
+			margin-right: 5px
 
-		> .pipe-repository > .item
-			background: #fcfadc
-
-	> .m-detail-pane
-		padding: 20px
-		height: 40%
-		overflow: auto
-
-		> h3
-			font-size: 1.1em
-			margin-top: 0
-			margin-bottom: 12px
-
-		> #defaultDialog
-			> label
-				display: block
-				clear: right
-			> label > span
-				display: inline-block
-				padding-top: 2px
-			> label > input
-				display: inline-block
-				float: right
-
-		> #newParameterDialog
-			> input
-				width: 100%
-			> label
-				display: block
-				margin-top: 5px
-				margin-bottom: 5px
-			> label > input
-				margin-right: 5px
-
-		.actions
-			margin-top: 12px
+	.actions
+		margin-top: 12px
 
 		button
 			display: block

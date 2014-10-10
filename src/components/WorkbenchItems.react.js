@@ -1,7 +1,7 @@
 var { Vector } = require('immutable');
-var SelectionStore = require('../flux/SelectionStore');
-var WorkbenchStore = require('../flux/WorkbenchStore');
-var WorkbenchLayout = require('../interface/WorkbenchLayout');
+var SelectionStore = require('../stores/SelectionStore');
+var WorkbenchStore = require('../stores/WorkbenchStore');
+var WorkbenchLayout = require('../WorkbenchLayout');
 
 var WorkbenchItem = require('./WorkbenchItem.react');
 var WorkbenchWire = require('./WorkbenchWire.react');

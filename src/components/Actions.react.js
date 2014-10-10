@@ -1,6 +1,6 @@
-var AppActions = require('../flux/AppActions');
-var WorkbenchStore = require('../flux/WorkbenchStore');
 var keypress = require('../lib/keypress-tool');
+var AppActions = require('../flux/AppActions');
+var WorkbenchStore = require('../stores/WorkbenchStore');
 
 var Actions = React.createClass({
 

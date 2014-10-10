@@ -2,8 +2,8 @@ var { Set } = require('immutable');
 var Rect = require('../lib/ImmutableRect');
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchStore; // late import
-var dispatcher = require('./dispatcher');
-var constants = require('./constants');
+var dispatcher = require('../flux/dispatcher');
+var constants = require('../flux/constants');
 
 // Data
 var selectedItems = Set();

@@ -1,9 +1,9 @@
 var { Vector } = require('immutable');
 var Rect = require('../lib/ImmutableRect');
 var BaseStore = require('../lib/BaseStore');
-var WorkbenchStore = require('../flux/WorkbenchStore');
-var dispatcher = require('./dispatcher');
-var constants = require('./constants');
+var WorkbenchStore = require('./WorkbenchStore');
+var dispatcher = require('../flux/dispatcher');
+var constants = require('../flux/constants');
 
 // Data
 var isDragging = false;

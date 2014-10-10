@@ -1,6 +1,6 @@
 var AppActions = require('../flux/AppActions');
-var WorkbenchStore = require('../flux/WorkbenchStore');
-var SelectionStore = require('../flux/SelectionStore');
+var WorkbenchStore = require('../stores/WorkbenchStore');
+var SelectionStore = require('../stores/SelectionStore');
 var keypress = require('../lib/keypress-tool');
 
 var DetailPane = React.createClass({

@@ -1,15 +1,13 @@
+var merge = require('react/lib/merge');
 var immutable = require('immutable');
 var { Map, Vector } = immutable;
-var Point = require('../lib/ImmutablePoint');
 var Rect = require('../lib/ImmutableRect');
-var merge = require('react/lib/merge');
-var WorkbenchLayout = require('../interface/WorkbenchLayout');
-
 var BaseStore = require('../lib/BaseStore');
+var WorkbenchLayout = require('../WorkbenchLayout');
 var RepositoryStore; // late import
 var SelectionStore; // late import
-var dispatcher = require('./dispatcher');
-var constants = require('./constants');
+var dispatcher = require('../flux/dispatcher');
+var constants = require('../flux/constants');
 
 // Data
 var data = Map({
@@ -618,6 +616,8 @@ function addConnection(output, input) {
  * Testing
  *************************************************************************/
 
+// TODO: put this in the APP.react.js
+
 // Restore from localStore
 if (window.localStorage && localStorage.dataBackup) {
 	console.log('Restoring state from local storage…');
@@ -632,7 +632,8 @@ if (window.localStorage && localStorage.dataBackup) {
 		// Restore the other immutable objects
 		data = immutable.fromJS(obj);
 	} catch (e) {
-		// Nothing, just start empty
+		// Start with an empty canvas
+		localStorage.removeItem('dataBackup');
 	}
 }
 
@@ -657,6 +658,7 @@ if (window.localStorage) {
 	window.addEventListener('unload', save);
 }
 
+// var Point = require('../lib/ImmutablePoint');
 // addFilter('SourceFilterExample', new Point(20, 20));
 // addFilter('WorkFilterExample',   new Point(20, 90));
 // addFilter('EndFilter',           new Point(508, 141));

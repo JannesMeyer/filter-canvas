@@ -1,5 +1,5 @@
 var constants = require('../flux/constants');
-var RepositoryStore = require('../flux/RepositoryStore');
+var RepositoryStore = require('../stores/RepositoryStore');
 var RepositoryItem = require('./RepositoryItem.react');
 
 var RepositoryPane = React.createClass({
@@ -14,14 +14,6 @@ var RepositoryPane = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state.filters !== nextState.filters ||
 		       this.state.pipes   !== nextState.pipes;
-	},
-
-	componentDidMount() {
-		RepositoryStore.addChangeListener(this._handleChange);
-	},
-
-	componentWillUnmount() {
-		RepositoryStore.removeChangeListener(this._handleChange);
 	},
 
 	render() {
@@ -41,10 +33,6 @@ var RepositoryPane = React.createClass({
 				</div>
 			</div>
 		);
-	},
-
-	_handleChange() {
-		this.replaceState(this.getInitialState());
 	}
 
 });

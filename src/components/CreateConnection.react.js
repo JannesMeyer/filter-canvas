@@ -1,6 +1,6 @@
-var	CreateConnectionStore = require('../flux/CreateConnectionStore');
-var WorkbenchLayout = require('../interface/WorkbenchLayout');
+var WorkbenchLayout = require('../WorkbenchLayout');
 var Point = require('../lib/ImmutablePoint');
+var	CreateConnectionStore = require('../stores/CreateConnectionStore');
 
 var WorkbenchWire = require('./WorkbenchWire.react');
 

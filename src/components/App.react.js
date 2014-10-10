@@ -1,9 +1,9 @@
-var AppActions = require('../flux/AppActions');
-var SelectionStore = require('../flux/SelectionStore');
-var CreateConnectionStore = require('../flux/CreateConnectionStore');
-var WorkbenchStore = require('../flux/WorkbenchStore');
-var Point = require('../lib/ImmutablePoint');
 var keypress = require('../lib/keypress-tool');
+var Point = require('../lib/ImmutablePoint');
+var AppActions = require('../flux/AppActions');
+var SelectionStore = require('../stores/SelectionStore');
+var CreateConnectionStore = require('../stores/CreateConnectionStore');
+var WorkbenchStore = require('../stores/WorkbenchStore');
 
 var Workbench = require('./Workbench.react');
 var RepositoryPane = require('./RepositoryPane.react');

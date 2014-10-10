@@ -1,9 +1,9 @@
 var saveAs = require('browser-saveas');
 var Point = require('../lib/ImmutablePoint');
 
-var WorkbenchStore = require('./WorkbenchStore');
-var	SelectionStore = require('./SelectionStore');
-var CreateConnectionStore = require('./CreateConnectionStore');
+var WorkbenchStore = require('../stores/WorkbenchStore');
+var	SelectionStore = require('../stores/SelectionStore');
+var CreateConnectionStore = require('../stores/CreateConnectionStore');
 var dispatcher = require('./dispatcher');
 var constants = require('./constants');
 

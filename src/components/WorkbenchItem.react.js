@@ -1,9 +1,11 @@
-var { Vector } = require('immutable');
 var cx = require('react/lib/cx');
-var constants = require('../flux/constants');
-var AppActions = require('../flux/AppActions');
-var WorkbenchStore = require('../flux/WorkbenchStore');
+var { Vector } = require('immutable');
 var Point = require('../lib/ImmutablePoint');
+
+var WorkbenchStore = require('../stores/WorkbenchStore');
+var AppActions = require('../flux/AppActions');
+var constants = require('../flux/constants');
+
 var Connector = require('./Connector.react');
 
 var WorkbenchItem = React.createClass({

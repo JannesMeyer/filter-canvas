@@ -1,4 +1,4 @@
-var CreateConnectionStore = require('../flux/CreateConnectionStore');
+var CreateConnectionStore = require('../stores/CreateConnectionStore');
 
 var Connector = React.createClass({
 
