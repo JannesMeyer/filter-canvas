@@ -27,6 +27,22 @@ class Rect {
 			this.height
 		);
 	}
+
+	/**
+	 * Clips the negative values from x and y
+	 */
+	clipNegative() {
+		if (this.x < 0 || this.y < 0) {
+			return new Rect(
+				Math.max(this.x, 0),
+				Math.max(this.y, 0),
+				this.width,
+				this.height
+			);
+		}
+		return this;
+	}
+
 	/**
 	 * Add these values to the current values
 	 * All arguments default to zero

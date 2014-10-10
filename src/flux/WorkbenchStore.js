@@ -347,7 +347,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		case constants.MOVE_SELECTED_ITEMS_BY:
 			setData(data.withMutations(data => {
 				action.selectedItems.forEach((_, id) => {
-					data.updateIn(['items', id, 'rect'], rect => rect.moveBy(action.delta));
+					data.updateIn(['items', id, 'rect'], rect => rect.moveBy(action.delta).clipNegative());
 				});
 			}));
 		break;
@@ -429,6 +429,7 @@ WorkbenchStore.dispatchToken = dispatcher.register(function(action) {
 		case constants.FINISH_MOVING_SELECTED_ITEMS:
 			isDragging = false;
 			itemPositions = itemPositions.clear();
+			// The actual moving is done in MOVE_SELECTED_ITEMS_BY
 		break;
 	}
 });
@@ -637,15 +638,21 @@ if (window.localStorage && localStorage.dataBackup) {
 // or when it is unloaded
 if (window.localStorage) {
 	var save = function() {
+		if (data.get('items').length === 0) {
+			localStorage.removeItem('dataBackup');
+			return;
+		}
 		console.log('Saving state to local storage…');
 		localStorage.dataBackup = JSON.stringify(data.toJS());
 	};
-	window.addEventListener('unload', save);
 	document.addEventListener('visibilitychange', () => {
 		if (document.hidden || document.msHidden) {
 			save();
 		}
 	});
+	// This could be dangerous in case the state gets corrupted.
+	// It would always write the corrupted state back on reload.
+	window.addEventListener('unload', save);
 }
 
 // addFilter('SourceFilterExample', new Point(20, 20));
