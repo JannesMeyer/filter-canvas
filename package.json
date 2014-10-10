@@ -9,6 +9,7 @@
   },
   "description": "Configuration tool for filters and pipes architectures",
   "devDependencies": {
+    "autoprefixer-loader": "^1.0.0",
     "css-loader": "0.x",
     "immutable": "2.x",
     "jsx-loader": "0.x",

@@ -41,11 +41,11 @@ var config = {
 			},
 			{
 				test: /\.css$/,
-				loaders: ['style-loader', 'css-loader']
+				loaders: ['style-loader', 'css-loader', 'autoprefixer-loader']
 			},
 			{
 				test: /\.styl$/,
-				loaders: ['style-loader', 'css-loader', 'stylus-loader']
+				loaders: ['style-loader', 'css-loader', 'autoprefixer-loader', 'stylus-loader']
 			}
 		]
 	},
