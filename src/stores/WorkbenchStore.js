@@ -370,31 +370,29 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 
 					// Inputs
 					data.updateIn(['items', id, 'inputs'], inputs => inputs.withMutations(inputs => {
-						if (deltaInputs > 0) {
-							for (var i = 0; i < deltaInputs; ++i) {
-								inputs.push(undefined);
+						for (; deltaInputs > 0; --deltaInputs) {
+							inputs.push(undefined);
+						}
+						for (; deltaInputs < 0; ++deltaInputs) {
+							if (inputs.last()) {
+								// TODO: delete connection
+								console.log('we have to delete a connection here');
 							}
-						} else if (deltaInputs < 0) {
-							for (var i = 0; i < -deltaInputs; ++i) {
-								// TODO
-								if (inputs.last()) { console.log('we have to delete a connection here'); }
-								inputs.pop();
-							}
+							inputs.pop();
 						}
 					}));
 
 					// Outputs
 					data.updateIn(['items', id, 'outputs'], outputs => outputs.withMutations(outputs => {
-						if (deltaOutputs > 0) {
-							for (var i = 0; i < deltaOutputs; ++i) {
-								outputs.push(undefined);
+						for (; deltaOutputs > 0; --deltaOutputs) {
+							outputs.push(undefined);
+						}
+						for (; deltaOutputs < 0; ++deltaOutputs) {
+							if (outputs.last()) {
+								// TODO: delete connection
+								console.log('we have to delete a connection here');
 							}
-						} else if (deltaOutputs < 0) {
-							for (var i = 0; i < -deltaOutputs; ++i) {
-								// TODO
-								if (outputs.last()) { console.log('we have to delete a connection here'); }
-								outputs.pop();
-							}
+							outputs.pop();
 						}
 					}));
 				}
