@@ -125,7 +125,7 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 		case Constants.UNDO:
 		case Constants.REDO:
 			// Remove items from the selection that are gone after the undo/redo
-			selectedItems = selectedItems.intersect(WorkbenchStore.getAllItems().keySeq());
+			selectedItems = selectedItems.intersect(WorkbenchStore.getAllItemIds());
 		break;
 
 		case Constants.CREATE_ITEM:
@@ -136,7 +136,7 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.SELECT_ALL:
-			selectedItems = WorkbenchStore.getAllItems().keySeq().toSet();
+			selectedItems = WorkbenchStore.getAllItemIds().toSet();
 			SelectionStore.emitChange();
 		break;
 	}

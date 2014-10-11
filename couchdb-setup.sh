@@ -30,6 +30,8 @@ curl -X PUT $DB/filter-repository/GLFWImageSink -H "$HEADERS" -d '{ "inputs": 1,
 
 # Populate pipe repository
 echo '\nCreate pipes...'
-curl -X PUT $DB/pipe-repository/ForwardPipe -H "$HEADERS" -d '{ "parameter": { "cardinality": 1, "sync": true } }'
-curl -X PUT $DB/pipe-repository/SplitPipe -H "$HEADERS" -d '{ "inputs": 1, "parameter": { "outputs": 2, "sync": false } }'
-curl -X PUT $DB/pipe-repository/JoinPipe -H "$HEADERS" -d '{ "outputs": 1, "parameter": { "inputs": 2, "sync": false } }'
+curl -X PUT $DB/pipe-repository/ForwardPipe -H "$HEADERS" -d '{ "inputs": 1, "outputs": 1, "variableInputs": true, "variableOutputs": true, "parameter": { "sync": false } }'
+curl -X PUT $DB/pipe-repository/SplitPipe -H "$HEADERS" -d '{ "inputs": 1, "outputs": 2, "variableOutputs": true, "parameter": { "sync": false } }'
+curl -X PUT $DB/pipe-repository/JoinPipe -H "$HEADERS" -d '{ "inputs": 2, "outputs": 1, "variableInputs": true, "parameter": { "sync": false } }'
+
+

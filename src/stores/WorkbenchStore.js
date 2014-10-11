@@ -42,6 +42,14 @@ function makeArray(n, value) {
 	return arr;
 }
 
+function fixSparseVector(vector) {
+	return vector.withMutations(items => {
+		items.forEach((item, index) => {
+			if (item) { return; }
+			items.remove(index);
+		});
+	});
+}
 
 
 
@@ -117,6 +125,13 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	},
 
 	/**
+	 * returns an immutable.Sequence
+	 */
+	getAllItemIds() {
+		return data.get('items').keySeq();
+	},
+
+	/**
 	 * returns an immutable.Map
 	 */
 	getItem(id) {
@@ -129,7 +144,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	getItemsCoveredBy(rect) {
 		return data.get('items')
 			.toMap()
-			.filter(f => rect.intersectsRect(f.get('rect')))
+			.filter(f => f && rect.intersectsRect(f.get('rect')))
 			.keySeq()
 			.toSet();
 	},
@@ -248,6 +263,9 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 		var filterIndexes = {};
 		obj.filters = items
 			.filter((item, index) => {
+				if (!item) {
+					return false;
+				}
 				// Preserve the original index, because after filtering out some
 				// elements, the remaining element's indexes will have changed
 				item.itemId = index;
@@ -265,8 +283,9 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 				};
 			});
 
+		// TODO: fix the mappings export
 		obj.pipes = items
-			.filter(item => item.type === Constants.ITEM_TYPE_PIPE)
+			.filter(item => item && item.type === Constants.ITEM_TYPE_PIPE)
 			.map((pipe, index) => {
 				var numInputs = pipe.inputs.length;
 				var numOutputs = pipe.outputs.length;
@@ -367,6 +386,7 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 					}
 
 					// TODO: introduce attributes: variableInputs, variableOutputs
+					// TODO: delete connector offset cache
 
 					// Inputs
 					data.updateIn(['items', id, 'inputs'], inputs => inputs.withMutations(inputs => {
@@ -694,11 +714,16 @@ if (window.localStorage && localStorage.dataBackup) {
 	try {
 		var obj = JSON.parse(localStorage.dataBackup);
 
-		// Restore the ImmutableRect objects
-		obj.items.forEach(item => {
-			if (!item) { return; }
-			item.rect = Rect.fromObject(item.rect);
+		// Restore the ImmutableRect objects, and remove other indexes
+		obj.items.forEach((item, itemId) => {
+			if (item) {
+				item.rect = Rect.fromObject(item.rect);
+			} else {
+				delete obj.items[itemId];
+			}
 		});
+
+		// console.log(obj.items);
 
 		// Restore the other immutable objects
 		data = immutable.fromJS(obj);
