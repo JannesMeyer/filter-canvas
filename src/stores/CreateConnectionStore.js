@@ -100,7 +100,7 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 					// TODO: workbenchlayout (linewidth/2)
 					var wireWidth = 8;
 					// TODO: make sure that these never overlap
-					return new Rect(pos.x - 6, pos.y - 2 - 4 - 4, 12+12, 8 + 6);
+					return new Rect(pos.x - 6, pos.y - 2 - 4 - 4, 12+12, 8 + 5);
 				})
 				.cacheResult();
 
