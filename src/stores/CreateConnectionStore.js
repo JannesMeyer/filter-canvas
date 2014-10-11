@@ -84,10 +84,12 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 			eligibleConnectors = [];
 			connectorFrames = [];
 			WorkbenchStore.getAllItems().forEach((item, itemId) => {
+				// The Vector could be sparse after elements have been deleted from it
+				if (!item) { return; }
+
 				// Find opposites
-				if (type === item.get('type')) {
-					return;
-				}
+				if (type === item.get('type')) { return; }
+
 				item.get(isOutput ? 'inputs' : 'outputs').forEach((connectedTo, connectorId) => {
 					if (connectedTo) {
 						return;
