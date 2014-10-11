@@ -31,10 +31,10 @@ var WorkbenchLayout = {
 	},
 
 	getConnectorBoundingBox(pos, isOutput) {
-		// Extend the bounding box by 16 pixels towards the cursor, which is
-		// composed out of these approximations:
-		// Width of a typical cursor: 11 pixels (Mac OSX)
-		// Size of the box shadow:     5 pixels
+		// Extend the bounding box by 16 pixels towards the cursor
+		// Which is composed of these approximations:
+		//  - Width of a typical cursor: 11 pixels (Mac OSX)
+		//  - Size of the box shadow:     5 pixels
 		var x     = isOutput ? pos.x - CONNECTOR_WIDTH : pos.x - 16;
 		var width = CONNECTOR_WIDTH + 16;
 

@@ -66,11 +66,6 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 			isDragging = true;
 			address = Vector.from(action.connector);
 			origin = WorkbenchStore.getConnectorPosition(address);
-
-			// The tip of the cursor is a little off on OSX (-1, -2), which is good,
-			// because it actually improves the perceived responsiveness of the UI.
-			// But in this case we reset the Y position, to get better looks.
-			// action.mousePos.y -= 2;
 			lastPos = action.mousePos;
 
 			var sourceIsOutput = address.get(1);
@@ -105,10 +100,6 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.RESIZE_CONNECTION:
-			// The tip of the cursor is a little off on OSX (-1, -2), which is good,
-			// because it actually improves the perceived responsiveness of the UI.
-			// But in this case we reset the Y position, to get better looks.
-			// action.absMousePos.y -= 2;
 			lastPos = action.absMousePos;
 
 			var id = targetFrames.findKey(f => f.containsPoint(lastPos));
