@@ -41,15 +41,28 @@ body
 	user-select: none
 	background: url(/images/tiny_grid_light.png)
 
-html, body, .m-app, .m-container, .m-workbench
+html, body, .m-app, .m-container
 	height: 100%
 
 .m-container
 	margin-right: 250px
+	display: flex
+	flex-direction: column
+
+.m-actions
+	padding: 5px 7px
+	background: #ededed
+	border-top: 1px solid #aaa
+
+	button
+		padding: 6px
+		font-size: 13px
+		margin-right: 5px
 
 .m-workbench
 	position: relative // for the connection drag wire and the selection rectangle
 	overflow: auto
+	flex-grow: 1
 
 .m-workbench-items
 	min-height: 100%
@@ -225,21 +238,6 @@ html, body, .m-app, .m-container, .m-workbench
 			background: #f22
 			color: #fff
 			font-weight: bold
-
-
-.m-actions
-	position: absolute
-	top: 0
-	left: 0
-	padding: 6px 8px
-	background: #ededed
-	border-bottom: 1px solid #aaa
-	width: 100%
-
-	button
-		margin-right: 3px
-		font-size: 110%
-		// padding: 5px
 
 
 // Third-party spinner styles
