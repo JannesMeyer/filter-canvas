@@ -21,24 +21,12 @@ var RepositoryStore = BaseStore.createEventEmitter(['change'], {
 		return pipes;
 	},
 
-	getPipe(id) {
-		return pipes[id];
-	},
-
 	getAllFilters() {
 		return filters;
 	},
 
-	getFilter(id) {
-		return filters[id];
-	},
-
 	getAllComplexFilters() {
 		return complexFilters;
-	},
-
-	getComplexFilter() {
-		return complexFilters[id];
 	}
 
 });
@@ -58,8 +46,10 @@ function reload() {
 
 	// Load pipes
 	xhr.getJSON(serverURL + '/pipe-repository/_all_docs?include_docs=true', (err, obj) => {
-		pipes = {};
-		if (!err) {
+		if (err) {
+			pipes = new Error('Connection error');
+		} else {
+			pipes = {};
 			obj.rows.forEach(row => {
 				pipes[row.id] = row.doc;
 			});
@@ -69,8 +59,10 @@ function reload() {
 
 	// Load filters
 	xhr.getJSON(serverURL + '/filter-repository/_all_docs?include_docs=true', (err, obj) => {
-		filters = {};
-		if (!err) {
+		if (err) {
+			filters = new Error('Connection error');
+		} else {
+			filters = {};
 			obj.rows.forEach(row => {
 				filters[row.id] = row.doc;
 			});
@@ -80,8 +72,10 @@ function reload() {
 
 	// Load complex filters
 	xhr.getJSON(serverURL + '/complex-filters/_all_docs?include_docs=true', (err, obj) => {
-		complexFilters = {};
-		if (!err) {
+		if (err) {
+			complexFilters = new Error('Connection error');
+		} else {
+			complexFilters = {};
 			obj.rows.forEach(row => {
 				complexFilters[row.id] = row.doc;
 			});

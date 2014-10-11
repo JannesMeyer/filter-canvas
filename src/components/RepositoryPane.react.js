@@ -30,6 +30,10 @@ var RepositoryPane = React.createClass({
 	},
 
 	render() {
+		var pipes = this.state.pipes;
+		var filters = this.state.filters;
+		var complexFilters = this.state.complexFilters;
+
 		var spinner = (
 			<div className="spinner">
 			  <div className="rect1"></div>
@@ -39,52 +43,48 @@ var RepositoryPane = React.createClass({
 			  <div className="rect5"></div>
 			</div>
 		);
+		var pipeContent = spinner;
+		var filterContent = spinner;
+		var complexFilterContent = spinner;
 
-		var pipes;
-		var filters;
-		var complexFilters;
-
-		if (!this.state.pipes) {
-			pipes = spinner;
-		} else if(isEmptyObject(this.state.pipes)) {
-			pipes = <p>Noch keine Daten</p>;
-		} else {
-			pipes = Object.keys(this.state.pipes).map(id => {
+		if(pipes instanceof Error) {
+			pipeContent = <p>Verbindungs-Fehler</p>;
+		} else
+		if (pipes !== null) {
+			pipeContent = Object.keys(pipes).map(id => {
 				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_PIPE} />;
 			});
 		}
 
-		if (!this.state.filters) {
-			filters = spinner;
-		} else if(isEmptyObject(this.state.filters)) {
-			pipes = <p>Noch keine Daten</p>;
-		} else {
-			filters = Object.keys(this.state.filters).map(id => {
+		if(filters instanceof Error) {
+			filterContent = <p>Verbindungs-Fehler</p>;
+		} else
+		if (filters !== null) {
+			filterContent = Object.keys(filters).map(id => {
 				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_FILTER} />;
 			});
 		}
 
-		if (!this.state.complexFilters) {
-			complexFilters = spinner;
-		} else if(isEmptyObject(this.state.complexFilters)) {
-			complexFilters = <p>Noch keine Daten</p>;
-		} else {
-			complexFilters = [];
+		if(complexFilters instanceof Error) {
+			complexFilterContent = <p>Verbindungs-Fehler</p>;
+		} else
+		if (complexFilters !== null) {
+			complexFilterContent = [];
 		}
 
 		return (
 			<div className="m-repository-pane">
 				<div className="pipe-repository">
 					<h3>Pipes</h3>
-					{pipes}
+					{pipeContent}
 				</div>
 				<div className="filter-repository">
 					<h3>Filter</h3>
-					{filters}
+					{filterContent}
 				</div>
 				<div className="complex-filter-repository">
 					<h3>Komplexe Filter</h3>
-					{complexFilters}
+					{complexFilterContent}
 				</div>
 			</div>
 		);
