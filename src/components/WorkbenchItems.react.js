@@ -33,7 +33,7 @@ var WorkbenchItems = React.createClass({
 		var items = [];
 
 		this.state.items.forEach((item, itemId) => {
-			// The Vector could contain some `null` or `undefined` elements because of deleted items
+			// The Vector could be sparse after elements have been deleted from it
 			if (!item) { return; }
 
 			var frame = WorkbenchStore.getItemPosition(itemId);

@@ -121,8 +121,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	 * returns an immutable.Sequence
 	 */
 	getAllItemIds() {
-		// Filter out undefined items (the Vector becomes sparse after
-		// there have been deleted items)
+		// The Vector could be sparse after elements have been deleted from it
 		return data.get('items').toKeyedSeq().filter(Boolean).keySeq();
 	},
 
@@ -134,14 +133,11 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	},
 
 	/**
-	 * returns an immutable.Set
+	 * returns an immutable.Sequence
 	 */
 	getItemsCoveredBy(rect) {
-		return data.get('items')
-			.toMap()
-			.filter(f => f && rect.intersectsRect(f.get('rect')))
-			.keySeq()
-			.toSet();
+		// The Vector could be sparse after elements have been deleted from it
+		return data.get('items').toKeyedSeq().filter(item => item && item.get('rect').intersectsRect(rect)).keySeq();
 	},
 
 	/**

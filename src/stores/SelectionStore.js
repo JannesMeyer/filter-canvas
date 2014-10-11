@@ -94,7 +94,7 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 			// Find itemsInsideSelection
 			lastPos = startScrollPos.add(action.mousePos);
 			var rect = SelectionStore.getSelectionRect();
-			itemsInsideSelection = WorkbenchStore.getItemsCoveredBy(rect);
+			itemsInsideSelection = WorkbenchStore.getItemsCoveredBy(rect).toSet();
 			SelectionStore.emitChange();
 		break;
 
