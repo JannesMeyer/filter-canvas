@@ -29,23 +29,23 @@ var config = {
 		loaders: [
 			{
 				test: /\.react\.js$/,
-				loaders: ['strict-loader', 'jsx-loader?harmony&insertPragma=React.DOM'],
+				loaders: ['strict', 'jsx?harmony&insertPragma=React.DOM'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
 			{
 				test: /\.js$/,
-				loaders: ['strict-loader', 'jsx-loader?harmony'],
+				loaders: ['strict', 'jsx?harmony'],
 				include: [ paths.main ],
 				exclude: [ paths.modules ]
 			},
 			{
 				test: /\.css$/,
-				loaders: ['style-loader', 'css-loader', 'autoprefixer-loader']
+				loaders: ['style', 'css', 'autoprefixer']
 			},
 			{
 				test: /\.styl$/,
-				loaders: ['style-loader', 'css-loader', 'autoprefixer-loader', 'stylus-loader']
+				loaders: ['style', 'css', 'autoprefixer', 'stylus']
 			}
 		]
 	},
@@ -74,7 +74,7 @@ if ('production' === process.env.NODE_ENV) {
 	// Hot module replacement in development
 	config.entry.unshift('webpack/hot/dev-server');
 	config.plugins.push(new webpack.HotModuleReplacementPlugin());
-	config.module.loaders[0].loaders.unshift('react-hot-loader');
+	config.module.loaders[0].loaders.unshift('react-hot');
 }
 
 module.exports = config;

@@ -33,20 +33,17 @@ var WorkbenchItems = React.createClass({
 		var items = [];
 
 		this.state.items.forEach((item, itemId) => {
-			// The Vector could be contain some `null` elements because of deleted items.
-			// And the immutable library tries to iterate over `null` values.
-			if (!item) {
-				return;
-			}
+			// The Vector could contain some `null` or `undefined` elements because of deleted items
+			if (!item) { return; }
+
 			var frame = WorkbenchStore.getItemPosition(itemId);
 			var isSelected = SelectionStore.isItemSelected(itemId);
 			items.push(<WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />);
 
 			// Any outputs connected?
 			item.get('outputs').forEach((to, outputId) => {
-				if (!to) {
-					return;
-				}
+				if (!to) { return; }
+
 				// The "address" of the target connector
 				var from = Vector(itemId, 1, outputId);
 

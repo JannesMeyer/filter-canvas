@@ -42,15 +42,6 @@ function makeArray(n, value) {
 	return arr;
 }
 
-function fixSparseVector(vector) {
-	return vector.withMutations(items => {
-		items.forEach((item, index) => {
-			if (item) { return; }
-			items.remove(index);
-		});
-	});
-}
-
 
 
 
@@ -121,6 +112,8 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	 * returns an immutable.Vector
 	 */
 	getAllItems() {
+		// Doesn't filter out undefined items
+		// (because it would be impossible without converting to a Map)
 		return data.get('items');
 	},
 
@@ -128,7 +121,9 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	 * returns an immutable.Sequence
 	 */
 	getAllItemIds() {
-		return data.get('items').keySeq();
+		// Filter out undefined items (the Vector becomes sparse after
+		// there have been deleted items)
+		return data.get('items').toKeyedSeq().filter(Boolean).keySeq();
 	},
 
 	/**
@@ -714,18 +709,13 @@ if (window.localStorage && localStorage.dataBackup) {
 	try {
 		var obj = JSON.parse(localStorage.dataBackup);
 
-		// Restore the ImmutableRect objects, and remove other indexes
+		// Restore the ImmutableRect objects
 		obj.items.forEach((item, itemId) => {
 			if (item) {
 				item.rect = Rect.fromObject(item.rect);
-			} else {
-				delete obj.items[itemId];
 			}
 		});
 
-		// console.log(obj.items);
-
-		// Restore the other immutable objects
 		data = immutable.fromJS(obj);
 	} catch (e) {
 		// Start with an empty canvas
