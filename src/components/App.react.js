@@ -13,21 +13,24 @@ var Actions = require('./Actions.react');
 var App = React.createClass({
 
 	handleMouseMove(ev) {
+		var x = ev.clientX;
+		var y = ev.clientY;
+
 		// Update item positions
 		if (WorkbenchStore.isDragging()) {
-			var mousePos = new Point(ev.clientX, ev.clientY);
+			var mousePos = new Point(x, y);
 			AppActions.moveSelectedItems(mousePos);
 		} else
 
 		// Update selection rectangle size
 		if (SelectionStore.isSelecting()) {
-			var mousePos = new Point(ev.clientX, ev.clientY);
+			var mousePos = new Point(x, y);
 			AppActions.resizeSelection(mousePos);
 		} else
 
 		// Update temporary wire
 		if (CreateConnectionStore.isDragging()) {
-			var absMousePos = WorkbenchStore.getScrollOffset().addValues(ev.clientX, ev.clientY);
+			var absMousePos = WorkbenchStore.getScrollOffset().addValues(x, y);
 			AppActions.resizeConnection(absMousePos);
 		}
 	},
@@ -35,9 +38,12 @@ var App = React.createClass({
 	handleMouseUp(ev) {
 		if (ev.button !== 0) { return; }
 
+		var x = ev.clientX;
+		var y = ev.clientY;
+
 		// Finish selection
 		if (WorkbenchStore.isDragging()) {
-			var mousePos = new Point(ev.clientX, ev.clientY);
+			var mousePos = new Point(x, y);
 			AppActions.finishMovingSelectedItems(mousePos);
 		} else
 
@@ -48,7 +54,7 @@ var App = React.createClass({
 
 		// Create a connection between an input and an output
 		if (CreateConnectionStore.isDragging()) {
-			var absMousePos = WorkbenchStore.getScrollOffset().addValues(ev.clientX, ev.clientY);
+			var absMousePos = WorkbenchStore.getScrollOffset().addValues(x, y);
 			AppActions.finishConnection(absMousePos);
 		}
 	},
