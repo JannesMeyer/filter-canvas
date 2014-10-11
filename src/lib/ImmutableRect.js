@@ -78,6 +78,15 @@ class Rect {
 		       this.y + this.height > other.y;
 	}
 	/**
+	 * Test whether the point lies within the Rect
+	 */
+	containsPoint(point) {
+		return this.x               < point.x &&
+           this.x + this.width  > point.x &&
+           this.y               < point.y &&
+           this.y + this.height > point.y;
+	}
+	/**
 	 * Calculates the length of the diagonal
 	 */
 	getDiagonalLength() {

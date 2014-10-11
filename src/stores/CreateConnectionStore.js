@@ -7,12 +7,16 @@ var Constants = require('../flux/Constants');
 
 // Data
 var isDragging = false;
-var eligibleConnectors = [];
-var connectorFrames = [];
-var mouseOverConnector = null;
-var address = null;
+var eligibleConnectors;
+var connectorFrames;
+var mouseOverConnector;
+var address;
 var origin;
 var lastPos;
+
+function isFalsy(obj) {
+	return !Boolean(obj);
+}
 
 /**
  * CreateConnectionStore single object
@@ -25,22 +29,17 @@ var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 	},
 
 	isEligibleTarget(address) {
-		for (var i = 0; i < eligibleConnectors.length; i++) {
-			var connector = eligibleConnectors[i];
-			if (connector.get(0) === address.get(0) &&
-			    connector.get(1) === address.get(1) &&
-			    connector.get(2) === address.get(2)) {
-				return true;
-			}
-		}
-		return false;
+		if (!eligibleConnectors) { return false; }
+
+		// Relies on the use of .equals() instead of pointer comparison
+		return eligibleConnectors.contains(address);
 	},
 
 	isMouseOver(address) {
-		return mouseOverConnector &&
-			mouseOverConnector.get(0) === address.get(0) &&
-			mouseOverConnector.get(1) === address.get(1) &&
-			mouseOverConnector.get(2) === address.get(2);
+		if (!mouseOverConnector) { return false; }
+
+		// Relies on the use of .equals() instead of pointer comparison
+		return mouseOverConnector.equals(address);
 	},
 
 	isComplete() {
@@ -69,9 +68,7 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 		case Constants.START_CONNECTION:
 			address = immutable.Vector.from(action.connector);
 			var isOutput = address.get(1);
-
-			var item = WorkbenchStore.getItem(address.get(0));
-			var type = item.get('type');
+			var sourceType = WorkbenchStore.getItem(address.get(0)).get('type');
 
 			origin = WorkbenchStore.getConnectorPosition(address);
 			// TODO: workbenchlayout (linewidth/2)
@@ -80,55 +77,51 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 			isDragging = true;
 
 			// Find eligible target connectors
-			// TODO: use flatMap() here as soon as the new version of immutable comes out
-			eligibleConnectors = [];
-			connectorFrames = [];
-			WorkbenchStore.getAllItems().forEach((item, itemId) => {
-				// The Vector could be sparse after elements have been deleted from it
-				if (!item) { return; }
-
-				// Find opposites
-				if (type === item.get('type')) { return; }
-
-				item.get(isOutput ? 'inputs' : 'outputs').forEach((connectedTo, connectorId) => {
-					if (connectedTo) {
-						return;
-					}
-					eligibleConnectors.push(Vector(itemId, Number(!isOutput), connectorId));
-				});
-			});
+			// The items have to be of opposite types (filter-pipe or pipe-filter)
+			eligibleConnectors = WorkbenchStore.getAllItems()
+				.toKeyedSeq()
+				.filter(item => item && item.get('type') !== sourceType)
+				.flatMap((item, itemId) => {
+					// Get all unconnected connectors' addresses
+					return item.get(isOutput ? 'inputs' : 'outputs')
+						.toKeyedSeq()
+						.filter(isFalsy)
+						.keySeq()
+						.map(connectorId => Vector(itemId, Number(!isOutput), connectorId));
+				})
+				// TODO: it might be a bug in the library that we have to use valueSeq() after flattening
+				.valueSeq()
+				.cacheResult();
 
 			connectorFrames = eligibleConnectors.map(address => {
-				var pos = WorkbenchStore.getConnectorPosition(address);
-				// TODO: put this into wblayout
-				// TODO: use CGRect stuff
-				var wireWidth = 8;
-				return new Rect(pos.x - 6, pos.y - 2 - 4, 12+12, 8 + 4);
-			});
+					var pos = WorkbenchStore.getConnectorPosition(address);
+					// TODO: put this into wblayout
+					// TODO: use CGRect stuff
+					// TODO: workbenchlayout (linewidth/2)
+					var wireWidth = 8;
+					// TODO: make sure that these never overlap
+					return new Rect(pos.x - 6, pos.y - 2 - 4 - 4, 12+12, 8 + 6);
+				})
+				.cacheResult();
 
 			CreateConnectionStore.emitChange();
 		break;
 
 		case Constants.RESIZE_CONNECTION:
-			// TODO: workbenchlayout (linewidth/2)
-			action.absMousePos.y -= 4;
 			lastPos = action.absMousePos;
-			// TODO: put this in WorkbenchLayout
-			// TODO: use a rect function for the collision check
 
-			mouseOverConnector = null;
-			connectorFrames.forEach((frame, id) => {
-				var check = frame.x < lastPos.x &&
-				            frame.x + frame.width > lastPos.x &&
-				            frame.y < lastPos.y &&
-				            frame.y + frame.height > lastPos.y;
-				if (mouseOverConnector !== null) {
-					console.warn('double match');
-				}
-				if (check) {
-					mouseOverConnector = eligibleConnectors[id];
-				}
-			});
+			var id = connectorFrames.findKey(f => f.containsPoint(lastPos));
+			if (id !== undefined) {
+				mouseOverConnector = eligibleConnectors.get(id);
+			} else {
+				mouseOverConnector = null;
+			}
+
+			// Helper code to make sure that none of the frames overlap
+			// var count = connectorFrames.count(f => f.containsPoint(lastPos));
+			// if (count > 1) {
+			// 	console.warn('Double match');
+			// }
 
 			CreateConnectionStore.emitChange();
 		break;
@@ -136,8 +129,8 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 		case Constants.FINISH_CONNECTION:
 		case Constants.CANCEL_CONNECTION:
 			isDragging = false;
-			eligibleConnectors = [];
-			connectorFrames = [];
+			eligibleConnectors = null;
+			connectorFrames = null;
 			mouseOverConnector = null;
 			CreateConnectionStore.emitChange();
 		break;
