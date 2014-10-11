@@ -21,8 +21,24 @@ var RepositoryStore = BaseStore.createEventEmitter(['change'], {
 		return pipes;
 	},
 
+	getPipe(id) {
+		var pipe = pipes[id];
+		if (pipe instanceof Error) {
+			return;
+		}
+		return pipe;
+	},
+
 	getAllFilters() {
 		return filters;
+	},
+
+	getFilter(id) {
+		var filter = filters[id];
+		if (filter instanceof Error) {
+			return;
+		}
+		return filter;
 	},
 
 	getAllComplexFilters() {
