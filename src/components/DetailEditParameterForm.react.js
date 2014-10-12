@@ -1,6 +1,5 @@
 var { Set } = require('immutable');
 var AppActions = require('../flux/AppActions');
-var WorkbenchStore = require('../stores/WorkbenchStore');
 
 function isEmptyObject(obj) {
 	for (var name in obj) {
@@ -16,9 +15,11 @@ var EditParameterForm = React.createClass({
 			changed: this.props.newParameter.keySeq().toSet()
 		};
 	},
+
 	componentWillReceiveProps(nextProps) {
-		this.setState({ changed: nextProps.newParameter.keySeq().toSet() });
+		this.setState({ changed: Set() });
 	},
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.item !== nextProps.item ||
 		       this.state.changed !== nextState.changed;
@@ -123,7 +124,6 @@ var EditParameterForm = React.createClass({
 	},
 
 	render() {
-		console.log('Render EditParameterForm');
 		var item = this.props.item;
 		var changed = this.state.changed;
 
