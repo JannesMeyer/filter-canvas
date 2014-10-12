@@ -3,8 +3,9 @@ var BaseStore = require('../lib/BaseStore');
 var Dispatcher = require('../flux/Dispatcher');
 var Constants = require('../flux/Constants');
 
-// TODO: don't hardcode this URL
-var serverURL = 'http://127.0.0.1:5984';
+// TODO: make this URL configurable
+// var serverURL = 'http://10.211.55.2:5984';
+var serverURL = 'http://localhost:5984';
 
 // Backed by AJAX requests to CouchDB
 var pipes = {};
@@ -23,9 +24,7 @@ var RepositoryStore = BaseStore.createEventEmitter(['change'], {
 
 	getPipe(id) {
 		var pipe = pipes[id];
-		if (pipe instanceof Error) {
-			return;
-		}
+		if (pipe instanceof Error) { return; }
 		return pipe;
 	},
 
@@ -35,9 +34,7 @@ var RepositoryStore = BaseStore.createEventEmitter(['change'], {
 
 	getFilter(id) {
 		var filter = filters[id];
-		if (filter instanceof Error) {
-			return;
-		}
+		if (filter instanceof Error) { return; }
 		return filter;
 	},
 

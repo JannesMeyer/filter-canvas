@@ -7,6 +7,8 @@ module.exports = keyMirror({
 	UNDO: null,
 	REDO: null,
 	CREATE_ITEM: null,
+	SET_ITEM_INPUTS: null,
+	SET_ITEM_OUTPUTS: null,
 	SET_ITEM_PARAMS: null,
 	REMOVE_ITEM_PARAM: null,
 	SELECT_ALL: null,

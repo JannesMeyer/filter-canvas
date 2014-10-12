@@ -3,13 +3,6 @@ var AppActions = require('../flux/AppActions');
 var RepositoryStore = require('../stores/RepositoryStore');
 var RepositoryItem = require('./RepositoryItem.react');
 
-function isEmptyObject(obj) {
-	for (var name in obj) {
-		return false;
-	}
-	return true;
-}
-
 var RepositoryPane = React.createClass({
 
 	getInitialState() {

@@ -349,65 +349,67 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			}
 		break;
 
+		case Constants.SET_ITEM_INPUTS:
+		case Constants.SET_ITEM_OUTPUTS:
+			var item = data.getIn(['items', action.id]);
+			var numInputs = item.get('inputs').length;
+			var numOutputs = item.get('outputs').length;
+
+			var deltaInputs = 0;
+			var deltaOutputs = 0;
+
+			if (action.numInputs > 0) {
+				// Join pipe
+				deltaInputs = action.numInputs - numInputs;
+			}
+			if (item.get('variableInputs') && item.get('variableOutputs')) {
+				// Forward pipe
+				deltaOutputs = deltaInputs;
+			}
+			if (action.numOutputs > 0) {
+				// Split pipe
+				deltaOutputs = action.numOutputs - numOutputs;
+			}
+			// TODO: delete connector offset cache
+
+			setData(data.withMutations(data => {
+				// Inputs
+				data.updateIn(['items', action.id, 'inputs'], inputs => inputs.withMutations(inputs => {
+					for (; deltaInputs > 0; --deltaInputs) {
+						inputs.push(undefined);
+					}
+					for (; deltaInputs < 0; ++deltaInputs) {
+						if (inputs.last()) {
+							// TODO: delete connection
+							console.log('we have to delete a connection here');
+						}
+						inputs.pop();
+					}
+				}));
+
+				// Outputs
+				data.updateIn(['items', action.id, 'outputs'], outputs => outputs.withMutations(outputs => {
+					for (; deltaOutputs > 0; --deltaOutputs) {
+						outputs.push(undefined);
+					}
+					for (; deltaOutputs < 0; ++deltaOutputs) {
+						if (outputs.last()) {
+							// TODO: delete connection
+							console.log('we have to delete a connection here');
+						}
+						outputs.pop();
+					}
+				}));
+			}));
+
+			// TODO: rename this to something more appropriate
+			WorkbenchStore.emitParamChange();
+		break;
+
 		case Constants.SET_ITEM_PARAMS:
 			var id = action.id;
 			var params = action.params;
-			var item = data.getIn(['items', id]);
-			// TODO: delete connections when decreasing the number of connectors
-			setData(data.withMutations(data => {
-				data.updateIn(['items', id, 'parameter'], params => params.merge(action.params));
-
-				// Adjust the number of inputs / outputs
-
-
-				if (item.get('type') === Constants.ITEM_TYPE_PIPE) {
-					var numInputs = item.get('inputs').length;
-					var numOutputs = item.get('outputs').length;
-
-					var deltaInputs = 0;
-					var deltaOutputs = 0;
-
-					if (params.cardinality && params.cardinality > 0) {
-						deltaInputs = params.cardinality - numInputs;
-						deltaOutputs = params.cardinality - numOutputs;
-					} else if (params.inputs && params.inputs > 0) {
-						deltaInputs = params.inputs - numInputs;
-					} else if (params.outputs && params.outputs > 0) {
-						deltaOutputs = params.outputs - numOutputs;
-					}
-
-					// TODO: introduce attributes: variableInputs, variableOutputs
-					// TODO: delete connector offset cache
-
-					// Inputs
-					data.updateIn(['items', id, 'inputs'], inputs => inputs.withMutations(inputs => {
-						for (; deltaInputs > 0; --deltaInputs) {
-							inputs.push(undefined);
-						}
-						for (; deltaInputs < 0; ++deltaInputs) {
-							if (inputs.last()) {
-								// TODO: delete connection
-								console.log('we have to delete a connection here');
-							}
-							inputs.pop();
-						}
-					}));
-
-					// Outputs
-					data.updateIn(['items', id, 'outputs'], outputs => outputs.withMutations(outputs => {
-						for (; deltaOutputs > 0; --deltaOutputs) {
-							outputs.push(undefined);
-						}
-						for (; deltaOutputs < 0; ++deltaOutputs) {
-							if (outputs.last()) {
-								// TODO: delete connection
-								console.log('we have to delete a connection here');
-							}
-							outputs.pop();
-						}
-					}));
-				}
-			}));
+			setData(data.updateIn(['items', id, 'parameter'], params => params.merge(action.params)));
 			WorkbenchStore.emitParamChange();
 		break;
 
@@ -613,57 +615,39 @@ function importFile(obj) {
 	return data.updateIn(['items'], _ => immutable.fromJS(items));
 }
 
-function addFilter(name, pos, params) {
-	var baseFilter = RepositoryStore.getFilter(name);
-	if (!baseFilter) {
+function addFilter(name, position, parameter) {
+	var f = RepositoryStore.getFilter(name);
+	if (!f) {
 		throw new Error('The filter class doesn\'t exist');
 	}
-
-	var inputs = baseFilter.inputs;
-	var outputs = baseFilter.outputs;
-	var parameter = merge(baseFilter.parameter, params);
 
 	var item = Map({
 		type: Constants.ITEM_TYPE_FILTER,
 		class: name,
-		inputs: Vector.from(new Array(inputs)),
-		outputs: Vector.from(new Array(outputs)),
-		parameter: Map(parameter),
-		rect: WorkbenchLayout.getFilterFrame(pos.x, pos.y, name, inputs, outputs)
+		inputs: Vector().setLength(f.inputs),
+		outputs: Vector().setLength(f.outputs),
+		parameter: Map(f.parameter).merge(parameter),
+		rect: WorkbenchLayout.getFilterFrame(position.x, position.y, name, f.inputs, f.outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
 }
 
-function addPipe(name, pos, params) {
-	var basePipe = RepositoryStore.getPipe(name);
-	if (!basePipe) {
+function addPipe(name, position, parameter) {
+	var p = RepositoryStore.getPipe(name);
+	if (!p) {
 		throw new Error('The pipe class doesn\'t exist');
 	}
-	var inputs = basePipe.inputs || 0;
-	var outputs = basePipe.outputs || 0;
-	var parameter = merge(basePipe.parameter, params);
-	// JoinPipe
-	if (parameter.inputs !== undefined) {
-		inputs += parameter.inputs;
-	}
-	// SplitPipe
-	if (parameter.outputs !== undefined) {
-		outputs += parameter.outputs;
-	}
-	// ForwardPipe
-	if (parameter.cardinality !== undefined) {
-		inputs += parameter.cardinality;
-		outputs += parameter.cardinality;
-	}
-
 	var item = Map({
 		type: Constants.ITEM_TYPE_PIPE,
 		class: name,
-		// inputs: immutable.Range(0, inputs).map(val => null).toVector(),
-		inputs: Vector.from(new Array(inputs)),
-		outputs: Vector.from(new Array(outputs)),
-		parameter: Map(parameter),
-		rect: WorkbenchLayout.getPipeFrame(pos.x, pos.y, name, inputs, outputs)
+		inputs: Vector().setLength(p.inputs),
+		outputs: Vector().setLength(p.outputs),
+		minInputs: p.inputs,
+		minOutputs: p.outputs,
+		variableInputs: Boolean(p.variableInputs),
+		variableOutputs: Boolean(p.variableOutputs),
+		parameter: Map(p.parameter).merge(parameter),
+		rect: WorkbenchLayout.getPipeFrame(position.x, position.y, name, p.inputs, p.outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
 }

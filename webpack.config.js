@@ -3,41 +3,36 @@
 var webpack = require('webpack');
 var path = require('path');
 
+// Helper function to convert relative paths to absolute ones
 var getAbsolutePath = path.join.bind(path, __dirname);
-var paths = {
-	main: getAbsolutePath(),
-	modules: getAbsolutePath('node_modules'),
-	entryScript: getAbsolutePath('src', 'main.js'),
-	publicScripts: getAbsolutePath('public', 'javascripts')
-};
 
 var config = {
 	cache: true,
-	entry: [ paths.entryScript ],
+	entry: [
+		getAbsolutePath('src', 'main.js')
+	],
 	output: {
-		path: paths.publicScripts,
+		path: getAbsolutePath('public', 'javascripts'),
 		filename: '[name].bundle.js',
 		publicPath: '/javascripts/'
 	},
 	watchDelay: 50,
 	plugins: [
-		new webpack.ProvidePlugin({
-			'React': 'react'
-		})
+		new webpack.ProvidePlugin({ 'React': 'react' })
 	],
 	module: {
 		loaders: [
 			{
 				test: /\.react\.js$/,
 				loaders: ['strict', 'jsx?harmony&insertPragma=React.DOM'],
-				include: [ paths.main ],
-				exclude: [ paths.modules ]
+				include: [ getAbsolutePath() ],
+				exclude: [ getAbsolutePath('node_modules') ]
 			},
 			{
 				test: /\.js$/,
 				loaders: ['strict', 'jsx?harmony'],
-				include: [ paths.main ],
-				exclude: [ paths.modules ]
+				include: [ getAbsolutePath() ],
+				exclude: [ getAbsolutePath('node_modules') ]
 			},
 			{
 				test: /\.css$/,
@@ -54,11 +49,10 @@ var config = {
 	}
 };
 
+// Do an optimized build for production
 if ('production' === process.env.NODE_ENV) {
-	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
-	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
-	var options = {
-		// Regex that never matches
+	var uglifyOptions = {
+		// This is a regex that never matches so that all comments get deleted
 		comments: / ^/,
 		mangle: {
 			sort: true
@@ -69,9 +63,11 @@ if ('production' === process.env.NODE_ENV) {
 			warnings: false
 		}
 	};
-	config.plugins.push(new webpack.optimize.UglifyJsPlugin(options));
+	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
+	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
+	config.plugins.push(new webpack.optimize.UglifyJsPlugin(uglifyOptions));
 } else {
-	// Hot module replacement in development
+	// Hot module replacement (automatic reloading) in development
 	config.entry.unshift('webpack/hot/dev-server');
 	config.plugins.push(new webpack.HotModuleReplacementPlugin());
 	config.module.loaders[0].loaders.unshift('react-hot');

@@ -193,7 +193,7 @@ html, body, .m-app, .m-container
 	height: 40%
 	overflow: auto
 
-	> h3
+	h3
 		font-size: 1.1em
 		margin-top: 0
 		margin-bottom: 12px
@@ -208,6 +208,8 @@ html, body, .m-app, .m-container
 		> label > input
 			display: inline-block
 			float: right
+		> label.changed
+			background: #c5e7ff
 
 	#newParameterDialog
 		> input
@@ -219,22 +221,19 @@ html, body, .m-app, .m-container
 		> label > input
 			margin-right: 5px
 
-	.actions
-		margin-top: 12px
+	button
+		display: block
+		width: 100%
+		background: #e7e7e7
+		border: 0
+		margin-top: 5px
+		margin-bottom: 5px
+		padding: 5px
 
-		button
-			display: block
-			width: 100%
-			background: #e7e7e7
-			border: 0
-			margin-top: 5px
-			margin-bottom: 5px
-			padding: 5px
-
-		button.red-button
-			background: #f22
-			color: #fff
-			font-weight: bold
+	button.red-button
+		background: #f22
+		color: #fff
+		font-weight: bold
 
 
 // Third-party spinner styles

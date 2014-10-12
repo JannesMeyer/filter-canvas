@@ -71,6 +71,14 @@ var AppActions = {
 		Dispatcher.dispatch({ actionType: Constants.CREATE_ITEM, type, id, position });
 	},
 
+	setItemInputs(id, numInputs) {
+		Dispatcher.dispatch({ actionType: Constants.SET_ITEM_INPUTS, id, numInputs });
+	},
+
+	setItemOutputs(id, numOutputs) {
+		Dispatcher.dispatch({ actionType: Constants.SET_ITEM_OUTPUTS, id, numOutputs });
+	},
+
 	setItemParams(id, params) {
 		Dispatcher.dispatch({ actionType: Constants.SET_ITEM_PARAMS, id, params });
 	},

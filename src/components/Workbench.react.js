@@ -22,12 +22,13 @@ var Workbench = React.createClass({
 	 */
 	handleDrop(ev) {
 		// Get data
-		var data = JSON.parse(ev.dataTransfer.getData('application/json'));
+		var data = JSON.parse(ev.dataTransfer.getData('Text'));
 
 		// Create item
 		var position = this.getScrollOffset()
+			//.addValues(window.pageXOffset, window.pageYOffset)
 			.addValues(ev.clientX, ev.clientY)
-			.subtractValues(data.clickX, data.clickY);
+			.subtractValues(data.x, data.y);
 		AppActions.createItem(data.type, data.id, position);
 
 		ev.stopPropagation(); // Stops some browsers from redirecting
