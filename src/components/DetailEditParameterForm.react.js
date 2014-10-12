@@ -13,21 +13,23 @@ var EditParameterForm = React.createClass({
 
 	getInitialState() {
 		return {
-			changed: Set()
+			changed: this.props.newParameter.keySeq().toSet()
 		};
 	},
 	componentWillReceiveProps(nextProps) {
-		this.setState({ changed: Set() });
-	},
-	componentDidMount() {
-		WorkbenchStore.addParamChangeListener(this._handleChange);
-	},
-	componentWillUnmount() {
-		WorkbenchStore.removeParamChangeListener(this._handleChange);
+		this.setState({ changed: nextProps.newParameter.keySeq().toSet() });
 	},
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.id !== nextProps.id ||
 		       this.state.changed !== nextState.changed;
+	},
+
+	componentDidMount() {
+		// After a new parameter has been created, focus
+		var lastKey = this.props.newParameter.keySeq().last();
+		if (lastKey) {
+			this.refs[lastKey].getDOMNode().focus();
+		}
 	},
 
 	/**
@@ -110,66 +112,42 @@ var EditParameterForm = React.createClass({
 		var onKeyDown = this.handleKeyDown.bind(this, key);
 		switch(typeof value) {
 			case 'boolean':
-			return <input
-					ref={key}
-					type="checkbox"
-					defaultChecked={value}
-					onChange={onChange}
-					onKeyDown={onKeyDown} />;
+			return <input ref={key} type="checkbox" defaultChecked={value} onChange={onChange} onKeyDown={onKeyDown} />;
 
 			case 'number':
-			return <input
-					ref={key}
-					type="number"
-					defaultValue={value}
-					step="any"
-					onChange={onChange}
-					onKeyDown={onKeyDown} />;
+			return <input ref={key} type="number" defaultValue={value} step="any" onChange={onChange} onKeyDown={onKeyDown} />;
 
 			default:
-			return <input
-				ref={key}
-				type="text"
-				defaultValue={value}
-				onChange={onChange}
-				onKeyDown={onKeyDown} />;
+			return <input ref={key} type="text" defaultValue={value} onChange={onChange} onKeyDown={onKeyDown} />;
 		}
 	},
 
 	render() {
-		var item = WorkbenchStore.getItem(this.props.id);
+		console.log('Render EditParameterForm');
+		var item = this.props.item;
 		var changed = this.state.changed;
 
+		// Forward/Join pipe
 		if (item.get('variableInputs')) {
-			// Forward/Join pipe
 			var k = 'inputs';
 			var v = item.get('inputs').length;
-			var inputs =
-				<label className={changed.has(k) ? 'changed' : ''}>
-					<span>{k}</span>
-					<input type="number"
-						ref={k}
-						defaultValue={v}
-						min={item.get('minInputs')}
-						onChange={this.handleChange.bind(this, k)} />
-				</label>;
-		} else if (item.get('variableOutputs')) {
-			// Split pipe
+			var min = item.get('minInputs');
+			var classes = changed.has(k) ? 'changed' : '';
+			var inputs = <label className={classes}><span>{k}</span><input type="number" ref={k} defaultValue={v} min={min} onChange={this.handleChange.bind(this, k)} /></label>;
+		} else
+
+		// Split pipe
+		if (item.get('variableOutputs')) {
 			var k = 'outputs';
 			var v = item.get('outputs').length;
-			var outputs =
-				<label className={changed.has(k) ? 'changed' : ''}>
-					<span>{k}</span>
-					<input type="number"
-						ref={k}
-						defaultValue={v}
-						min={item.get('minOutputs')}
-						onChange={this.handleChange.bind(this, k)} />
-				</label>;
+			var min = item.get('minOutputs');
+			var classes = changed.has(k) ? 'changed' : '';
+			var outputs = <label className={classes}><span>{k}</span><input type="number" ref={k} defaultValue={v} min={min} onChange={this.handleChange.bind(this, k)} /></label>;
 		}
 
 		// Show all parameters. Select the input element that fits the data type.
 		var params = item.get('parameter')
+			.merge(this.props.newParameter)
 			.sortBy((v, k) => k)
 			.map((v, k) =>
 				<label key={k} className={changed.has(k) ? 'changed' : ''}>
@@ -193,11 +171,13 @@ var EditParameterForm = React.createClass({
 	 * Update values manually after selecting a different item
 	 */
 	componentDidUpdate(prevProps, prevState) {
-		// When the item has changed or when the form was submitted
+		console.log('componentDidUpdate');
+		// When the item has changed or when the form was submitted, we manually
+		// update all the values
 		if (prevProps.id !== this.props.id ||
 			  prevProps.changed !== this.state.changed && this.state.changed.length === 0) {
-
-			var item = WorkbenchStore.getItem(this.props.id);
+			var item = this.props.item;
+			// TODO: undo/redo
 
 			// Forward/Join pipe
 			if (item.get('variableInputs')) {
@@ -219,10 +199,6 @@ var EditParameterForm = React.createClass({
 				input[type === 'checkbox' ? 'defaultChecked' : 'defaultValue'] = value;
 			});
 		}
-	},
-
-	_handleChange() {
-		this.replaceState(this.getInitialState());
 	}
 
 });

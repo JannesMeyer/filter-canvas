@@ -370,7 +370,11 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 				// Split pipe
 				deltaOutputs = action.numOutputs - numOutputs;
 			}
-			// TODO: delete connector offset cache
+
+			// Only continue if there are actually some changes outstanding
+			if (deltaInputs === 0 && deltaOutputs === 0) {
+				break;
+			}
 
 			setData(data.withMutations(data => {
 				// Inputs
@@ -401,6 +405,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 					}
 				}));
 			}));
+
+			// Reset connector offset cache
+			connectorOffsets = {};
 
 			// TODO: rename this to something more appropriate
 			WorkbenchStore.emitParamChange();

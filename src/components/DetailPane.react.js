@@ -1,5 +1,7 @@
+var { OrderedMap } = require('immutable');
 var AppActions = require('../flux/AppActions');
 var SelectionStore = require('../stores/SelectionStore');
+var WorkbenchStore = require('../stores/WorkbenchStore');
 var EditParameterForm = require('./DetailEditParameterForm.react');
 var NewParameterForm = require('./DetailNewParameterForm.react');
 
@@ -8,43 +10,40 @@ var DetailPane = React.createClass({
 	getInitialState() {
 		return {
 			selectedItems: SelectionStore.getSelectedItemIds(),
-			showNewParameterForm: false
+			showNewParameterForm: false,
+			newParameter: OrderedMap()
 		};
 	},
 	shouldComponentUpdate(nextProps, nextState) {
 		return !this.state.selectedItems.equals(nextState.selectedItems) ||
-		       this.state.showNewParameterForm !== nextState.showNewParameterForm;
+		       this.state.showNewParameterForm !== nextState.showNewParameterForm ||
+		       this.state.newParameter !== nextState.newParameter;
 	},
 	componentDidMount() {
 		SelectionStore.addChangeListener(this._handleChange);
+		WorkbenchStore.addParamChangeListener(this._handleChange);
 	},
 	componentWillUnmount() {
 		SelectionStore.removeChangeListener(this._handleChange);
+		WorkbenchStore.removeParamChangeListener(this._handleChange);
 	},
-	handleNewParameter() {
+	showNewParameterForm() {
 		this.setState({ showNewParameterForm: true });
 	},
-	handleNewParameterSubmit(ev) {
+	hideNewParameterForm() {
 		this.setState({ showNewParameterForm: false });
-		ev.preventDefault();
 	},
-	handleNewParameterCancel(ev) {
-		this.setState({ showNewParameterForm: false });
+	handleCreateParameter(key, value) {
+		this.setState({
+			showNewParameterForm: false,
+			newParameter: this.state.newParameter.set(key, value)
+		});
 	},
 
 	render() {
+		console.log('Render DetailPane');
 		var selectedItems = this.state.selectedItems;
 		var count = selectedItems.length;
-
-		if (this.state.showNewParameterForm) {
-			return (
-					<div className="m-detail-pane">
-						<NewParameterForm id={selectedItems.first()}
-							onSubmit={this.handleNewParameterSubmit}
-							onCancel={this.handleNewParameterCancel} />
-					</div>
-				);
-		}
 
 		// No items selected
 		if (count === 0) {
@@ -56,11 +55,24 @@ var DetailPane = React.createClass({
 		}
 
 		// Exactly one item selected
-		if (count === 1) {
+		if (this.state.showNewParameterForm) {
+			var itemId = selectedItems.first();
+			var item = WorkbenchStore.getItem(itemId);
 			return (
 				<div className="m-detail-pane">
-					<EditParameterForm id={selectedItems.first()}>
-						<button type="button" onClick={this.handleNewParameter}>Neuer Parameter</button>
+					<NewParameterForm id={itemId} item={item}
+						onCreateParameter={this.handleCreateParameter}
+						onCancel={this.hideNewParameterForm} />
+				</div>
+			);
+		}
+		if (count === 1) {
+			var itemId = selectedItems.first();
+			var item = WorkbenchStore.getItem(itemId);
+			return (
+				<div className="m-detail-pane">
+					<EditParameterForm id={itemId} item={item} newParameter={this.state.newParameter}>
+						<button type="button" onClick={this.showNewParameterForm}>Neuer Parameter</button>
 						<button type="button" onClick={AppActions.deleteSelectedItems} className="red-button">Element löschen</button>
 					</EditParameterForm>
 				</div>

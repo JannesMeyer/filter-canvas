@@ -4,8 +4,7 @@ var Dispatcher = require('../flux/Dispatcher');
 var Constants = require('../flux/Constants');
 
 // TODO: make this URL configurable
-// var serverURL = 'http://10.211.55.2:5984';
-var serverURL = 'http://localhost:5984';
+var serverURL = 'http://' + location.hostname + ':5984';
 
 // Backed by AJAX requests to CouchDB
 var pipes = {};
