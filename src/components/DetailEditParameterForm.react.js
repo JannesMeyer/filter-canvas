@@ -148,7 +148,7 @@ var EditParameterForm = React.createClass({
 		// Show all parameters. Select the input element that fits the data type.
 		var params = item.get('parameter')
 			.merge(this.props.newParameter)
-			.sortBy((v, k) => k)
+			.sortBy((v, k) => k.toLowerCase())
 			.map((v, k) =>
 				<label key={k} className={changed.has(k) ? 'changed' : ''}>
 					<span>{k}</span>
