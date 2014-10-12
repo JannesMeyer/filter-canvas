@@ -20,12 +20,12 @@ var EditParameterForm = React.createClass({
 		this.setState({ changed: nextProps.newParameter.keySeq().toSet() });
 	},
 	shouldComponentUpdate(nextProps, nextState) {
-		return this.props.id !== nextProps.id ||
+		return this.props.item !== nextProps.item ||
 		       this.state.changed !== nextState.changed;
 	},
 
 	componentDidMount() {
-		// After a new parameter has been created, focus
+		// After a new parameter has been created, focus its input
 		var lastKey = this.props.newParameter.keySeq().last();
 		if (lastKey) {
 			this.refs[lastKey].getDOMNode().focus();
@@ -36,15 +36,15 @@ var EditParameterForm = React.createClass({
 	 * Potentially deletes a parameter
 	 */
 	handleKeyDown(paramName, ev) {
-		// Backspace
-		if (ev.which === 8) {
-			var input = ev.target;
-			if (input.type === 'checkbox' || input.value === '') {
-				// TODO: this totally skips over all changes that haven't been saved yet
-				AppActions.removeItemParam(this.state.itemId, paramName);
-				ev.preventDefault();
-			}
-		}
+		// // Backspace
+		// if (ev.which === 8) {
+		// 	var input = ev.target;
+		// 	if (input.type === 'checkbox' || input.value === '') {
+		// 		// TODO: this totally skips over all changes that haven't been saved yet
+		// 		AppActions.removeItemParam(this.state.itemId, paramName);
+		// 		ev.preventDefault();
+		// 	}
+		// }
 	},
 
 	/**
@@ -171,13 +171,11 @@ var EditParameterForm = React.createClass({
 	 * Update values manually after selecting a different item
 	 */
 	componentDidUpdate(prevProps, prevState) {
-		console.log('componentDidUpdate');
-		// When the item has changed or when the form was submitted, we manually
-		// update all the values
-		if (prevProps.id !== this.props.id ||
-			  prevProps.changed !== this.state.changed && this.state.changed.length === 0) {
+		// When the item has changed, when the form was submitted or when the user did an
+		// undo/redo
+		if (prevProps.item !== this.props.item) {
+			// Manually update all the values
 			var item = this.props.item;
-			// TODO: undo/redo
 
 			// Forward/Join pipe
 			if (item.get('variableInputs')) {

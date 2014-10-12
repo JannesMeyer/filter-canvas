@@ -9,6 +9,7 @@ var DetailPane = React.createClass({
 
 	getInitialState() {
 		return {
+			items: WorkbenchStore.getAllItems(),
 			selectedItems: SelectionStore.getSelectedItemIds(),
 			showNewParameterForm: false,
 			newParameter: OrderedMap()
@@ -17,7 +18,8 @@ var DetailPane = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
 		return !this.state.selectedItems.equals(nextState.selectedItems) ||
 		       this.state.showNewParameterForm !== nextState.showNewParameterForm ||
-		       this.state.newParameter !== nextState.newParameter;
+		       this.state.newParameter !== nextState.newParameter ||
+		       this.state.items !== nextState.items;
 	},
 	componentDidMount() {
 		SelectionStore.addChangeListener(this._handleChange);
@@ -41,7 +43,6 @@ var DetailPane = React.createClass({
 	},
 
 	render() {
-		console.log('Render DetailPane');
 		var selectedItems = this.state.selectedItems;
 		var count = selectedItems.length;
 
