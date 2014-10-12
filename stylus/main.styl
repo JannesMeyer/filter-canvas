@@ -198,24 +198,24 @@ html, body, .m-app, .m-container
 		margin-top: 0
 		margin-bottom: 12px
 
-	#defaultDialog
+	.dialog-default
 		> label
 			display: block
 			clear: right
-			// transition: background 0.1s
+			margin-left: -8px
+			border-left: 6px solid transparent
+			padding-left: 2px
+			transition: border-left 0.15s
+		> label.changed
+			border-left-color: #5fb2ff
 		> label > span
 			display: inline-block
 			padding-top: 2px
 		> label > input
 			display: inline-block
 			float: right
-		> label.changed
-			border-left: 4px solid #5fb2ff
-			padding-left: 3px
-			margin-left: -7px
-			// background: #c5e7ff
 
-	#newParameterDialog
+	.dialog-new-parameter
 		> input
 			width: 100%
 		> label

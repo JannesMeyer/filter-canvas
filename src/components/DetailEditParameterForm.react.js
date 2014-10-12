@@ -36,16 +36,15 @@ var EditParameterForm = React.createClass({
 	/**
 	 * Potentially deletes a parameter
 	 */
-	handleKeyDown(paramName, ev) {
-		// // Backspace
-		// if (ev.which === 8) {
-		// 	var input = ev.target;
-		// 	if (input.type === 'checkbox' || input.value === '') {
-		// 		// TODO: this totally skips over all changes that haven't been saved yet
-		// 		AppActions.removeItemParam(this.state.itemId, paramName);
-		// 		ev.preventDefault();
-		// 	}
-		// }
+	handleKeyDown(key, ev) {
+		if (ev.which === 8) { // Backspace
+			var inputEl = ev.currentTarget;
+			if (inputEl.type === 'checkbox' || inputEl.value === '') {
+				// TODO: This erases all changes that haven't been saved yet
+				AppActions.removeItemParam(this.props.id, key);
+				ev.preventDefault();
+			}
+		}
 	},
 
 	/**
@@ -158,7 +157,7 @@ var EditParameterForm = React.createClass({
 			.toArray();
 
 		return (
-			<form id="defaultDialog" onSubmit={this.handleSubmit}>
+			<form className="dialog-default" onSubmit={this.handleSubmit}>
 				<h3>{item.get('class')}</h3>
 				{inputs}{outputs}{params}
 				{changed.length > 0 && <button type="submit">Übernehmen</button>}

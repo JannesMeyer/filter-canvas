@@ -31,9 +31,8 @@ var DetailNewParameterForm = React.createClass({
 	},
 
 	render() {
-		console.log('Render NewParameterForm');
 		return (
-			<form id="newParameterDialog" ref="form" onSubmit={this.handleSubmit}>
+			<form className="dialog-new-parameter" ref="form" onSubmit={this.handleSubmit}>
 				<h3>Neuer Parameter</h3>
 				<input type="text" ref="key" placeholder="Parametername" required />
 				<label><input type="radio" name="parameterType" value="string" defaultChecked />Text</label>
