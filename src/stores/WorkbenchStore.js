@@ -404,7 +404,19 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 						outputs.pop();
 					}
 				}));
+
+				// Update frame
+				data.updateIn(['items', action.id], item => {
+					var rect = item.get('rect');
+					var name = item.get('class');
+					var inputs = item.get('inputs').length;
+					var outputs = item.get('outputs').length;
+					return item.set('rect', WorkbenchLayout.getPipeFrame(rect.x, rect.y, name, inputs, outputs));
+				});
+
 			}));
+
+			// TODO: redraw wires
 
 			// Reset connector offset cache
 			connectorOffsets = {};
