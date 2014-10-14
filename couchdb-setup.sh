@@ -21,11 +21,11 @@ HEADERS='Content-Type: application/json'
 # Populate filter repository
 echo '\nCreate filters...'
 curl -X PUT $DB/filter-repository/SourceFilterExample -H "$HEADERS" -d '{ "inputs": 0, "outputs": 1, "parameter": { "waitMin": 10, "waitMax": 500000 } }'
+curl -X PUT $DB/filter-repository/OpenCVImageSource -H "$HEADERS" -d '{ "inputs": 0, "outputs": 1 }'
 curl -X PUT $DB/filter-repository/WorkFilterExample -H "$HEADERS" -d '{ "inputs": 1, "outputs": 1, "parameter": { "waitMin": 10, "waitMax": 500000 } }'
-curl -X PUT $DB/filter-repository/EndFilterExample -H "$HEADERS" -d '{ "inputs": 1, "outputs": 0, "parameter": { "waitMin": 10, "waitMax": 500000 } }'
-curl -X PUT $DB/filter-repository/OpenCVImageSource -H "$HEADERS" -d '{ "inputs": 1, "outputs": 1 }'
 curl -X PUT $DB/filter-repository/RgbToGrayFilter -H "$HEADERS" -d '{ "inputs": 1, "outputs": 1 }'
 curl -X PUT $DB/filter-repository/FindEdges -H "$HEADERS" -d '{ "inputs": 1, "outputs": 1 }'
+curl -X PUT $DB/filter-repository/EndFilterExample -H "$HEADERS" -d '{ "inputs": 1, "outputs": 0, "parameter": { "waitMin": 10, "waitMax": 500000 } }'
 curl -X PUT $DB/filter-repository/GLFWImageSink -H "$HEADERS" -d '{ "inputs": 1, "outputs": 0 }'
 
 # Populate pipe repository

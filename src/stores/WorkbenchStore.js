@@ -499,6 +499,8 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 		case Constants.UNDO:
 			undo();
 
+			connectorOffsets = {};
+
 			// Wait for the SelectionStore to update before emitting an event,
 			// because it is possible that a selected item was removed.
 			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
@@ -509,6 +511,8 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 
 		case Constants.REDO:
 			redo();
+
+			connectorOffsets = {};
 
 			// Wait for the SelectionStore to update before emitting an event,
 			// because it is possible that a selected item was removed.
@@ -743,24 +747,3 @@ if (window.localStorage) {
 	// It would always write the corrupted state back on reload.
 	window.addEventListener('unload', save);
 }
-
-// var Point = require('../lib/ImmutablePoint');
-// addFilter('SourceFilterExample', new Point(20, 20));
-// addFilter('WorkFilterExample',   new Point(20, 90));
-// addFilter('EndFilter',           new Point(508, 141));
-// addFilter('WorkFilterExample',   new Point(20,  230));
-// addPipe('ForwardPipe',           new Point(300, 150), { cardinality: 3 });
-// addFilter('WorkFilterExample',   new Point(60, 380));
-// addPipe('ForwardPipe',           new Point(350, 250));
-// addPipe('ForwardPipe',           new Point(450, 250));
-// addFilter('WorkFilterExample',   new Point(400,  380));
-
-// addConnection(Vector(0, 1, 0), Vector(4, 0, 0));
-// addConnection(Vector(1, 1, 0), Vector(4, 0, 1));
-// addConnection(Vector(3, 1, 0), Vector(4, 0, 2));
-
-// addConnection(Vector(4, 1, 0), Vector(2, 0, 0));
-// addConnection(Vector(4, 1, 1), Vector(2, 0, 1));
-// addConnection(Vector(4, 1, 2), Vector(5, 0, 0));
-// addConnection(Vector(5, 1, 0), Vector(6, 0, 0));
-// addConnection(Vector(6, 1, 0), Vector(2, 0, 2));
