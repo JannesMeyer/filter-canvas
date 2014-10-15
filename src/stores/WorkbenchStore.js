@@ -4,8 +4,10 @@ var { Map, Vector } = immutable;
 var Rect = require('../lib/ImmutableRect');
 var BaseStore = require('../lib/BaseStore');
 var WorkbenchLayout = require('../WorkbenchLayout');
+var FilterCompatibility = require('../FilterCompatibility');
 var RepositoryStore; // late import
 var SelectionStore; // late import
+var CreateConnectionStore; // late import
 var Dispatcher = require('../flux/Dispatcher');
 var Constants = require('../flux/Constants');
 
@@ -24,15 +26,6 @@ var itemPositions = Map();
 /**
  * Inverts the key/value pairs of an object
  */
-// function invert(obj) {
-//   var newObject = {}, prop;
-//   for (prop in obj) {
-//     if (obj.hasOwnProperty(prop)) {
-//       newObject[obj[prop]] = prop;
-//     }
-//   }
-//   return newObject;
-// }
 
 function makeArray(n, value) {
 	var arr = [];
@@ -548,6 +541,7 @@ module.exports = WorkbenchStore;
 // Requiring after the export prevents problems with circular dependencies
 RepositoryStore = require('./RepositoryStore');
 SelectionStore = require('./SelectionStore');
+CreateConnectionStore = require('./CreateConnectionStore');
 
 
 
@@ -682,22 +676,85 @@ function addConnection(output, input) {
 		[input, output] = [output, input];
 	}
 
-	var p1 = data.getIn(['items', output.get(0), 'outputs', output.get(2)]);
-	var p2 = data.getIn(['items', input.get(0), 'inputs', input.get(2)]);
-	if (p1) {
-		throw new Error('The connector ' + p1 + ' already has a connection');
-	}
-	if (p2) {
-		throw new Error('The connector ' + p2 + ' already has a connection');
+	var item1 = data.getIn(['items', output.get(0)]);
+	var item2 = data.getIn(['items', input.get(0)]);
+
+	// Check if these connectors are already occupied
+	if (item1.getIn(['outputs', output.get(2)]) || item2.getIn(['inputs', input.get(2)])) {
+		throw new Error('The connector is already connected');
 	}
 
+	// Check if the filters would be compatible
+	if (item1.get('type') === Constants.ITEM_TYPE_PIPE) {
+		// The output connector belongs to a pipe
+		var pipe = item1;
+		var pipeIndex = output.get(2);
+		// Let's see what's at the other end of the pipe
+		var connectedTo = pipe.getIn(['inputs', pipeIndex]) || pipe.get('inputs').last();
+		if (connectedTo) {
+			var fromFilter = data.getIn(['items', connectedTo.get(0), 'class']);
+			var fromFilterIndex = connectedTo.get(2);
+			var toFilter = data.getIn(['items', input.get(0), 'class']);
+			var toFilterIndex = input.get(2);
+		}
+	} else {
+		// The input connector belongs to a pipe
+		var pipe = item2;
+		var pipeIndex = input.get(2);
+		// Let's see what's at the other end of the pipe
+		var connectedTo = pipe.getIn(['outputs', pipeIndex]) || pipe.get('outputs').last();
+		if (connectedTo) {
+			var fromFilter = data.getIn(['items', output.get(0), 'class']);
+			var fromFilterIndex = output.get(2);
+			var toFilter = data.getIn(['items', connectedTo.get(0), 'class']);
+			var toFilterIndex = connectedTo.get(2);
+		}
+	}
+
+	if (fromFilter && toFilter && !FilterCompatibility.test(fromFilter, fromFilterIndex, toFilter, toFilterIndex)) {
+		// Dispatcher.waitFor([ CreateConnectionStore.dispatchToken ]);
+		alert('Die Filter „' + fromFilter + '“ und „' + toFilter + '“ sind leider nicht miteinander kompatibel.');
+		return;
+	}
+
+
+	// Make the connection come true
 	setData(data.withMutations(data => {
 		data.updateIn(['items', output.get(0), 'outputs', output.get(2)], () => Vector.from(input));
 		data.updateIn(['items', input.get(0), 'inputs', input.get(2)], () => Vector.from(output));
 	}));
 }
 
+function getConnectedPairs(pipe) {
+	var inputs = pipe.get('inputs');
+	var outputs = pipe.get('outputs');
 
+	var connectors = Math.max(inputs.length, outputs.length);
+	var pairs = [];
+	for (var i = 0; i < connectors; ++i) {
+		var input = inputs.get(i) || inputs.last();
+		var output = outputs.get(i) || outputs.last();
+		if (!input || !output) { continue; }
+		pairs.push(Vector(input, output));
+	}
+	return Vector.from(pairs);
+}
+
+/**
+ * Tests all connection pairs for compatibility and returns
+ * and Array of those that are incompatible
+ */
+function testCompatibilityAll() {
+	return data.get('items')
+		.filter(i => i && i.get('type') === Constants.ITEM_TYPE_PIPE) // get only pipes
+		.flatMap(pipe => getConnectedPairs(pipe)) // get the connections between filters
+		.filter(pair => { // test the connections for compatibility and keep a list of the incompatible ones
+			var fromFilter = data.getIn(['items', pair.getIn([0, 0]), 'class']);
+			var toFilter = data.getIn(['items', pair.getIn([1, 0]), 'class']);
+			return !FilterCompatibility.test(fromFilter, pair.getIn([0, 2]), toFilter, pair.getIn([1, 2]));
+		})
+		.cacheResult();
+}
 
 
 /*************************************************************************
