@@ -9,12 +9,12 @@ var DetailNewParameterForm = React.createClass({
 	handleSubmit(ev) {
 		ev.preventDefault();
 
-		var key = this.refs.key.getDOMNode().value;
+		var key = this.readTextValue('key');
 		if (key.length === 0) {
 			return;
 		}
 		var defaultValue;
-		switch(this.refs.form.getDOMNode().parameterType.value) {
+		switch(this.readRadioButtonValue('parameterType')) {
 			case 'number':
 			defaultValue = 0;
 			break;
@@ -28,6 +28,21 @@ var DetailNewParameterForm = React.createClass({
 		}
 
 		this.props.onCreateParameter(key, defaultValue);
+	},
+
+	readTextValue(key) {
+		return this.refs[key].getDOMNode().value;
+	},
+
+	readRadioButtonValue(key) {
+		var buttons = this.refs.form.getDOMNode()[key];
+		for (var i = 0; i < buttons.length; ++i) {
+			if (buttons[i].checked) {
+				return buttons[i].value;
+			}
+		}
+		// buttons.value
+		// this.refs.form.getDOMNode().querySelector('input[name=' + key + ']:checked').value
 	},
 
 	render() {

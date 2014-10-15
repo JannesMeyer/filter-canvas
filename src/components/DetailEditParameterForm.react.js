@@ -67,15 +67,19 @@ var EditParameterForm = React.createClass({
 		ev.preventDefault();
 
 		var params = {};
+		var allParams = this.props.item.get('parameter').merge(this.props.newParameter);
 		this.state.changed.forEach(key => {
+			var type = typeof allParams.get(key);
 			if (key === 'inputs') {
-				var numInputs = this.readInputValue(key);
-				AppActions.setItemInputs(this.props.id, numInputs);
+				AppActions.setItemInputs(this.props.id, this.readNumberValue(key));
 			} else if (key === 'outputs') {
-				var numOutputs = this.readInputValue(key);
-				AppActions.setItemOutputs(this.props.id, numOutputs);
+				AppActions.setItemOutputs(this.props.id, this.readNumberValue(key));
+			} else if (type === 'number') {
+				params[key] = this.readNumberValue(key);
+			} else if (type === 'boolean') {
+				params[key] = this.readBooleanValue(key);
 			} else {
-				params[key] = this.readInputValue(key);
+				params[key] = this.readTextValue(key);
 			}
 		});
 
@@ -93,18 +97,18 @@ var EditParameterForm = React.createClass({
 		}
 	},
 
-	readInputValue(key) {
+	readNumberValue(key) {
 		var input = this.refs[key].getDOMNode();
-		switch(input.type) {
-			case 'number':
-			return input.valueAsNumber;
+		// input.valueAsNumber is so buggy in Internet Explorer that we can't use it
+		return parseFloat(input.value);
+	},
 
-			case 'checkbox':
-			return input.checked;
+	readBooleanValue(key) {
+		return this.refs[key].getDOMNode().checked;
+	},
 
-			default:
-			return input.value;
-		}
+	readTextValue(key) {
+		return this.refs[key].getDOMNode().value;
 	},
 
 	renderInput(key, value) {
