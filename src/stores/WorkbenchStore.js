@@ -685,6 +685,7 @@ function addConnection(output, input) {
 	}
 
 	// Check if the filters would be compatible
+	// TODO: do this before sending the action?
 	if (item1.get('type') === Constants.ITEM_TYPE_PIPE) {
 		// The output connector belongs to a pipe
 		var pipe = item1;
@@ -717,7 +718,6 @@ function addConnection(output, input) {
 		return;
 	}
 
-
 	// Make the connection come true
 	setData(data.withMutations(data => {
 		data.updateIn(['items', output.get(0), 'outputs', output.get(2)], () => Vector.from(input));
@@ -744,7 +744,7 @@ function getConnectedPairs(pipe) {
  * Tests all connection pairs for compatibility and returns
  * and Array of those that are incompatible
  */
-function testCompatibilityAll() {
+function testFilterCompatibility() {
 	return data.get('items')
 		.filter(i => i && i.get('type') === Constants.ITEM_TYPE_PIPE) // get only pipes
 		.flatMap(pipe => getConnectedPairs(pipe)) // get the connections between filters
@@ -753,7 +753,8 @@ function testCompatibilityAll() {
 			var toFilter = data.getIn(['items', pair.getIn([1, 0]), 'class']);
 			return !FilterCompatibility.test(fromFilter, pair.getIn([0, 2]), toFilter, pair.getIn([1, 2]));
 		})
-		.cacheResult();
+		.cacheResult()
+		.length === 0;
 }
 
 
