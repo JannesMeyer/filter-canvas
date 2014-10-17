@@ -59,6 +59,43 @@ var App = React.createClass({
 		}
 	},
 
+	/**
+	 * Try to save the current store data to localStorage
+	 */
+	save() {
+		if (!window.localStorage) {
+			return;
+		}
+
+		var data = WorkbenchStore.exportMyFormat();
+		if (data.items.length === 0) {
+			localStorage.removeItem('dataBackup');
+			return;
+		}
+
+		localStorage.dataBackup = JSON.stringify(data);
+	},
+
+	/**
+	 * Try to restore the backed up store data from localStorage
+	 */
+	restore() {
+		if (window.localStorage && localStorage.dataBackup) {
+			try {
+				WorkbenchStore.importMyFormat(JSON.parse(localStorage.dataBackup))
+			} catch (e) {
+				localStorage.removeItem('dataBackup');
+				console.warn(e);
+			}
+		}
+	},
+
+	handleVisibilityChange() {
+		if (document.hidden || document.msHidden) {
+			this.save();
+		}
+	},
+
 	confirmPageUnload(ev) {
 		var message = 'You have unsaved changes.';
 		ev.returnValue = message;
@@ -69,10 +106,18 @@ var App = React.createClass({
 		addEventListener('mousemove', this.handleMouseMove);
 		addEventListener('mouseup',   this.handleMouseUp);
 		// addEventListener('beforeunload', this.confirmPageUnload);
+
+		// This could be dangerous in case the state gets corrupted.
+		// It would always write the corrupted state back on reload.
+		window.addEventListener('unload', this.save);
+		document.addEventListener('visibilitychange', this.handleVisibilityChange);
+
 		keypress.on('backspace',   AppActions.deleteSelectedItems);
 		keypress.on('del',         AppActions.deleteSelectedItems);
 		keypress.on('a', ['ctrl'], AppActions.selectAll);
 		keypress.on('esc',         AppActions.cancel);
+
+		this.restore();
 	},
 
 	componentWillUnmount() {

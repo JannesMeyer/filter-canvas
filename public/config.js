@@ -1,0 +1,1 @@
+window.filterServerURL = 'http://' + location.hostname + ':5984';

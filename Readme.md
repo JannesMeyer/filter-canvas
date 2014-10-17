@@ -17,6 +17,17 @@ origins = *
 
 ## Starten der Server
 
+Starte eine CouchDB-Instanz. Unter Linux/OS X geht das so:
+
+```bash
+sudo couchdb
+```
+
+Überprüfe ob's geklappt hat, indem du die folgende URL im Browser aufrufst:
+<http://localhost:5984/_utils>
+
+Setze die Server-URL zum Datenbank-Server in der Datei `./public/config.js`.
+
 Hoste den `public` Ordner mit einem Webserver (z.B. mit Apache, nginx, Node.js, IIS, etc.). Oder mit Python:
 
 ```bash
@@ -28,15 +39,6 @@ python -m SimpleHTTPServer 8080
 # Python 3:
 python -m http.server 8080
 ```
-
-Starte eine CouchDB-Instanz. Unter Linux/OS X geht das so:
-
-```bash
-sudo couchdb
-```
-
-Überprüfe ob's geklappt hat, indem du die folgende URL im Browser aufrufst:
-<http://localhost:5984/_utils>
 
 Gehe dann zu dieser URL um das Konfigurationswerkzeug zu benutzen:
 <http://localhost:8080/>

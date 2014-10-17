@@ -315,13 +315,42 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 			});
 
 		return obj;
+	},
+
+
+	/**
+	 * Tries to import data that was backed up to localStorage in the native format
+	 * (but serialized to JSON)
+	 *
+	 * dataBackup: Object
+	 */
+	importMyFormat(dataBackup) {
+		// Restore the ImmutableRect objects
+		dataBackup.items.forEach((item, itemId) => {
+			if (item) {
+				item.rect = Rect.fromObject(item.rect);
+			}
+		});
+
+		setData(immutable.fromJS(dataBackup));
+	},
+
+	exportMyFormat() {
+		return data.toJS();
 	}
 
 });
 
+
+
+
+// Register for all actions with the dispatcher
 WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 	switch(action.actionType) {
 
+		/**
+		 * When a file object should be imported into the Store
+		 */
 		case Constants.IMPORT_FILE:
 			// In case somebody is subscribed to WorkbenchStore and SelectionStore
 			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
@@ -333,6 +362,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			setData(importFile(action.obj));
 		break;
 
+		/**
+		 * When a new item was dragged from the RepositoryPane onto the Workbench
+		 */
 		case Constants.CREATE_ITEM:
 			if (action.type === Constants.ITEM_TYPE_FILTER) {
 				addFilter(action.id, action.position);
@@ -343,6 +375,10 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			}
 		break;
 
+		/**
+		 * When the number of inputs or outputs of a pipe was changed in the
+		 * inspector.
+		 */
 		case Constants.SET_ITEM_INPUTS:
 		case Constants.SET_ITEM_OUTPUTS:
 			var item = data.getIn(['items', action.id]);
@@ -419,6 +455,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			WorkbenchStore.emitParamChange();
 		break;
 
+		/**
+		 * When an item's parameters should be updated because of an edit from the inspector
+		 */
 		case Constants.SET_ITEM_PARAMS:
 			var id = action.id;
 			var params = action.params;
@@ -426,11 +465,17 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			WorkbenchStore.emitParamChange();
 		break;
 
+		/**
+		 * When an item's param should be removed because of a delete action from the inspector
+		 */
 		case Constants.REMOVE_ITEM_PARAM:
 			setData(data.updateIn(['items', action.id, 'parameter'], params => params.remove(action.param)));
 			WorkbenchStore.emitParamChange();
 		break;
 
+		/**
+		 * When a drag and drop move has been completed. Commits the change.
+		 */
 		case Constants.MOVE_SELECTED_ITEMS_BY:
 			setData(data.withMutations(data => {
 				action.selectedItems.forEach((_, id) => {
@@ -439,6 +484,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			}));
 		break;
 
+		/**
+		 * Deletes all selected items
+		 */
 		case Constants.DELETE_SELECTED_ITEMS:
 			var deleteItems = action.selectedItems;
 			if (deleteItems.length === 0) {
@@ -468,6 +516,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			})));
 		break;
 
+		/**
+		 * Creates a blank canvas
+		 */
 		case Constants.DELETE_ALL_ITEMS:
 			// In case somebody is subscribed to WorkbenchStore and SelectionStore
 			Dispatcher.waitFor([ SelectionStore.dispatchToken ]);
@@ -477,10 +528,16 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			connectorOffsets = {};
 		break;
 
+		/**
+		 * When a connection has been succesfully dragged onto a connector
+		 */
 		case Constants.FINISH_CONNECTION:
 			addConnection(action.from, action.to);
 		break;
 
+		/**
+		 * Deletes a connection
+		 */
 		case Constants.DELETE_CONNECTION:
 			var c1 = action.connector1;
 			var c2 = action.connector2;
@@ -490,6 +547,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			}));
 		break;
 
+		/**
+		 * Undo the last change to the data object
+		 */
 		case Constants.UNDO:
 			undo();
 
@@ -503,6 +563,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			WorkbenchStore.emitParamChange();
 		break;
 
+		/**
+		 * Redo the last undone change of the data object
+		 */
 		case Constants.REDO:
 			redo();
 
@@ -516,11 +579,17 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			WorkbenchStore.emitParamChange();
 		break;
 
+		/**
+		 * When the left mouse button is pressed on top of a selected item
+		 */
 		case Constants.START_MOVING_SELECTED_ITEMS:
 			isDragging = true;
 			startMousePos = action.mousePos;
 		break;
 
+		/**
+		 * When the mouse was moved while moving items
+		 */
 		case Constants.MOVING_SELECTED_ITEMS:
 			var delta = action.mousePos.subtract(startMousePos);
 			itemPositions = SelectionStore.getSelectedItemIds().map(id => {
@@ -529,6 +598,9 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			WorkbenchStore.emitPreliminaryPosition();
 		break;
 
+		/**
+		 * When the left mouse button was released while moving items
+		 */
 		case Constants.FINISH_MOVING_SELECTED_ITEMS:
 			isDragging = false;
 			itemPositions = itemPositions.clear();
@@ -551,10 +623,11 @@ CreateConnectionStore = require('./CreateConnectionStore');
 
 
 
-/*************************************************************************
- * Item adding
- *************************************************************************/
-
+/**
+ * Imports a file from the external data format
+ *
+ * obj: An object in the external data format
+ */
 function importFile(obj) {
 	var items = [];
 	var outputToConnector = {};
@@ -634,6 +707,13 @@ function importFile(obj) {
 	return data.updateIn(['items'], _ => immutable.fromJS(items));
 }
 
+/**
+ * Adds a new filter to the store
+ *
+ * name: Name of the filter
+ * position: Position where the filter should be created
+ * parameter (optional)
+ */
 function addFilter(name, position, parameter) {
 	var f = RepositoryStore.getFilter(name);
 	if (!f) {
@@ -651,6 +731,13 @@ function addFilter(name, position, parameter) {
 	setData(data.updateIn(['items'], items => items.push(item)));
 }
 
+/**
+ * Adds a new pipe to the store
+ *
+ * name: Name of the pipe
+ * position: Position where the pipe should be created
+ * parameter (optional)
+ */
 function addPipe(name, position, parameter) {
 	var p = RepositoryStore.getPipe(name);
 	if (!p) {
@@ -671,7 +758,12 @@ function addPipe(name, position, parameter) {
 	setData(data.updateIn(['items'], items => items.push(item)));
 }
 
-
+/**
+ * Adds a new connection between two connectors of a pipe and a filter to the store
+ *
+ * input: a connector address
+ * output: a connector address
+ */
 function addConnection(output, input) {
 	// If they arrive in reverse order swap them
 	if (!output.get(1) && input.get(1)) {
@@ -727,6 +819,9 @@ function addConnection(output, input) {
 	}));
 }
 
+/**
+ * Finds connected pairs of input/output on opposing sides of an item
+ */
 function getConnectedPairs(pipe) {
 	var inputs = pipe.get('inputs');
 	var outputs = pipe.get('outputs');
@@ -757,53 +852,4 @@ function testFilterCompatibility() {
 		})
 		.cacheResult()
 		.length === 0;
-}
-
-
-/*************************************************************************
- * Testing
- *************************************************************************/
-
-// TODO: put this in the APP.react.js
-
-// Restore from localStore
-if (window.localStorage && localStorage.dataBackup) {
-	console.log('Restoring state from local storage…');
-	try {
-		var obj = JSON.parse(localStorage.dataBackup);
-
-		// Restore the ImmutableRect objects
-		obj.items.forEach((item, itemId) => {
-			if (item) {
-				item.rect = Rect.fromObject(item.rect);
-			}
-		});
-
-		data = immutable.fromJS(obj);
-	} catch (e) {
-		// Start with an empty canvas
-		localStorage.removeItem('dataBackup');
-		console.warn(e);
-	}
-}
-
-// Save the current state to localStorage whenever the tab is hidden
-// or when it is unloaded
-if (window.localStorage) {
-	var save = function() {
-		if (data.get('items').length === 0) {
-			localStorage.removeItem('dataBackup');
-			return;
-		}
-		console.log('Saving state to local storage…');
-		localStorage.dataBackup = JSON.stringify(data.toJS());
-	};
-	document.addEventListener('visibilitychange', () => {
-		if (document.hidden || document.msHidden) {
-			save();
-		}
-	});
-	// This could be dangerous in case the state gets corrupted.
-	// It would always write the corrupted state back on reload.
-	window.addEventListener('unload', save);
 }
