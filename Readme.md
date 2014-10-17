@@ -59,3 +59,26 @@ Compile JavaScript with webpack:
 NODE_ENV=production webpack
 ~~~
 
+
+# Attribution
+
+Die folgenden Open-Source-Libraries werden von diesem Projekt benutzt:
+
+- [react](http://facebook.github.io/react/)
+- [flux](https://github.com/facebook/flux)
+- [immutable](https://github.com/facebook/immutable-js)
+- [normalize.css](https://github.com/necolas/normalize.css)
+- [browser-saveas](https://github.com/eligrey/FileSaver.js)
+
+Die folgenden Open-Source-Build-Tools werden von diesem Projekt benutzt:
+
+- [webpack](https://github.com/webpack/webpack) (Fügt Module zu einer einzigen Datei zusammen)
+- [stylus](https://github.com/learnboost/stylus) (CSS-Precompiler)
+- [autoprefixer](https://github.com/postcss/autoprefixer) (Fügt automatisch Vendor-Prefixes ins CSS ein)
+- [jsx](http://facebook.github.io/react/docs/jsx-in-depth.html)
+  (JavaScript-Precompiler, der bei der Benutzung von React empfohlen wird)
+- [UglifyJS](https://github.com/mishoo/UglifyJS2) (JavaScript-Minifizierer)
+
+Die Hintergrundgrafik stammt von [subtlepatterns.com](http://subtlepatterns.com/)/Atle Mo und wird unter der Lizenz [CC BY-SA 3.0](http://creativecommons.org/licenses/by-sa/3.0/) verteilt.
+
+Die Icon-Font heißt [Font Awesome](http://fortawesome.github.io/Font-Awesome/) und wird unter der Lizenz [SIL Open Font License 1.1](http://scripts.sil.org/OFL) verteilt. Die Font-Datei wurde mit [fontello.com](http://fontello.com/) generiert.

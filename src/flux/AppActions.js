@@ -1,6 +1,5 @@
 var saveAs = require('browser-saveas');
 var Point = require('../lib/ImmutablePoint');
-
 var WorkbenchStore = require('../stores/WorkbenchStore');
 var	SelectionStore = require('../stores/SelectionStore');
 var CreateConnectionStore = require('../stores/CreateConnectionStore');
@@ -8,8 +7,15 @@ var Dispatcher = require('./Dispatcher');
 var Constants = require('./Constants');
 
 /**
- * AppActions single object
- * (like a singleton)
+ * Global AppActions (like a singleton)
+ *
+ * These functions are not supposed to do much except call out to the global
+ * Dispatcher object and dispatch actions which will be received by the Stores.
+ *
+ * @see WorkbenchStore
+ * @see SelectionStore
+ * @see RepositoryStore
+ * @see CreateConnectionStore
  */
 var AppActions = {
 

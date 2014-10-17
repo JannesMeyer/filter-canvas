@@ -11,6 +11,7 @@
   "devDependencies": {
     "autoprefixer-loader": "^1.0.0",
     "css-loader": "0.x",
+    "flux": "^2.0.1",
     "immutable": "2.x",
     "jsx-loader": "0.x",
     "normalize.css": "^3.0.1",
@@ -19,9 +20,7 @@
     "style-loader": "0.x",
     "stylus-loader": "^0.4.0",
     "webpack": "1.x",
-    "webpack-dev-server": "1.x"
-  },
-  "dependencies": {
+    "webpack-dev-server": "1.x",
     "browser-saveas": "^1.0.0"
   }
 }

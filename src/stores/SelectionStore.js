@@ -99,7 +99,7 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 		break;
 
 		case Constants.FINISH_SELECTION:
-			// Transfer itemsInsideSelection
+			// Commit itemsInsideSelection to the Store
 			selectedItems = selectedItems.union(itemsInsideSelection);
 			itemsInsideSelection = Set();
 			isSelecting = false;

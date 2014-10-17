@@ -49,7 +49,8 @@ var Workbench = React.createClass({
 	},
 
 	/**
-	 * Returns the scroll offset as a Point
+	 * Returns the scroll offset as a Point. This function is going to be inserted into the
+	 * WorkbenchStore
 	 */
 	getScrollOffset() {
 		var node = this.getDOMNode();

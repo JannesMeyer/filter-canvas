@@ -1,6 +1,21 @@
 var keyMirror = require('react/lib/keyMirror');
 
-module.exports = keyMirror({
+/**
+ * An object containing mostly the action types that can be dispatched through
+ * the Dispatcher. These constants are basically only used for equality checks
+ * to find out which type of action was received.
+ *
+ * The keyMirror function will make all values to be exactly the same as the key
+ * (i.e. a String that contains the name of the constant)
+ *
+ * @see AppActions
+ * @see WorkbenchStore
+ * @see SelectionStore
+ * @see RepositoryStore
+ * @see CreateConnectionStore
+ */
+var Constants = keyMirror({
+	// Action types
 	RELOAD_REPOSITORY: null,
 	IMPORT_FILE: null,
 	EXPORT_FILE: null,
@@ -34,8 +49,12 @@ module.exports = keyMirror({
 	CANCEL_CONNECTION: null,
 	DELETE_CONNECTION: null,
 
+	// Item types
 	ITEM_TYPE_FILTER: null,
 	ITEM_TYPE_PIPE: null,
+
+	// Selection types
 	SELECTION_TYPE_NEW: null,
 	SELECTION_TYPE_EXTEND: null
 });
+module.exports = Constants;

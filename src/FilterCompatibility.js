@@ -9,9 +9,9 @@
 function test(fromFilter, fromIndex, toFilter, toIndex) {
 	console.log('Testing compatibility between', fromFilter+'['+fromIndex+'] – '+toFilter+'['+toIndex+']');
 
-	// if (fromFilter === 'SourceFilterExample' && toFilter === 'EndFilterExample') {
-	// 	return false;
-	// }
+	if (fromFilter === 'SourceFilterExample' && toFilter === 'EndFilterExample') {
+		return false;
+	}
 
 	return true;
 }

@@ -263,6 +263,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	        parameter: [ filter.parameter ],
 	        inputs: filter.inputs.map(cTo => ({ inputID: inputCounter++, type: null })), // TODO: type
 	        outputs: filter.outputs.map(cTo => ({ outputID: outputCounter++, type: null })),
+	        // TODO: minInputs, minOutputs, variableInputs, variableOutputs
 	        rect: filter.rect // Saving this information is optional, but enhances the UX
 				};
 			});
@@ -602,6 +603,7 @@ function importFile(obj) {
 			// TODO: inputNum and outputNum TO BE DETERMINED for split/join pipes
 			inputs: new Array(numMappings),
 			outputs: new Array(numMappings),
+			// TODO: minInputs, minOutputs, variableInputs, variableOutputs
 			rect
 		};
 
@@ -742,7 +744,7 @@ function getConnectedPairs(pipe) {
 
 /**
  * Tests all connection pairs for compatibility and returns
- * and Array of those that are incompatible
+ * true if that is the case
  */
 function testFilterCompatibility() {
 	return data.get('items')
