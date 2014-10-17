@@ -1,10 +1,25 @@
-# Pipes and Filters Konfigurationswerkzeug
+# Pipes und Filters-Konfigurationswerkzeug
 
 ## Installation
 
-Serve the `public` directory with any webserver you want (for example with Apache, nginx, Python's SimpleHTTPServer, etc.). Or with Python:
+Downloade und installiere [CouchDB](http://couchdb.apache.org/). Es gibt Anleitungen: [Installation guides for various OSs](http://docs.couchdb.org/en/latest/install/).
 
-~~~bash
+Bearbeite die Datei `local.ini`, welche normalerweise unter einem diser Pfade gefunden werden kann: `/etc/couchdb/local.ini` or `/opt/local/etc/couchdb/local.ini`
+
+```
+[httpd]
+bind_address = 0.0.0.0
+enable_cors = true
+
+[cors]
+origins = *
+```
+
+## Starten der Server
+
+Hoste den `public` Ordner mit einem Webserver (z.B. mit Apache, nginx, Node.js, IIS, etc.). Oder mit Python:
+
+```bash
 cd ${PROJECT_DIR}/public
 
 # Python 2:
@@ -12,55 +27,43 @@ python -m SimpleHTTPServer 8080
 
 # Python 3:
 python -m http.server 8080
-~~~
+```
 
-Download and install [CouchDB](http://couchdb.apache.org/). [Installation guides for various OSs](http://docs.couchdb.org/en/latest/install/)
+Starte eine CouchDB-Instanz. Unter Linux/OS X geht das so:
 
+```bash
+sudo couchdb
+```
 
-<https://wiki.archlinux.org/index.php/couchdb>
+Überprüfe ob's geklappt hat, indem du die folgende URL im Browser aufrufst:
+<http://localhost:5984/_utils>
 
-**/etc/couchdb/local.ini**
-**/opt/local/etc/couchdb/local.ini**
+Gehe dann zu dieser URL um das Konfigurationswerkzeug zu benutzen:
+<http://localhost:8080/>
 
-~~~
-[httpd]
-bind_address = 0.0.0.0
-enable_cors = true
+## Source kompilieren
 
-[cors]
-origins = *
-~~~
+Downloade und installiere [node.js](http://nodejs.org/). Installiere dann webpack:
 
-start couchdb
-
-	sudo couchdb
-
-Verify that it's running by going to this URL: <http://localhost:5984/_utils>
-
-Open your favorite browser and go to the this address: <http://localhost:8080/>
-
-http://localhost:5984/_utils/docs/intro/tour.html
-
-## Compile from source
-
-Download and install [node.js](http://nodejs.org/)
-
-Install dependencies:
-
-~~~bash
-cd ${PROJECT_DIR}
+```bash
 npm install -g webpack
-npm install
-~~~
+```
 
-Compile JavaScript with webpack:
+Nun kann man mit folgendem Befehl die JavaScript-Datei kompilieren:
 
-~~~bash
+```bash
+cd ${PROJECT_DIR}
 NODE_ENV=production webpack
-~~~
+```
+
+Mit diesem Befehl kann man einen Dev-Server starten:
+
+```bash
+node ./server.js
+```
 
 
-# Attribution
+## Benutzte Open-Source-Projekte
 
 Die folgenden Open-Source-Libraries werden von diesem Projekt benutzt:
 
