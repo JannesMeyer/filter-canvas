@@ -263,7 +263,6 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 	        parameter: [ filter.parameter ],
 	        inputs: filter.inputs.map(cTo => ({ inputID: inputCounter++, type: null })), // TODO: type
 	        outputs: filter.outputs.map(cTo => ({ outputID: outputCounter++, type: null })),
-	        // TODO: minInputs, minOutputs, variableInputs, variableOutputs
 	        rect: filter.rect // Saving this information is optional, but enhances the UX
 				};
 			});
@@ -305,13 +304,15 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 				}
 
 				// Return pipe
-				return {
+				var result = {
 					pipeID: index,
 					type: pipe.class,
 					parameter: [ pipe.parameter ],
 					mappings,
 					rect: pipe.rect // Saving this information is optional, but enhances the UX
 				};
+				// TODO: minInputs, minOutputs, variableInputs, variableOutputs
+				return result;
 			});
 
 		return obj;
@@ -633,6 +634,7 @@ function importFile(obj) {
 	var outputToConnector = {};
 	var inputToConnector = {};
 
+	// Filters import
 	obj.filters.forEach(filter => {
 		var id = items.length;
 		var numInputs = filter.inputs.length;
@@ -659,16 +661,21 @@ function importFile(obj) {
 		});
 	});
 
+	// Pipes import
 	obj.pipes.forEach(pipe => {
 		var id = items.length;
-		var numMappings = pipe.mappings.length;
-		// TODO: recognize split/join pipes
+
+		// Calculate rect if necessary
 		var rect;
 		if (pipe.rect) {
 			rect = Rect.fromObject(pipe.rect);
 		} else {
 			rect = WorkbenchLayout.getPipeFrame(200, 200, pipe.type, numMappings, numMappings);
 		}
+
+		// TODO: recognize split/join pipes
+		var numMappings = pipe.mappings.length;
+
 		items[id] = {
 			type: Constants.ITEM_TYPE_PIPE,
 			class: pipe.type,
@@ -679,6 +686,8 @@ function importFile(obj) {
 			// TODO: minInputs, minOutputs, variableInputs, variableOutputs
 			rect
 		};
+
+		// if ()
 
 		// Create connections out of the mappings
 		pipe.mappings.forEach((mapping, connectorId) => {

@@ -15,6 +15,12 @@ enable_cors = true
 origins = *
 ```
 
+Lade die Datenbank mit den Daten:
+```
+cd ${PROJECT_DIR}
+./couchdb-setup.sh
+```
+
 ## Starten der Server
 
 Starte eine CouchDB-Instanz. Unter Linux/OS X geht das so:
