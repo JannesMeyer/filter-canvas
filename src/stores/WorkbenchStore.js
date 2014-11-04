@@ -274,6 +274,8 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 			.map((pipe, index) => {
 				var numInputs = pipe.inputs.length;
 				var numOutputs = pipe.outputs.length;
+				var origInputs = numInputs;
+				var origOutputs = numOutputs;
 
 				// Equalize the number of inputs and outputs
 				if (numInputs === 1 && numInputs < numOutputs) {
@@ -314,6 +316,8 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 					mappings,
 					rect: pipe.rect // Saving this information is optional, but enhances the UX
 				};
+				result.numInputs = origInputs;
+				result.numOutputs = origOutputs;
 				// save minInputs, minOutputs
 				if (pipe.minInputs !== undefined) {
 					result.minInputs = pipe.minInputs;
@@ -636,9 +640,21 @@ CreateConnectionStore = require('./CreateConnectionStore');
 
 
 
+function arraysEqual(a, b) {
+  if (a === b) {
+  	return true;
+  }
+  if (a.length !== b.length) {
+  	return false;
+  }
 
-
-
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) {
+    	return false;
+    }
+  }
+  return true;
+}
 
 /**
  * Imports a file from the external data format
@@ -689,9 +705,9 @@ function importFile(obj) {
 			rect = WorkbenchLayout.getPipeFrame(200, 200, pipe.type, numMappings, numMappings);
 		}
 
-		// TODO: recognize split/join pipes
-		var numInputs = pipe.mappings.length;
-		var numOutputs = pipe.mappings.length;
+		// For split/join pipes we need the exact number of inputs/outputs
+		var numInputs = pipe.numInputs || pipe.mappings.length;
+		var numOutputs = pipe.numOutputs || pipe.mappings.length;
 
 		items[id] = {
 			type: Constants.ITEM_TYPE_PIPE,
@@ -729,20 +745,29 @@ function importFile(obj) {
 			var pipeOut   = [id, 1, connectorId];
 			var filterIn  = inputToConnector[mapping.input];
 
-			// Check for duplicate connection
-			var p1 = items[filterOut[0]].outputs[filterOut[2]];
-			var p2 = items[filterIn[0]].inputs[filterIn[2]];
-			if (p1 || p2) {
-				throw new Error('Es wurde versucht, mehrmals den gleichen Input/Output zu verbinden.');
+			// First connection (doubly linked)
+			// Check bounds of pipe
+			if (pipeIn[2] < items[pipeIn[0]].inputs.length) {
+				// Check for duplicate connection
+				if (items[filterOut[0]].outputs[filterOut[2]]) {
+					console.warn('Es wurde versucht, mehrmals den gleichen Input/Output zu verbinden.');
+				} else {
+					items[filterOut[0]].outputs[filterOut[2]] = pipeIn;
+					items[pipeIn[0]].inputs[pipeIn[2]] = filterOut;
+				}
 			}
 
-			// First connection (doubly linked)
-			items[filterOut[0]].outputs[filterOut[2]] = pipeIn;
-			items[pipeIn[0]].inputs[pipeIn[2]] = filterOut;
-
 			// Second connection (doubly linked)
-			items[pipeOut[0]].outputs[pipeOut[2]] = filterIn;
-			items[filterIn[0]].inputs[filterIn[2]] = pipeOut;
+			// Check bounds of pipe
+			if (pipeOut[2] < items[pipeOut[0]].outputs.length) {
+				// Check for duplicate connection
+				if (items[filterIn[0]].inputs[filterIn[2]]) {
+					console.warn('Es wurde versucht, mehrmals den gleichen Input/Output zu verbinden.');
+				} else {
+					items[pipeOut[0]].outputs[pipeOut[2]] = filterIn;
+					items[filterIn[0]].inputs[filterIn[2]] = pipeOut;
+				}
+			}
 		});
 	});
 
