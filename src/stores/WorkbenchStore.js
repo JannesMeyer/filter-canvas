@@ -243,7 +243,8 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 		var items = data.get('items').toJS();
 		var inputCounter = 1;
 		var outputCounter = 1;
-		// Filters
+
+		// Filters export
 		var filterIndexes = {};
 		obj.filters = items
 			.filter((item, index) => {
@@ -267,12 +268,13 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 				};
 			});
 
-		// TODO: fix the mappings export
+		// Pipes export
 		obj.pipes = items
 			.filter(item => item && item.type === Constants.ITEM_TYPE_PIPE)
 			.map((pipe, index) => {
 				var numInputs = pipe.inputs.length;
 				var numOutputs = pipe.outputs.length;
+
 				// Equalize the number of inputs and outputs
 				if (numInputs === 1 && numInputs < numOutputs) {
 					// SplitPipe
@@ -293,6 +295,7 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 					var outputTo = pipe.outputs[i];
 					if (!inputTo || !outputTo) {
 						console.warn('Unconnected pipe connector');
+						mappings.push(null);
 						continue;
 					}
 					// These names are a bit weird, but that's how the file format is specified
@@ -311,7 +314,20 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 					mappings,
 					rect: pipe.rect // Saving this information is optional, but enhances the UX
 				};
-				// TODO: minInputs, minOutputs, variableInputs, variableOutputs
+				// save minInputs, minOutputs
+				if (pipe.minInputs !== undefined) {
+					result.minInputs = pipe.minInputs;
+				}
+				if (pipe.minOutputs !== undefined) {
+					result.minOutputs = pipe.minOutputs;
+				}
+				// save variableInputs, variableOutputs
+				if (pipe.variableInputs !== undefined) {
+					result.variableInputs = pipe.variableInputs;
+				}
+				if (pipe.variableOutputs !== undefined) {
+					result.variableOutputs = pipe.variableOutputs;
+				}
 				return result;
 			});
 
@@ -674,23 +690,40 @@ function importFile(obj) {
 		}
 
 		// TODO: recognize split/join pipes
-		var numMappings = pipe.mappings.length;
+		var numInputs = pipe.mappings.length;
+		var numOutputs = pipe.mappings.length;
 
 		items[id] = {
 			type: Constants.ITEM_TYPE_PIPE,
 			class: pipe.type,
 			parameter: pipe.parameter[0] || {},
-			// TODO: inputNum and outputNum TO BE DETERMINED for split/join pipes
-			inputs: new Array(numMappings),
-			outputs: new Array(numMappings),
-			// TODO: minInputs, minOutputs, variableInputs, variableOutputs
+			inputs: new Array(numInputs),
+			outputs: new Array(numOutputs),
 			rect
 		};
 
-		// if ()
+		// Read minInputs, minOutputs
+		if (pipe.minInputs !== undefined) {
+			items[id].minInputs = pipe.minInputs;
+		}
+		if (pipe.minOutputs !== undefined) {
+			items[id].minOutputs = pipe.minOutputs;
+		}
+
+		// variableInputs, variableOutputs
+		if (pipe.variableInputs !== undefined) {
+			items[id].variableInputs = pipe.variableInputs;
+		}
+		if (pipe.variableOutputs !== undefined) {
+			items[id].variableOutputs = pipe.variableOutputs;
+		}
 
 		// Create connections out of the mappings
 		pipe.mappings.forEach((mapping, connectorId) => {
+			if (!mapping) {
+				return;
+			}
+
 			var filterOut = outputToConnector[mapping.output];
 			var pipeIn    = [id, 0, connectorId];
 			var pipeOut   = [id, 1, connectorId];

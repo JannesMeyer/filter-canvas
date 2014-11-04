@@ -38,6 +38,8 @@ var Actions = React.createClass({
 		var reader = ev.currentTarget;
 		try {
 			AppActions.importFile(reader.result);
+			// Reset file input field
+			this.refs.file.getDOMNode().value = '';
 		} catch (err) {
 			alert('Ungültige Datei\n\n' + err.message);
 		}
