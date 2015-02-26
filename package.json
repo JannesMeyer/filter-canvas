@@ -2,25 +2,24 @@
   "name": "filter-canvas",
   "version": "1.0.0",
   "author": "Jannes Meyer <jannes.meyer@gmail.com>",
-  "private": true,
   "scripts": {
-    "start": "./server.js",
-    "prepublish": "NODE_ENV=production webpack --colors"
+    "start": "./server.js"
   },
   "description": "Configuration tool for filters and pipes architectures",
   "devDependencies": {
-    "autoprefixer-loader": "^1.0.0",
+    "autoprefixer-loader": "1.x",
+    "browser-saveas": "1.x",
     "css-loader": "0.x",
-    "flux": "^2.0.1",
+    "file-loader": "0.x",
+    "flux": "2.x",
     "immutable": "2.x",
     "jsx-loader": "0.x",
-    "normalize.css": "^3.0.1",
+    "normalize.css": "3.x",
     "react": "0.x",
     "react-hot-loader": "0.x",
     "style-loader": "0.x",
-    "stylus-loader": "^0.4.0",
+    "stylus-loader": "0.x",
     "webpack": "1.x",
-    "webpack-dev-server": "1.x",
-    "browser-saveas": "^1.0.0"
+    "webpack-dev-server": "1.x"
   }
 }

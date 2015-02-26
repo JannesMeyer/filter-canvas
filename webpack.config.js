@@ -1,10 +1,5 @@
-'use strict';
-
 var webpack = require('webpack');
-var path = require('path');
-
-// Helper function to convert relative paths to absolute ones
-var getAbsolutePath = path.join.bind(path, __dirname);
+var getAbsolutePath = require('path').join.bind(require('path'), __dirname);
 
 var config = {
 	cache: true,
@@ -12,9 +7,9 @@ var config = {
 		getAbsolutePath('src', 'main.js')
 	],
 	output: {
-		path: getAbsolutePath('public', 'javascripts'),
+		path: getAbsolutePath('../jannesmeyer.github.io/filter-canvas'),
 		filename: '[name].bundle.js',
-		publicPath: '/javascripts/'
+		publicPath: '/filter-canvas/'
 	},
 	watchDelay: 50,
 	plugins: [
@@ -25,23 +20,20 @@ var config = {
 			{
 				test: /\.react\.js$/,
 				loaders: ['strict', 'jsx?harmony&insertPragma=React.DOM'],
-				include: [ getAbsolutePath() ],
+				include: [ getAbsolutePath('src') ],
 				exclude: [ getAbsolutePath('node_modules') ]
 			},
 			{
 				test: /\.js$/,
 				loaders: ['strict', 'jsx?harmony'],
-				include: [ getAbsolutePath() ],
+				include: [ getAbsolutePath('src') ],
 				exclude: [ getAbsolutePath('node_modules') ]
 			},
-			{
-				test: /\.css$/,
-				loaders: ['style', 'css?root=.', 'autoprefixer']
-			},
-			{
-				test: /\.styl$/,
-				loaders: ['style', 'css?root=.', 'autoprefixer', 'stylus']
-			}
+			{ test: /\.css$/, loaders: ['style', 'css', 'autoprefixer'] },
+			{ test: /\.styl$/, loaders: ['style', 'css', 'autoprefixer', 'stylus'] },
+			{ test: /\.(woff|eot|ttf|svg)($|\?)/, loader: 'file' },
+			{ test: /\.png$/, loader: 'file' },
+			{ test: getAbsolutePath('public'), loader: 'file?name=[name].[ext]' }
 		]
 	},
 	resolve: {

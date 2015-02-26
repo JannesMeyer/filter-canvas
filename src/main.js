@@ -1,8 +1,14 @@
-var App = require('./components/App.react');
+// Webpack: Copy public files
+require('../public/index.html');
 
-// Import CSS (with webpack)
+// Webpack: Copy configuration file
+require('../config.js');
+
+// Webpack: Import CSS
 require('normalize.css/normalize.css');
 require('../stylus/main.styl');
+
+var App = require('./components/App.react');
 
 // Render controller view
 React.renderComponent(App(), document.body);
