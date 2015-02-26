@@ -3,10 +3,6 @@ var BaseStore = require('../lib/BaseStore');
 var Dispatcher = require('../flux/Dispatcher');
 var Constants = require('../flux/Constants');
 
-var pipesURL          = window.filterServerURL + '/pipe-repository/_all_docs?include_docs=true';
-var filtersURL        = window.filterServerURL + '/filter-repository/_all_docs?include_docs=true';
-var complexFiltersURL = window.filterServerURL + '/complex-filters/_all_docs?include_docs=true';
-
 // Backed by AJAX requests to CouchDB
 var pipes = {};
 var filters = {};

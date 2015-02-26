@@ -26,7 +26,7 @@ cd ${PROJECT_DIR}
 Starte eine CouchDB-Instanz. Unter Linux/OS X geht das so:
 
 ```bash
-sudo couchdb
+sudo couchdb -b
 ```
 
 Überprüfe ob's geklappt hat, indem du die folgende URL im Browser aufrufst:
