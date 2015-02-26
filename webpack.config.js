@@ -36,11 +36,11 @@ var config = {
 			},
 			{
 				test: /\.css$/,
-				loaders: ['style', 'css', 'autoprefixer']
+				loaders: ['style', 'css?root=.', 'autoprefixer']
 			},
 			{
 				test: /\.styl$/,
-				loaders: ['style', 'css', 'autoprefixer', 'stylus']
+				loaders: ['style', 'css?root=.', 'autoprefixer', 'stylus']
 			}
 		]
 	},
