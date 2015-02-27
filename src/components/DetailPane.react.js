@@ -52,6 +52,7 @@ var DetailPane = React.createClass({
 			return (
 				<div className="m-detail-pane">
 					<h3>{translate('detail_pane.headline', { count })}</h3>
+					<p className="introduction">{translate('introduction_multiselect')}</p>
 				</div>
 			);
 		}
