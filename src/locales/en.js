@@ -8,6 +8,7 @@ export default {
 	actions: {
 		'new': 'New',
 		'import': 'Import',
+		filename: 'configuration',
 		'export': 'Export',
 		undo: 'Undo',
 		redo: 'Redo'

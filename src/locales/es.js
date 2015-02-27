@@ -11,6 +11,7 @@ export default {
 	actions: {
 		'new': 'Nuevo',
 		'import': 'Importar',
+		filename: 'configuración',
 		'export': 'Exportar',
 		undo: 'Deshacer',
 		redo: 'Rehacer'

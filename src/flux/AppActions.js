@@ -56,7 +56,7 @@ var AppActions = {
 		// Download the generated file (has issues in Safari)
 		// Browser compatibility:
 		// https://github.com/eligrey/FileSaver.js
-		saveAs(blob, 'Konfiguration.json');
+		saveAs(blob, translate('actions.filename') + '.json');
 
 		// URL.createObjectURL(blob)
 	},
