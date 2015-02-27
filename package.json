@@ -1,22 +1,26 @@
 {
   "name": "filter-canvas",
-  "version": "1.0.0",
   "author": "Jannes Meyer <jannes.meyer@gmail.com>",
-  "scripts": {
-    "start": "./server.js"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JannesMeyer/filter-canvas.git"
   },
-  "description": "Configuration tool for filters and pipes architectures",
+  "scripts": {
+    "start": "./dev-server.js",
+    "build": "NODE_ENV=production webpack"
+  },
   "devDependencies": {
     "autoprefixer-loader": "1.x",
+    "babel-core": "4.x",
+    "babel-loader": "4.x",
     "browser-saveas": "1.x",
     "css-loader": "0.x",
     "file-loader": "0.x",
     "flux": "2.x",
     "immutable": "2.x",
-    "jsx-loader": "0.x",
     "normalize.css": "3.x",
     "react": "0.x",
-    "react-hot-loader": "0.x",
+    "react-hot-loader": "1.x",
     "style-loader": "0.x",
     "stylus-loader": "0.x",
     "webpack": "1.x",
