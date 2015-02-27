@@ -1,5 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
-var merge = require('react/lib/merge');
+var assign = require('react/lib/Object.assign');
 
 /**
  * This function creates objects that are based on EventEmitter.
@@ -45,7 +45,7 @@ function createEventEmitter(eventNames, extensions) {
 	});
 
 	// Create the EventEmitter instance (and remove the listener limit)
-	return merge(EventEmitter.prototype, extensions).setMaxListeners(0);
+	return assign({}, EventEmitter.prototype, extensions).setMaxListeners(0);
 }
 
 module.exports.createEventEmitter = createEventEmitter;

@@ -15,7 +15,7 @@ var RepositoryItem = React.createClass({
 	handleDragStart(ev) {
 		var box = ev.currentTarget.getBoundingClientRect();
 		var data = {
-			id: this.props.key,
+			id: this.props.id,
 			type: this.props.type,
 			x: Math.floor(ev.clientX - box.left),
 			y: Math.floor(ev.clientY - box.top)
@@ -28,7 +28,7 @@ var RepositoryItem = React.createClass({
 	 * Renders the component
 	 */
 	render() {
-		return <div className="item" draggable onDragStart={this.handleDragStart}>{this.props.key}</div>;
+		return <div className="item" draggable onDragStart={this.handleDragStart}>{this.props.id}</div>;
 	}
 
 });

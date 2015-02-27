@@ -21,7 +21,7 @@ var WorkbenchItem = React.createClass({
 		ev.preventDefault();
 		ev.stopPropagation();
 		var mousePos = new Point(ev.clientX, ev.clientY);
-		AppActions.startMovingSelectedItems(this.props.key, ev.ctrlKey, ev.metaKey, mousePos);
+		AppActions.startMovingSelectedItems(this.props.id, ev.ctrlKey, ev.metaKey, mousePos);
 	},
 
 	handleConnectorMouseDown(isOutput, connectorId, connectedTo, ev) {
@@ -29,7 +29,7 @@ var WorkbenchItem = React.createClass({
 		ev.stopPropagation();
 		ev.preventDefault();
 
-		var connector = Vector(this.props.key, isOutput, connectorId);
+		var connector = Vector(this.props.id, isOutput, connectorId);
 
 		// Erase the old connection
 		if (connectedTo) {
@@ -41,7 +41,7 @@ var WorkbenchItem = React.createClass({
 	},
 
 	render() {
-		var itemId = this.props.key;
+		var itemId = this.props.id;
 		var item = this.props.item;
 		var frame = this.props.frame;
 		var type = item.get('type');

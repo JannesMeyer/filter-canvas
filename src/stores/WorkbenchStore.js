@@ -1,4 +1,3 @@
-var merge = require('react/lib/merge');
 var immutable = require('immutable');
 var { Map, Vector } = immutable;
 var Rect = require('../lib/ImmutableRect');

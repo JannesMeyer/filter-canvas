@@ -13,9 +13,9 @@ import App from './components/App.react';
 // Render controller view
 React.render(<App />, document.body);
 
+// Measure performance for debugging
 var isBrowser = (typeof window !== 'undefined');
 var isDev = (process.env.NODE_ENV !== 'production');
-
 if (isBrowser && isDev) {
 	window.Perf = require('react/lib/ReactDefaultPerf');
 	window.printWasted = window.Perf.printWasted;

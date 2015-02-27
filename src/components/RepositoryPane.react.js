@@ -50,7 +50,7 @@ var RepositoryPane = React.createClass({
 		} else
 		if (pipes !== null) {
 			pipeContent = Object.keys(pipes).map(id => {
-				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_PIPE} />;
+				return <RepositoryItem key={id} id={id} type={Constants.ITEM_TYPE_PIPE} />;
 			});
 		}
 
@@ -62,13 +62,13 @@ var RepositoryPane = React.createClass({
 		if (filters !== null) {
 			filters = immutable.Map(filters);
 			sourcesContent = filters.filter(f => f.inputs === 0).map((_, id) => {
-				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_FILTER} />;
+				return <RepositoryItem key={id} id={id} type={Constants.ITEM_TYPE_FILTER} />;
 			}).toArray();
 			filtersContent = filters.filter(f => f.inputs !== 0 && f.outputs !== 0).map((_, id) => {
-				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_FILTER} />;
+				return <RepositoryItem key={id} id={id} type={Constants.ITEM_TYPE_FILTER} />;
 			}).toArray();
 			sinksContent = filters.filter(f => f.outputs === 0).map((_, id) => {
-				return <RepositoryItem key={id} type={Constants.ITEM_TYPE_FILTER} />;
+				return <RepositoryItem key={id} id={id} type={Constants.ITEM_TYPE_FILTER} />;
 			}).toArray();
 		}
 

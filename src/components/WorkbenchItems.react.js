@@ -38,7 +38,7 @@ var WorkbenchItems = React.createClass({
 
 			var frame = WorkbenchStore.getItemPosition(itemId);
 			var isSelected = SelectionStore.isItemSelected(itemId);
-			items.push(<WorkbenchItem key={itemId} item={item} frame={frame} isSelected={isSelected} />);
+			items.push(<WorkbenchItem key={itemId} id={itemId} item={item} frame={frame} isSelected={isSelected} />);
 
 			// Any outputs connected?
 			item.get('outputs').forEach((to, outputId) => {
