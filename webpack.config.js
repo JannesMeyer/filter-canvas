@@ -43,11 +43,7 @@ if ('production' === process.env.NODE_ENV) {
 	var uglifyOptions = {
 		// This is a regex that never matches so that all comments get deleted
 		comments: / ^/,
-		mangle: { sort: true },
-		compress: {
-			hoist_vars: true,
-			warnings: false
-		}
+		compress: { hoist_vars: true, warnings: false }
 	};
 	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
 	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
@@ -55,9 +51,9 @@ if ('production' === process.env.NODE_ENV) {
 } else {
 	// Hot module replacement in development
 	config.entry.unshift('webpack/hot/dev-server');
-	// config.plugins.push(new webpack.NoErrorsPlugin());
 	config.plugins.push(new webpack.HotModuleReplacementPlugin());
 	config.module.loaders[0].loaders.unshift('react-hot');
+	// config.plugins.push(new webpack.NoErrorsPlugin());
 }
 
 module.exports = config;
