@@ -1,3 +1,4 @@
+var defaultConfig = require('json!../../example-configurations/default.json');
 var keypress = require('../lib/keypress-tool');
 var Point = require('../lib/ImmutablePoint');
 var AppActions = require('../flux/AppActions');
@@ -82,11 +83,14 @@ var App = React.createClass({
 	restore() {
 		if (window.localStorage && localStorage.dataBackup) {
 			try {
-				WorkbenchStore.importMyFormat(JSON.parse(localStorage.dataBackup))
+				WorkbenchStore.importMyFormat(JSON.parse(localStorage.dataBackup));
 			} catch (e) {
 				localStorage.removeItem('dataBackup');
 				console.warn(e);
 			}
+		} else {
+			console.log('Loading default configuration...');
+			WorkbenchStore.importFile(defaultConfig);
 		}
 	},
 

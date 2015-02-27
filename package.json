@@ -19,6 +19,7 @@
     "file-loader": "0.x",
     "flux": "2.x",
     "immutable": "2.x",
+    "json-loader": "^0.5.1",
     "normalize.css": "3.x",
     "react": "0.x",
     "react-hot-loader": "1.x",

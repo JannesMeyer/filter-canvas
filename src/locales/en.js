@@ -1,4 +1,6 @@
 export default {
+	introduction_1: 'You can move these building blocks onto the workbench by drag and drop.',
+	introduction_2: 'Then you can connect one block\'s output with another\'s input. But you cannot connect two filters directly, you always need a pipe in between.',
 	errors: {
 		invalid_file: 'Invalid file:\n%(message)s',
 		unsaved_changes: 'You have unsaved changes.',

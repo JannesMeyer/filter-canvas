@@ -84,6 +84,8 @@ var RepositoryPane = React.createClass({
 
 		return (
 			<div className="m-repository-pane">
+				<p className="introduction">{translate('introduction_1')}</p>
+				<p className="introduction">{translate('introduction_2')}</p>
 				<div className="pipe-repository">
 					<h3>{translate('repository_pane.pipes')}</h3>
 					{pipeContent}

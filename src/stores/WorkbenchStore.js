@@ -357,6 +357,124 @@ var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPositio
 
 	exportMyFormat() {
 		return data.toJS();
+	},
+
+	/**
+	 * Imports a file from the external data format
+	 *
+	 * obj: An object in the external data format
+	 */
+	importFile(obj) {
+		var items = [];
+		var outputToConnector = {};
+		var inputToConnector = {};
+
+		// Filters import
+		obj.filters.forEach(filter => {
+			var id = items.length;
+			var numInputs = filter.inputs.length;
+			var numOuputs = filter.outputs.length;
+			var rect;
+			if (filter.rect) {
+				rect = Rect.fromObject(filter.rect);
+			} else {
+				rect = WorkbenchLayout.getFilterFrame(100, 100, filter.class, numInputs, numOuputs);
+			}
+			items[id] = {
+				type: Constants.ITEM_TYPE_FILTER,
+				class: filter.class,
+				parameter: filter.parameter[0] || {},
+				inputs: new Array(numInputs),
+				outputs: new Array(numOuputs),
+				rect
+			};
+			filter.inputs.forEach((input, connectorId) => {
+				inputToConnector[input.inputID] = [id, 0, connectorId];
+			});
+			filter.outputs.forEach((output, connectorId) => {
+				outputToConnector[output.outputID] = [id, 1, connectorId];
+			});
+		});
+
+		// Pipes import
+		obj.pipes.forEach(pipe => {
+			var id = items.length;
+
+			// Calculate rect if necessary
+			var rect;
+			if (pipe.rect) {
+				rect = Rect.fromObject(pipe.rect);
+			} else {
+				rect = WorkbenchLayout.getPipeFrame(200, 200, pipe.type, numMappings, numMappings);
+			}
+
+			// For split/join pipes we need the exact number of inputs/outputs
+			var numInputs = pipe.numInputs || pipe.mappings.length;
+			var numOutputs = pipe.numOutputs || pipe.mappings.length;
+
+			items[id] = {
+				type: Constants.ITEM_TYPE_PIPE,
+				class: pipe.type,
+				parameter: pipe.parameter[0] || {},
+				inputs: new Array(numInputs),
+				outputs: new Array(numOutputs),
+				rect
+			};
+
+			// Read minInputs, minOutputs
+			if (pipe.minInputs !== undefined) {
+				items[id].minInputs = pipe.minInputs;
+			}
+			if (pipe.minOutputs !== undefined) {
+				items[id].minOutputs = pipe.minOutputs;
+			}
+
+			// variableInputs, variableOutputs
+			if (pipe.variableInputs !== undefined) {
+				items[id].variableInputs = pipe.variableInputs;
+			}
+			if (pipe.variableOutputs !== undefined) {
+				items[id].variableOutputs = pipe.variableOutputs;
+			}
+
+			// Create connections out of the mappings
+			pipe.mappings.forEach((mapping, connectorId) => {
+				if (!mapping) {
+					return;
+				}
+
+				var filterOut = outputToConnector[mapping.output];
+				var pipeIn    = [id, 0, connectorId];
+				var pipeOut   = [id, 1, connectorId];
+				var filterIn  = inputToConnector[mapping.input];
+
+				// First connection (doubly linked)
+				// Check bounds of pipe
+				if (pipeIn[2] < items[pipeIn[0]].inputs.length) {
+					// Check for duplicate connection
+					if (items[filterOut[0]].outputs[filterOut[2]]) {
+						console.warn('You tried to connect an input/output twice.');
+					} else {
+						items[filterOut[0]].outputs[filterOut[2]] = pipeIn;
+						items[pipeIn[0]].inputs[pipeIn[2]] = filterOut;
+					}
+				}
+
+				// Second connection (doubly linked)
+				// Check bounds of pipe
+				if (pipeOut[2] < items[pipeOut[0]].outputs.length) {
+					// Check for duplicate connection
+					if (items[filterIn[0]].inputs[filterIn[2]]) {
+						console.warn('You tried to connect an input/output twice.');
+					} else {
+						items[pipeOut[0]].outputs[pipeOut[2]] = filterIn;
+						items[filterIn[0]].inputs[filterIn[2]] = pipeOut;
+					}
+				}
+			});
+		});
+
+		setData(data.updateIn(['items'], _ => immutable.fromJS(items)));
 	}
 
 });
@@ -379,7 +497,7 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 			connectorOffsets = {};
 
 			// Load data
-			setData(importFile(action.obj));
+			WorkbenchStore.importFile(action.obj);
 		break;
 
 		/**
@@ -653,124 +771,6 @@ function arraysEqual(a, b) {
     }
   }
   return true;
-}
-
-/**
- * Imports a file from the external data format
- *
- * obj: An object in the external data format
- */
-function importFile(obj) {
-	var items = [];
-	var outputToConnector = {};
-	var inputToConnector = {};
-
-	// Filters import
-	obj.filters.forEach(filter => {
-		var id = items.length;
-		var numInputs = filter.inputs.length;
-		var numOuputs = filter.outputs.length;
-		var rect;
-		if (filter.rect) {
-			rect = Rect.fromObject(filter.rect);
-		} else {
-			rect = WorkbenchLayout.getFilterFrame(100, 100, filter.class, numInputs, numOuputs);
-		}
-		items[id] = {
-			type: Constants.ITEM_TYPE_FILTER,
-			class: filter.class,
-			parameter: filter.parameter[0] || {},
-			inputs: new Array(numInputs),
-			outputs: new Array(numOuputs),
-			rect
-		};
-		filter.inputs.forEach((input, connectorId) => {
-			inputToConnector[input.inputID] = [id, 0, connectorId];
-		});
-		filter.outputs.forEach((output, connectorId) => {
-			outputToConnector[output.outputID] = [id, 1, connectorId];
-		});
-	});
-
-	// Pipes import
-	obj.pipes.forEach(pipe => {
-		var id = items.length;
-
-		// Calculate rect if necessary
-		var rect;
-		if (pipe.rect) {
-			rect = Rect.fromObject(pipe.rect);
-		} else {
-			rect = WorkbenchLayout.getPipeFrame(200, 200, pipe.type, numMappings, numMappings);
-		}
-
-		// For split/join pipes we need the exact number of inputs/outputs
-		var numInputs = pipe.numInputs || pipe.mappings.length;
-		var numOutputs = pipe.numOutputs || pipe.mappings.length;
-
-		items[id] = {
-			type: Constants.ITEM_TYPE_PIPE,
-			class: pipe.type,
-			parameter: pipe.parameter[0] || {},
-			inputs: new Array(numInputs),
-			outputs: new Array(numOutputs),
-			rect
-		};
-
-		// Read minInputs, minOutputs
-		if (pipe.minInputs !== undefined) {
-			items[id].minInputs = pipe.minInputs;
-		}
-		if (pipe.minOutputs !== undefined) {
-			items[id].minOutputs = pipe.minOutputs;
-		}
-
-		// variableInputs, variableOutputs
-		if (pipe.variableInputs !== undefined) {
-			items[id].variableInputs = pipe.variableInputs;
-		}
-		if (pipe.variableOutputs !== undefined) {
-			items[id].variableOutputs = pipe.variableOutputs;
-		}
-
-		// Create connections out of the mappings
-		pipe.mappings.forEach((mapping, connectorId) => {
-			if (!mapping) {
-				return;
-			}
-
-			var filterOut = outputToConnector[mapping.output];
-			var pipeIn    = [id, 0, connectorId];
-			var pipeOut   = [id, 1, connectorId];
-			var filterIn  = inputToConnector[mapping.input];
-
-			// First connection (doubly linked)
-			// Check bounds of pipe
-			if (pipeIn[2] < items[pipeIn[0]].inputs.length) {
-				// Check for duplicate connection
-				if (items[filterOut[0]].outputs[filterOut[2]]) {
-					console.warn('You tried to connect an input/output twice.');
-				} else {
-					items[filterOut[0]].outputs[filterOut[2]] = pipeIn;
-					items[pipeIn[0]].inputs[pipeIn[2]] = filterOut;
-				}
-			}
-
-			// Second connection (doubly linked)
-			// Check bounds of pipe
-			if (pipeOut[2] < items[pipeOut[0]].outputs.length) {
-				// Check for duplicate connection
-				if (items[filterIn[0]].inputs[filterIn[2]]) {
-					console.warn('You tried to connect an input/output twice.');
-				} else {
-					items[pipeOut[0]].outputs[pipeOut[2]] = filterIn;
-					items[filterIn[0]].inputs[filterIn[2]] = pipeOut;
-				}
-			}
-		});
-	});
-
-	return data.updateIn(['items'], _ => immutable.fromJS(items));
 }
 
 /**
