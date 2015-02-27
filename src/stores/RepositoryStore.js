@@ -121,19 +121,19 @@ function reload() {
 	});
 
 	// Load complex filters
-	xhr.getJSON(complexFiltersURL, (err, result) => {
-		if (err) {
-			complexFilters = new Error('Connection error');
-		} else {
-			complexFilters = {};
-			result.rows.forEach(row => {
-				complexFilters[row.id] = row.doc;
-			});
-		}
+	// xhr.getJSON(complexFiltersURL, (err, result) => {
+	// 	if (err) {
+	// 		complexFilters = new Error('Connection error');
+	// 	} else {
+	// 		complexFilters = {};
+	// 		result.rows.forEach(row => {
+	// 			complexFilters[row.id] = row.doc;
+	// 		});
+	// 	}
 
-		// Refresh the UI
-		RepositoryStore.emitChange();
-	});
+	// 	// Refresh the UI
+	// 	RepositoryStore.emitChange();
+	// });
 }
 
 module.exports = RepositoryStore;

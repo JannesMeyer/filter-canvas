@@ -17,9 +17,9 @@ export default {
 	},
 	detail_pane: {
 		headline: {
-			zero:  'No elementos seleccionados',
-			one:   '1 elemento seleccionado',
-			other: '%(count)s elementos seleccionados'
+			zero:  'No elementos están seleccionados',
+			one:   '1 elemento esta seleccionado',
+			other: '%(count)s elementos están seleccionados'
 		},
 		'delete': {
 			one: 'Borrar elemento',

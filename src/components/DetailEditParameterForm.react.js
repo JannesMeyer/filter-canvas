@@ -23,7 +23,7 @@ var EditParameterForm = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.item !== nextProps.item ||
 		       this.state.changed !== nextState.changed ||
-		       localeChange;
+		       window.localeChange;
 	},
 
 	componentDidMount() {

@@ -20,7 +20,7 @@ var DetailPane = React.createClass({
 		       this.state.showNewParameterForm !== nextState.showNewParameterForm ||
 		       this.state.newParameter !== nextState.newParameter ||
 		       this.state.items !== nextState.items ||
-		       localeChange;
+		       window.localeChange;
 	},
 	componentDidMount() {
 		SelectionStore.addChangeListener(this._handleChange);
@@ -86,10 +86,10 @@ var DetailPane = React.createClass({
 			return (
 				<div className="m-detail-pane">
 					<h3>{translate('detail_pane.headline', { count })}</h3>
-					<button type="button" onClick={AppActions.saveSelectedItemsAsFilter}>{translate('detail_pane.save_complex_filter')}</button>
 					<button type="button" onClick={AppActions.deleteSelectedItems} className="red-button">{translate('detail_pane.delete.other')}</button>
 				</div>
 			);
+			// <button type="button" onClick={AppActions.saveSelectedItemsAsFilter}>{translate('detail_pane.save_complex_filter')}</button>
 		}
 	},
 

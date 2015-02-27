@@ -14,7 +14,7 @@ var Actions = React.createClass({
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state.hasUndoSteps !== nextState.hasUndoSteps ||
 		       this.state.hasRedoSteps !== nextState.hasRedoSteps ||
-		       localeChange;
+		       window.localeChange;
 	},
 
 	selectFile() {

@@ -9,8 +9,8 @@ var RepositoryPane = React.createClass({
 	getInitialState() {
 		return {
 			pipes: RepositoryStore.getAllPipes(),
-			filters: RepositoryStore.getAllFilters(),
-			complexFilters: RepositoryStore.getAllComplexFilters()
+			filters: RepositoryStore.getAllFilters()
+			// complexFilters: RepositoryStore.getAllComplexFilters()
 		};
 	},
 
@@ -72,12 +72,15 @@ var RepositoryPane = React.createClass({
 			}).toArray();
 		}
 
-		if(complexFilters instanceof Error) {
-			complexFilterContent = <p>{translate('errors.no_network')}</p>;
-		} else
-		if (complexFilters !== null) {
-			complexFilterContent = [];
-		}
+		// if(complexFilters instanceof Error) {
+		// 	complexFilterContent = <p>{translate('errors.no_network')}</p>;
+		// } else
+		// if (complexFilters !== null) {
+		// 	complexFilterContent = [];
+		// }
+
+		// <h3>{translate('repository_pane.complex_filters')}</h3>
+		// {complexFilterContent}
 
 		return (
 			<div className="m-repository-pane">
@@ -92,8 +95,6 @@ var RepositoryPane = React.createClass({
 					{filtersContent}
 					<h3>{translate('repository_pane.sinks')}</h3>
 					{sinksContent}
-					<h3>{translate('repository_pane.complex_filters')}</h3>
-					{complexFilterContent}
 				</div>
 			</div>
 		);
