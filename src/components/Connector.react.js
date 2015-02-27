@@ -29,7 +29,7 @@ var Connector = React.createClass({
 	},
 
 	_handleChange() {
-		this.replaceState(this.getInitialState());
+		this.setState(this.getInitialState());
 	}
 
 });

@@ -97,7 +97,7 @@ var App = React.createClass({
 	},
 
 	confirmPageUnload(ev) {
-		var message = 'You have unsaved changes.';
+		var message = translate('errors.unsaved_changes');
 		ev.returnValue = message;
 		return message;
 	},

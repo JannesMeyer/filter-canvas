@@ -13,7 +13,8 @@ var Actions = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state.hasUndoSteps !== nextState.hasUndoSteps ||
-		       this.state.hasRedoSteps !== nextState.hasRedoSteps;
+		       this.state.hasRedoSteps !== nextState.hasRedoSteps ||
+		       localeChange;
 	},
 
 	selectFile() {
@@ -41,7 +42,7 @@ var Actions = React.createClass({
 			// Reset file input field
 			this.refs.file.getDOMNode().value = '';
 		} catch (err) {
-			alert('Ungültige Datei\n\n' + err.message);
+			alert(translate('errors.invalid_file', { message: err.message }));
 		}
 	},
 
@@ -67,17 +68,17 @@ var Actions = React.createClass({
 		return (
 			<div className="m-actions">
 				<input className="hidden" type="file" ref="file" accept="application/json" onChange={this.handleFileChange} />
-				<button onClick={AppActions.deleteAllItems} className="icon icon-doc-inv">Neu</button>
-				<button onClick={this.selectFile} className="icon icon-open">Importieren</button>
-				<button onClick={AppActions.exportFile} className="icon icon-save">Exportieren</button>
-				<button onClick={AppActions.undo} className="icon icon-undo" disabled={!this.state.hasUndoSteps}>Rückgängig</button>
-				<button onClick={AppActions.redo} className="icon icon-redo" disabled={!this.state.hasRedoSteps}>Wiederholen</button>
+				<button onClick={AppActions.deleteAllItems} className="icon icon-doc-inv">{translate('actions.new')}</button>
+				<button onClick={this.selectFile} className="icon icon-open">{translate('actions.import')}</button>
+				<button onClick={AppActions.exportFile} className="icon icon-save">{translate('actions.export')}</button>
+				<button onClick={AppActions.undo} className="icon icon-undo" disabled={!this.state.hasUndoSteps}>{translate('actions.undo')}</button>
+				<button onClick={AppActions.redo} className="icon icon-redo" disabled={!this.state.hasRedoSteps}>{translate('actions.redo')}</button>
 			</div>
 		);
 	},
 
 	_handleChange() {
-		this.replaceState(this.getInitialState());
+		this.setState(this.getInitialState());
 	}
 
 });

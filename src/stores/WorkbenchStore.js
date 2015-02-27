@@ -749,7 +749,7 @@ function importFile(obj) {
 			if (pipeIn[2] < items[pipeIn[0]].inputs.length) {
 				// Check for duplicate connection
 				if (items[filterOut[0]].outputs[filterOut[2]]) {
-					console.warn('Es wurde versucht, mehrmals den gleichen Input/Output zu verbinden.');
+					console.warn('You tried to connect an input/output twice.');
 				} else {
 					items[filterOut[0]].outputs[filterOut[2]] = pipeIn;
 					items[pipeIn[0]].inputs[pipeIn[2]] = filterOut;
@@ -761,7 +761,7 @@ function importFile(obj) {
 			if (pipeOut[2] < items[pipeOut[0]].outputs.length) {
 				// Check for duplicate connection
 				if (items[filterIn[0]].inputs[filterIn[2]]) {
-					console.warn('Es wurde versucht, mehrmals den gleichen Input/Output zu verbinden.');
+					console.warn('You tried to connect an input/output twice.');
 				} else {
 					items[pipeOut[0]].outputs[pipeOut[2]] = filterIn;
 					items[filterIn[0]].inputs[filterIn[2]] = pipeOut;
@@ -874,7 +874,7 @@ function addConnection(output, input) {
 
 	if (fromFilter && toFilter && !FilterCompatibility.test(fromFilter, fromFilterIndex, toFilter, toFilterIndex)) {
 		// Dispatcher.waitFor([ CreateConnectionStore.dispatchToken ]);
-		alert('Die Filter „' + fromFilter + '“ und „' + toFilter + '“ sind leider nicht miteinander kompatibel.');
+		alert(translate('errors.incompatible_filters', { fromFilter, toFilter }));
 		return;
 	}
 

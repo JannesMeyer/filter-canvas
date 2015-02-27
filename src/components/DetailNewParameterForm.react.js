@@ -48,14 +48,14 @@ var DetailNewParameterForm = React.createClass({
 	render() {
 		return (
 			<form className="dialog-new-parameter" ref="form" onSubmit={this.handleSubmit}>
-				<h3>Neuer Parameter</h3>
-				<input type="text" ref="key" placeholder="Parametername" required />
-				<label><input type="radio" name="parameterType" value="string" defaultChecked />Text</label>
-				<label><input type="radio" name="parameterType" value="number" />Zahl</label>
-				<label><input type="radio" name="parameterType" value="boolean" />Boolesche Variable</label>
+				<h3>{translate('detail_pane.new_parameter')}</h3>
+				<input type="text" ref="key" placeholder={translate('new_parameter.name')} required />
+				<label><input type="radio" name="parameterType" value="string" defaultChecked />{translate('new_parameter.type_text')}</label>
+				<label><input type="radio" name="parameterType" value="number" />{translate('new_parameter.type_number')}</label>
+				<label><input type="radio" name="parameterType" value="boolean" />{translate('new_parameter.type_bool')}</label>
 				<div className="actions">
-					<button type="submit">OK</button>
-					<button type="button" onClick={this.props.onCancel} className="red-button">Abbrechen</button>
+					<button type="submit">{translate('dialog.ok')}</button>
+					<button type="button" onClick={this.props.onCancel} className="red-button">{translate('dialog.cancel')}</button>
 				</div>
 			</form>
 		);

@@ -13,7 +13,10 @@ var config = {
 		filename: '[name].bundle.js'
 	},
 	plugins: [
-		new webpack.ProvidePlugin({ 'React': 'react' })
+		new webpack.ProvidePlugin({
+			React: 'react',
+			translate: 'counterpart'
+		})
 	],
 	module: {
 		loaders: [

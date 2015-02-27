@@ -22,7 +22,8 @@ var EditParameterForm = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.item !== nextProps.item ||
-		       this.state.changed !== nextState.changed;
+		       this.state.changed !== nextState.changed ||
+		       localeChange;
 	},
 
 	componentDidMount() {
@@ -164,7 +165,7 @@ var EditParameterForm = React.createClass({
 			<form className="dialog-default" onSubmit={this.handleSubmit}>
 				<h3>{item.get('class')}</h3>
 				{inputs}{outputs}{params}
-				{changed.length > 0 && <button type="submit">Übernehmen</button>}
+				{changed.length > 0 && <button type="submit">{translate('dialog.apply')}</button>}
 				{this.props.children}
 			</form>
 		);

@@ -46,7 +46,7 @@ var RepositoryPane = React.createClass({
 		var complexFilterContent = spinner;
 
 		if(pipes instanceof Error) {
-			pipeContent = <p>Verbindungs-Fehler</p>;
+			pipeContent = <p>{translate('errors.no_network')}</p>;
 		} else
 		if (pipes !== null) {
 			pipeContent = Object.keys(pipes).map(id => {
@@ -55,9 +55,9 @@ var RepositoryPane = React.createClass({
 		}
 
 		if(filters instanceof Error) {
-			sourcesContent = <p>Verbindungs-Fehler</p>;
-			filtersContent = <p>Verbindungs-Fehler</p>;
-			sinksContent = <p>Verbindungs-Fehler</p>;
+			sourcesContent = <p>{translate('errors.no_network')}</p>;
+			filtersContent = <p>{translate('errors.no_network')}</p>;
+			sinksContent = <p>{translate('errors.no_network')}</p>;
 		} else
 		if (filters !== null) {
 			filters = immutable.Map(filters);
@@ -73,7 +73,7 @@ var RepositoryPane = React.createClass({
 		}
 
 		if(complexFilters instanceof Error) {
-			complexFilterContent = <p>Verbindungs-Fehler</p>;
+			complexFilterContent = <p>{translate('errors.no_network')}</p>;
 		} else
 		if (complexFilters !== null) {
 			complexFilterContent = [];
@@ -82,17 +82,17 @@ var RepositoryPane = React.createClass({
 		return (
 			<div className="m-repository-pane">
 				<div className="pipe-repository">
-					<h3>Pipes</h3>
+					<h3>{translate('repository_pane.pipes')}</h3>
 					{pipeContent}
 				</div>
 				<div className="filter-repository">
-					<h3>Pumps</h3>
+					<h3>{translate('repository_pane.pumps')}</h3>
 					{sourcesContent}
-					<h3>Filter</h3>
+					<h3>{translate('repository_pane.filters')}</h3>
 					{filtersContent}
-					<h3>Sinks</h3>
+					<h3>{translate('repository_pane.sinks')}</h3>
 					{sinksContent}
-					<h3>Komplexe Filter</h3>
+					<h3>{translate('repository_pane.complex_filters')}</h3>
 					{complexFilterContent}
 				</div>
 			</div>
@@ -100,7 +100,7 @@ var RepositoryPane = React.createClass({
 	},
 
 	_handleChange() {
-		this.replaceState(this.getInitialState());
+		this.setState(this.getInitialState());
 	}
 
 });

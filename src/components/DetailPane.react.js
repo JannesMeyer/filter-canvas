@@ -19,7 +19,8 @@ var DetailPane = React.createClass({
 		return !this.state.selectedItems.equals(nextState.selectedItems) ||
 		       this.state.showNewParameterForm !== nextState.showNewParameterForm ||
 		       this.state.newParameter !== nextState.newParameter ||
-		       this.state.items !== nextState.items;
+		       this.state.items !== nextState.items ||
+		       localeChange;
 	},
 	componentDidMount() {
 		SelectionStore.addChangeListener(this._handleChange);
@@ -50,7 +51,7 @@ var DetailPane = React.createClass({
 		if (count === 0) {
 			return (
 				<div className="m-detail-pane">
-					<h3>Keine Elemente markiert</h3>
+					<h3>{translate('detail_pane.headline', { count })}</h3>
 				</div>
 			);
 		}
@@ -73,8 +74,8 @@ var DetailPane = React.createClass({
 			return (
 				<div className="m-detail-pane">
 					<EditParameterForm id={itemId} item={item} newParameter={this.state.newParameter}>
-						<button type="button" onClick={this.showNewParameterForm}>Neuer Parameter</button>
-						<button type="button" onClick={AppActions.deleteSelectedItems} className="red-button">Element löschen</button>
+						<button type="button" onClick={this.showNewParameterForm}>{translate('detail_pane.new_parameter')}</button>
+						<button type="button" onClick={AppActions.deleteSelectedItems} className="red-button">{translate('detail_pane.delete.one')}</button>
 					</EditParameterForm>
 				</div>
 			);
@@ -84,16 +85,16 @@ var DetailPane = React.createClass({
 		if (count > 1) {
 			return (
 				<div className="m-detail-pane">
-					<h3>{count + ' Elemente markiert'}</h3>
-					<button type="button" onClick={AppActions.saveSelectedItemsAsFilter}>Als komplexen Filter speichern</button>
-					<button type="button" onClick={AppActions.deleteSelectedItems} className="red-button">Elemente löschen</button>
+					<h3>{translate('detail_pane.headline', { count })}</h3>
+					<button type="button" onClick={AppActions.saveSelectedItemsAsFilter}>{translate('detail_pane.save_complex_filter')}</button>
+					<button type="button" onClick={AppActions.deleteSelectedItems} className="red-button">{translate('detail_pane.delete.other')}</button>
 				</div>
 			);
 		}
 	},
 
 	_handleChange() {
-		this.replaceState(this.getInitialState());
+		this.setState(this.getInitialState());
 	}
 
 });

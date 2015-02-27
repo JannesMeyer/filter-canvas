@@ -14,6 +14,7 @@
     "babel-core": "4.x",
     "babel-loader": "4.x",
     "browser-saveas": "1.x",
+    "counterpart": "^0.16.4",
     "css-loader": "0.x",
     "file-loader": "0.x",
     "flux": "2.x",
