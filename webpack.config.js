@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === 'production') {
 	config.plugins.push(new webpack.optimize.UglifyJsPlugin({
 		// regex never matches
 		comments: / ^/,
-		compress: { hoist_vars: true, warnings: false }
+		compress: { warnings: false }
 	}));
 } else {
 	// Hot module replacement
