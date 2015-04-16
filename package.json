@@ -7,8 +7,7 @@
   },
   "scripts": {
     "start": "./dev-server.js",
-    "build": "NODE_ENV=production webpack",
-    "deploy": "NODE_ENV=production webpack && git checkout gh-pages && mv build/* . && rm -r build && git add -u . && git commit -m Build && git checkout master && git push"
+    "build": "NODE_ENV=production webpack && git checkout gh-pages && mv build/* . && rm -r build && git add -u . && git commit -m Build && git checkout master"
   },
   "devDependencies": {
     "autoprefixer-loader": "1.x",
