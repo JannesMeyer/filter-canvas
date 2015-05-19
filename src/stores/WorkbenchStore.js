@@ -22,9 +22,6 @@ var isDragging = false;
 var startMousePos;
 var itemPositions = Map();
 
-/**
- * Inverts the key/value pairs of an object
- */
 
 function makeArray(n, value) {
 	var arr = [];

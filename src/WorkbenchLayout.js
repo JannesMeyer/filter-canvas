@@ -1,5 +1,5 @@
-var Point = require('./lib/ImmutablePoint');
-var Rect = require('./lib/ImmutableRect');
+import Point from './lib/ImmutablePoint';
+import Rect from './lib/ImmutableRect';
 
 // Some constants
 var WIRE_WIDTH        = 8;
@@ -147,4 +147,4 @@ var WorkbenchLayout = {
 	}
 
 };
-module.exports = WorkbenchLayout;
+export default WorkbenchLayout;

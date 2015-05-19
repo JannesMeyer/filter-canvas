@@ -5,7 +5,7 @@ var getAbsolutePath = path.join.bind(path, __dirname);
 var config = {
 	entry: [ './src/main.js' ],
 	output: {
-		path: 'build',
+		path: getAbsolutePath('build'),
 		filename: '[name].bundle.js'
 	},
 	cache: true,
@@ -18,8 +18,7 @@ var config = {
 			{
 				test: /\.js$/,
 				loaders: [ 'babel' ],
-				include: [ getAbsolutePath('src') ],
-				exclude: [ getAbsolutePath('node_modules') ]
+				include: [ getAbsolutePath('src') ]
 			},
 			{ test: /\.styl$/, loaders: [ 'style', 'css', 'autoprefixer', 'stylus' ] },
 			{ test: /\.css$/, loaders: [ 'style', 'css', 'autoprefixer' ] },

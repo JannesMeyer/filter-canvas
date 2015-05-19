@@ -1,43 +1,43 @@
-// Webpack
-import '../public/index.html'; // copy
-import '../filter-canvas.config.js'; // copy
-import 'normalize.css/normalize.css'; // import
-import '../stylus/main.styl'; // import & translate
-
-// JavaScript modules
+import React from 'react';
+import Perf from 'react/lib/ReactDefaultPerf';
 import App from './components/App.react';
+import translate from 'counterpart';
+import 'babel-core/polyfill';
 
-var isBrowser = (typeof window !== 'undefined');
+// Webpack
+import '../public/index.html';
+import '../config.js';
+import 'normalize.css/normalize.css';
+import '../stylus/main.styl';
+
+var locales = ['en', 'de', 'es'];
 var isDev = (process.env.NODE_ENV !== 'production');
 
-translate.registerTranslations('en', require('./locales/en'));
-translate.registerTranslations('de', require('./locales/de'));
-translate.registerTranslations('es', require('./locales/es'));
+// Register translations
+for (var locale of locales) {
+	translate.registerTranslations(locale, require('./locales/' + locale));
+}
 
-// Only if the browser supports `navigator.languages`
-if (isBrowser && navigator.languages) {
-	for (var locale of navigator.languages) {
-		locale = locale.split('-')[0];
-		if (locale === 'en' || locale === 'de' || locale === 'es') {
-			translate.setLocale(locale);
+// Select language
+if (navigator.languages) {
+	for (var lang of navigator.languages) {
+		lang = lang.split('-')[0];
+		if (locales.includes(lang)) {
+			translate.setLocale(lang);
 			break;
 		}
 	}
 }
 
-// Render the controller-view
-React.render(<App />, document.body);
-
-// Re-render on locale changes
-translate.onLocaleChange(() => {
-	window.localeChange = true;
-	React.render(<App />, document.body, () => { window.localeChange = false; });
-});
-
-// Measure performance for debugging
-if (isBrowser && isDev) {
-	window.Perf = require('react/lib/ReactDefaultPerf');
-	window.printWasted = window.Perf.printWasted;
-	window.printInclusive = window.Perf.printInclusive;
-	window.Perf.start();
+// Measure performance
+if (isDev) {
+	window.printWasted = Perf.printWasted;
+	window.printInclusive = Perf.printInclusive;
+	Perf.start();
 }
+
+// Render the controller-view
+React.render(<App locale={translate.getLocale()} />, document.body);
+translate.onLocaleChange(() => {
+	React.render(<App locale={translate.getLocale()} />, document.body);
+});

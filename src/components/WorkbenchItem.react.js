@@ -1,4 +1,4 @@
-var cx = require('react/lib/cx');
+var cx = require('classnames');
 var { Vector } = require('immutable');
 var Point = require('../lib/ImmutablePoint');
 

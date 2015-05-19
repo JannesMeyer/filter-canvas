@@ -1,15 +1,26 @@
-var cx = require('react/lib/cx');
-var Rect = require('../lib/ImmutableRect');
+import cx from 'classnames';
+import Rect from '../lib/ImmutableRect';
 
-var WorkbenchWire = React.createClass({
+export default class WorkbenchWire extends React.Component {
+	shouldComponentUpdate(nextProps, nextState) {
+		return !nextProps.frame.equals(this.props.frame);
+	}
 
-	context: null,
+	componentDidMount() {
+		this.setState({ context: React.findDOMNode(this).getContext('2d') }, () => {
+			this.draw();
+		});
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevProps.frame.width  !== this.props.frame.width ||
+		    prevProps.frame.height !== this.props.frame.height) {
+			this.draw();
+		}
+	}
 
 	draw() {
-		if (!this.context) {
-			this.context = this.getDOMNode().getContext('2d');
-		}
-		var ctx = this.context;
+		var ctx = this.state.context;
 		var bez = this.props.bezier;
 
 		ctx.beginPath();
@@ -23,40 +34,15 @@ var WorkbenchWire = React.createClass({
 		ctx.strokeStyle = '#63e4ff';
 		ctx.lineWidth = this.props.width - 2;
 		ctx.stroke();
-	},
-
-	shouldComponentUpdate(nextProps, nextState) {
-		return !nextProps.frame.equals(this.props.frame);
-	},
-
-	shouldComponentRedraw(prevProps) {
-		return prevProps.frame.width  !== this.props.frame.width ||
-		       prevProps.frame.height !== this.props.frame.height;
-	},
-
-	componentDidUpdate(prevProps, prevState) {
-		if (this.shouldComponentRedraw(prevProps)) {
-			this.draw();
-		}
-	},
-
-	componentDidMount() {
-		this.draw();
-	},
-
-	render() {
-		var frame = this.props.frame;
-
-		var classes = cx({
-			'm-wire': true,
-			'dragging': this.props.dragging
-		});
-		var style = {
-			left: frame.x,
-			top: frame.y
-		};
-		return <canvas className={classes} width={frame.width} height={frame.height} style={style} />;
 	}
 
-});
-module.exports = WorkbenchWire;
+	render() {
+		var dragging = this.props.dragging;
+		var frame = this.props.frame;
+
+		return <canvas className={cx('m-wire', { dragging })}
+		               style={{ left: frame.x, top: frame.y }}
+		               width={frame.width}
+		               height={frame.height} />;
+	}
+}

@@ -7,14 +7,14 @@
   },
   "scripts": {
     "start": "./dev-server.js",
-    "build": "NODE_ENV=production ./node_modules/.bin/webpack",
-    "gh-pages": "git checkout gh-pages && mv build/* . && rm -r build"
+    "prepublish": "NODE_ENV=production ./node_modules/.bin/webpack"
   },
   "devDependencies": {
     "autoprefixer-loader": "1.x",
     "babel-core": "4.x",
     "babel-loader": "4.x",
     "browser-saveas": "1.x",
+    "classnames": "^1.2.0",
     "counterpart": "^0.16.4",
     "css-loader": "0.x",
     "file-loader": "0.x",
