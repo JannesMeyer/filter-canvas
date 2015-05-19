@@ -3,7 +3,8 @@
 # http://www.damian.oquanta.info/posts/one-line-deployment-of-your-site-to-gh-pages.html
 # git checkout -b gh-pages
 # git rm -rf .
-# git commit -am "First commit to gh-pages branch"
+# git add build
+# git commit -m "Recompile $(date +'%d %b %H:%M')"
 # git push origin gh-pages
 # git push origin $(git subtree split --prefix build gh-pages):gh-pages --force
 
