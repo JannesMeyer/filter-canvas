@@ -6,7 +6,7 @@ import 'babel-core/polyfill';
 
 // Webpack
 import '../public/index.html';
-import '../config.js';
+import './config.js';
 import 'normalize.css/normalize.css';
 import '../stylus/main.styl';
 
