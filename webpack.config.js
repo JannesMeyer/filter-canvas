@@ -29,13 +29,14 @@ var config = {
 };
 
 if (process.env.NODE_ENV === 'production') {
-	// Production
-	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
-	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
-	config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-		comments: / ^/,
-		compress: { warnings: false }
-	}));
+	config.plugins = [
+		new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }),
+		new webpack.optimize.OccurenceOrderPlugin(),
+		new webpack.optimize.UglifyJsPlugin({
+			comments: / ^/,
+			compress: { warnings: false }
+		})
+	];
 } else {
 	// Hot module replacement
 	config.entry.unshift('webpack/hot/dev-server');
