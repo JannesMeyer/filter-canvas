@@ -1,32 +1,31 @@
 {
   "name": "filter-canvas",
   "author": "Jannes Meyer <jannes.meyer@gmail.com>",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/JannesMeyer/filter-canvas.git"
-  },
+  "repository": "JannesMeyer/filter-canvas",
   "scripts": {
     "start": "./dev-server.js",
     "prepublish": "NODE_ENV=production ./node_modules/.bin/webpack"
   },
-  "devDependencies": {
-    "autoprefixer-loader": "1.x",
-    "babel-core": "4.x",
-    "babel-loader": "4.x",
-    "browser-saveas": "1.x",
-    "classnames": "^1.2.0",
+  "dependencies": {
+    "react": "^0.13.3",
+    "flux": "^2.0.3",
+    "immutable": "^2.6.2",
+    "classnames": "^2.1.1",
     "counterpart": "^0.16.4",
-    "css-loader": "0.x",
-    "file-loader": "0.x",
-    "flux": "2.x",
-    "immutable": "2.x",
+    "browser-saveas": "^1.0.0",
+    "normalize.css": "^3.0.3"
+  },
+  "devDependencies": {
+    "webpack": "^1.9.7",
+    "webpack-dev-server": "^1.8.2",
+    "babel-loader": "^5.1.2",
+    "babel-core": "^5.4.3",
+    "react-hot-loader": "^1.2.7",
+    "autoprefixer-loader": "^1.2.0",
+    "css-loader": "^0.12.1",
+    "file-loader": "^0.8.1",
     "json-loader": "^0.5.1",
-    "normalize.css": "3.x",
-    "react": "0.x",
-    "react-hot-loader": "1.x",
-    "style-loader": "0.x",
-    "stylus-loader": "0.x",
-    "webpack": "1.x",
-    "webpack-dev-server": "1.x"
+    "style-loader": "^0.12.2",
+    "stylus-loader": "^1.1.1"
   }
 }
