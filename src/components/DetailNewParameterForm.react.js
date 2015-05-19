@@ -1,11 +1,18 @@
 import React from 'react';
 import translate from 'counterpart';
+import LanguageStore from '../stores/LanguageStore';
 import AppActions from '../flux/AppActions';
 
 var DetailNewParameterForm = React.createClass({
 
 	componentDidMount() {
 		this.refs.key.getDOMNode().focus();
+		this.forceUpdate = this.forceUpdate.bind(this);
+		LanguageStore.addChangeListener(this.forceUpdate);
+	},
+
+	componentWillUnmount() {
+		LanguageStore.removeChangeListener(this.forceUpdate);
 	},
 
 	handleSubmit(ev) {

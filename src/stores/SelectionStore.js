@@ -1,6 +1,6 @@
 import { Set } from 'immutable';
 import Rect from '../lib/ImmutableRect';
-import { createEventEmitter } from '../lib/BaseStore';
+import { createStore } from '../lib/BaseStore';
 import WorkbenchStore from './WorkbenchStore';
 import Dispatcher from '../flux/Dispatcher';
 import Constants from '../flux/Constants';
@@ -31,7 +31,7 @@ var isMacPlatform = Boolean(typeof navigator !== 'undefined' && navigator.platfo
  * SelectionStore single object
  * (like a singleton)
  */
-var SelectionStore = createEventEmitter(['change'], {
+var SelectionStore = createStore(['change'], {
 
 	/**
 	 * Helper-function to determine what kind of action should happen

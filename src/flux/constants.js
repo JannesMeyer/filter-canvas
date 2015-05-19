@@ -55,6 +55,9 @@ var Constants = keyMirror({
 
 	// Selection types
 	SELECTION_TYPE_NEW: null,
-	SELECTION_TYPE_EXTEND: null
+	SELECTION_TYPE_EXTEND: null,
+
+	// Change UI language
+	CHANGE_UI_LANGUAGE: null
 });
 export default Constants;

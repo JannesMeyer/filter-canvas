@@ -17,8 +17,13 @@ import Constants from './Constants';
  * @see SelectionStore
  * @see RepositoryStore
  * @see CreateConnectionStore
+ * @see LanguageStore
  */
 export default {
+
+	changeLanguage(language) {
+		Dispatcher.dispatch({ actionType: Constants.CHANGE_UI_LANGUAGE, language });
+	},
 
 	reloadRepository() {
 		Dispatcher.dispatch({ actionType: Constants.RELOAD_REPOSITORY })

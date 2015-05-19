@@ -1,7 +1,8 @@
 import xhr from '../lib/xhr-tool';
-import { createEventEmitter } from '../lib/BaseStore';
+import { createStore } from '../lib/BaseStore';
 import Dispatcher from '../flux/Dispatcher';
 import Constants from '../flux/Constants';
+import cfg from '../config';
 
 // Backed by AJAX requests to CouchDB
 var pipes = {};
@@ -13,7 +14,7 @@ var complexFilters = {};
  *
  * @see components/RepositoryPane.react.js
  */
-var RepositoryStore = createEventEmitter(['change'], {
+var RepositoryStore = createStore(['change'], {
 
 	/**
 	 * Returns all pipes that are available in the database
@@ -91,7 +92,7 @@ function reload() {
 	RepositoryStore.emitChange();
 
 	// Load pipes
-	xhr.getJSON(pipesURL, (err, result) => {
+	xhr.getJSON(cfg.DB_URLS.pipes, (err, result) => {
 		if (err) {
 			pipes = new Error('Connection error');
 		} else {
@@ -106,7 +107,7 @@ function reload() {
 	});
 
 	// Load normal filters
-	xhr.getJSON(filtersURL, (err, result) => {
+	xhr.getJSON(cfg.DB_URLS.filters, (err, result) => {
 		if (err) {
 			filters = new Error('Connection error');
 		} else {
@@ -121,7 +122,7 @@ function reload() {
 	});
 
 	// Load complex filters
-	// xhr.getJSON(complexFiltersURL, (err, result) => {
+	// xhr.getJSON(cfg.DB_URLS.complexFilters, (err, result) => {
 	// 	if (err) {
 	// 		complexFilters = new Error('Connection error');
 	// 	} else {

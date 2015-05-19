@@ -1,5 +1,6 @@
 import React from 'react';
 import translate from 'counterpart';
+import LanguageStore from '../stores/LanguageStore';
 import { OrderedMap } from 'immutable';
 import AppActions from '../flux/AppActions';
 import SelectionStore from '../stores/SelectionStore';
@@ -17,27 +18,35 @@ var DetailPane = React.createClass({
 			newParameter: OrderedMap()
 		};
 	},
+
 	shouldComponentUpdate(nextProps, nextState) {
 		return !this.state.selectedItems.equals(nextState.selectedItems) ||
 		       this.state.showNewParameterForm !== nextState.showNewParameterForm ||
 		       this.state.newParameter !== nextState.newParameter ||
-		       this.state.items !== nextState.items ||
-		       window.localeChange;
+		       this.state.items !== nextState.items;
 	},
+
 	componentDidMount() {
+		this.forceUpdate = this.forceUpdate.bind(this);
+		LanguageStore.addChangeListener(this.forceUpdate);
 		SelectionStore.addChangeListener(this._handleChange);
 		WorkbenchStore.addParamChangeListener(this._handleChange);
 	},
+
 	componentWillUnmount() {
+		LanguageStore.removeChangeListener(this.forceUpdate);
 		SelectionStore.removeChangeListener(this._handleChange);
 		WorkbenchStore.removeParamChangeListener(this._handleChange);
 	},
+
 	showNewParameterForm() {
 		this.setState({ showNewParameterForm: true });
 	},
+
 	hideNewParameterForm() {
 		this.setState({ showNewParameterForm: false });
 	},
+
 	handleCreateParameter(key, value) {
 		this.setState({
 			showNewParameterForm: false,

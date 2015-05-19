@@ -1,5 +1,6 @@
 import React from 'react';
 import translate from 'counterpart';
+import LanguageStore from '../stores/LanguageStore';
 import { Set } from 'immutable';
 import AppActions from '../flux/AppActions';
 
@@ -24,8 +25,7 @@ var EditParameterForm = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.props.item !== nextProps.item ||
-		       this.state.changed !== nextState.changed ||
-		       window.localeChange;
+		       this.state.changed !== nextState.changed;
 	},
 
 	componentDidMount() {
@@ -34,6 +34,13 @@ var EditParameterForm = React.createClass({
 		if (lastKey) {
 			this.refs[lastKey].getDOMNode().focus();
 		}
+
+		this.forceUpdate = this.forceUpdate.bind(this);
+		LanguageStore.addChangeListener(this.forceUpdate);
+	},
+
+	componentWillUnmount() {
+		LanguageStore.removeChangeListener(this.forceUpdate);
 	},
 
 	/**

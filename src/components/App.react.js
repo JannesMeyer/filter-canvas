@@ -2,13 +2,13 @@ import defaultConfig from 'json!../../example-configurations/default.json';
 
 import React from 'react';
 import translate from 'counterpart';
+import LanguageStore from '../stores/LanguageStore';
 import keypress from '../lib/keypress-tool';
 import Point from '../lib/ImmutablePoint';
 import AppActions from '../flux/AppActions';
 import SelectionStore from '../stores/SelectionStore';
 import CreateConnectionStore from '../stores/CreateConnectionStore';
 import WorkbenchStore from '../stores/WorkbenchStore';
-
 import Workbench from './Workbench.react';
 import RepositoryPane from './RepositoryPane.react';
 import DetailPane from './DetailPane.react';

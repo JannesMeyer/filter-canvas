@@ -3,6 +3,7 @@ import React from 'react';
 import translate from 'counterpart';
 import AppActions from '../flux/AppActions';
 import WorkbenchStore from '../stores/WorkbenchStore';
+import LanguageStore from '../stores/LanguageStore';
 
 var Actions = React.createClass({
 
@@ -15,8 +16,7 @@ var Actions = React.createClass({
 
 	shouldComponentUpdate(nextProps, nextState) {
 		return this.state.hasUndoSteps !== nextState.hasUndoSteps ||
-		       this.state.hasRedoSteps !== nextState.hasRedoSteps ||
-		       window.localeChange;
+		       this.state.hasRedoSteps !== nextState.hasRedoSteps;
 	},
 
 	selectFile() {
@@ -49,6 +49,8 @@ var Actions = React.createClass({
 	},
 
 	componentDidMount() {
+		this.forceUpdate = this.forceUpdate.bind(this);
+		LanguageStore.addChangeListener(this.forceUpdate);
 		WorkbenchStore.addChangeListener(this._handleChange);
 		keypress.on('o', ['ctrl'],         this.selectFile);
 		keypress.on('s', ['ctrl'],         AppActions.exportFile);
@@ -58,6 +60,7 @@ var Actions = React.createClass({
 	},
 
 	componentWillUnmount() {
+		LanguageStore.removeChangeListener(this.forceUpdate);
 		WorkbenchStore.removeChangeListener(this._handleChange);
 		keypress.off('o', ['ctrl'],         this.selectFile);
 		keypress.off('s', ['ctrl'],         AppActions.exportFile);

@@ -1,6 +1,6 @@
 import { Vector } from 'immutable';
 import Rect from '../lib/ImmutableRect';
-import { createEventEmitter } from '../lib/BaseStore';
+import { createStore } from '../lib/BaseStore';
 import WorkbenchStore from './WorkbenchStore';
 import WorkbenchLayout from '../WorkbenchLayout';
 import Dispatcher from '../flux/Dispatcher';
@@ -18,7 +18,7 @@ var lastPos;
 /**
  * CreateConnectionStore single object (like a singleton)
  */
-var CreateConnectionStore = createEventEmitter(['change'], {
+var CreateConnectionStore = createStore(['change'], {
 
 	/**
 	 * This function signals to the outside that a new connection is currently being

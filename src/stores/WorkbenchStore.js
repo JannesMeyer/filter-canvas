@@ -1,7 +1,7 @@
 import translate from 'counterpart';
 import immutable from 'immutable';
 import Rect from '../lib/ImmutableRect';
-import { createEventEmitter } from '../lib/BaseStore';
+import { createStore } from '../lib/BaseStore';
 import WorkbenchLayout from '../WorkbenchLayout';
 import FilterCompatibility from '../FilterCompatibility';
 import RepositoryStore from './RepositoryStore';
@@ -95,7 +95,7 @@ function redo() {
  * WorkbenchStore single object
  * (like a singleton)
  */
-var WorkbenchStore = createEventEmitter(['change', 'preliminaryPosition', 'paramChange'], {
+var WorkbenchStore = createStore(['change', 'preliminaryPosition', 'paramChange'], {
 
 	/**
 	 * returns an immutable.Vector

@@ -13,7 +13,6 @@
     "flux": "^2.0.3",
     "immutable": "^2.6.2",
     "normalize.css": "^3.0.3",
-    "object.assign": "^2.0.1",
     "react": "^0.13.3"
   },
   "devDependencies": {

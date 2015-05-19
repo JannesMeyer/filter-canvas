@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import assign from 'object.assign';
 
 /**
  * This function creates objects that are based on EventEmitter.
@@ -14,7 +13,7 @@ import assign from 'object.assign';
  * extensions: Object that will be merged with an EventEmitter instance
  *
  * Example:
- *   createEventEmitter(['change', 'paramChange'], { otherFunction: function(){} })
+ *   createStore(['change', 'paramChange'], { otherFunction: function(){} })
  *
  * Will create an object like this:
  *   {
@@ -27,7 +26,7 @@ import assign from 'object.assign';
  *     'otherFunction': [Function]
  *   }
  */
-export function createEventEmitter(eventNames, extensions) {
+export function createStore(eventNames, extensions) {
 	eventNames.forEach(eventName => {
 		// Capitalize the first letter of the name
 		var Name = eventName.charAt(0).toUpperCase() + eventName.substr(1);
@@ -45,5 +44,5 @@ export function createEventEmitter(eventNames, extensions) {
 	});
 
 	// Create the EventEmitter instance (and remove the listener limit)
-	return assign({}, EventEmitter.prototype, extensions).setMaxListeners(0);
+	return Object.assign({}, EventEmitter.prototype, extensions).setMaxListeners(0);
 }

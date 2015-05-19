@@ -1,10 +1,13 @@
 import React from 'react';
 import translate from 'counterpart';
+import LanguageStore from '../stores/LanguageStore';
 import immutable from 'immutable';
 import Constants from '../flux/Constants';
 import AppActions from '../flux/AppActions';
 import RepositoryStore from '../stores/RepositoryStore';
 import RepositoryItem from './RepositoryItem.react';
+
+const LANGUAGES = Array.from(LanguageStore.getAllLanguages());
 
 var RepositoryPane = React.createClass({
 
@@ -17,6 +20,8 @@ var RepositoryPane = React.createClass({
 	},
 
 	componentDidMount() {
+		this.forceUpdate = this.forceUpdate.bind(this);
+		LanguageStore.addChangeListener(this.forceUpdate);
 		RepositoryStore.addChangeListener(this._handleChange);
 
 		// Load the data via AJAX
@@ -24,7 +29,12 @@ var RepositoryPane = React.createClass({
 	},
 
 	componentWillUnmount() {
+		LanguageStore.removeChangeListener(this.forceUpdate);
 		RepositoryStore.removeChangeListener(this._handleChange);
+	},
+
+	handleLanguageChange(ev) {
+		AppActions.changeLanguage(ev.target.value);
 	},
 
 	render() {
@@ -86,6 +96,11 @@ var RepositoryPane = React.createClass({
 
 		return (
 			<div className="m-repository-pane">
+				<select className="m-language-selector" defaultValue={LanguageStore.getLanguage()} onChange={this.handleLanguageChange}>
+				{LANGUAGES.map(([id, name]) =>
+					<option value={id} key={id}>{name}</option>
+				)}
+				</select>
 				<p className="introduction">{translate('introduction_1')}</p>
 				<p className="introduction">{translate('introduction_2')}</p>
 				<div className="pipe-repository">
