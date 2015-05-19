@@ -1,8 +1,8 @@
-var WorkbenchLayout = require('../WorkbenchLayout');
-var Point = require('../lib/ImmutablePoint');
-var	CreateConnectionStore = require('../stores/CreateConnectionStore');
-
-var WorkbenchWire = require('./WorkbenchWire.react');
+import React from 'react';
+import WorkbenchWire from './WorkbenchWire.react';
+import WorkbenchLayout from '../WorkbenchLayout';
+import Point from '../lib/ImmutablePoint';
+import CreateConnectionStore from '../stores/CreateConnectionStore';
 
 var CreateConnection = React.createClass({
 
@@ -41,4 +41,4 @@ var CreateConnection = React.createClass({
 	}
 
 });
-module.exports = CreateConnection;
+export default CreateConnection;

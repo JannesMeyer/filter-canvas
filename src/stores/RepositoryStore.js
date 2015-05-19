@@ -1,7 +1,7 @@
-var xhr = require('../lib/xhr-tool');
-var BaseStore = require('../lib/BaseStore');
-var Dispatcher = require('../flux/Dispatcher');
-var Constants = require('../flux/Constants');
+import xhr from '../lib/xhr-tool';
+import { createEventEmitter } from '../lib/BaseStore';
+import Dispatcher from '../flux/Dispatcher';
+import Constants from '../flux/Constants';
 
 // Backed by AJAX requests to CouchDB
 var pipes = {};
@@ -13,7 +13,7 @@ var complexFilters = {};
  *
  * @see components/RepositoryPane.react.js
  */
-var RepositoryStore = BaseStore.createEventEmitter(['change'], {
+var RepositoryStore = createEventEmitter(['change'], {
 
 	/**
 	 * Returns all pipes that are available in the database
@@ -136,4 +136,4 @@ function reload() {
 	// });
 }
 
-module.exports = RepositoryStore;
+export default RepositoryStore;

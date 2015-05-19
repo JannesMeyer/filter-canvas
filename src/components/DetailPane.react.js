@@ -1,9 +1,11 @@
-var { OrderedMap } = require('immutable');
-var AppActions = require('../flux/AppActions');
-var SelectionStore = require('../stores/SelectionStore');
-var WorkbenchStore = require('../stores/WorkbenchStore');
-var EditParameterForm = require('./DetailEditParameterForm.react');
-var NewParameterForm = require('./DetailNewParameterForm.react');
+import React from 'react';
+import translate from 'counterpart';
+import { OrderedMap } from 'immutable';
+import AppActions from '../flux/AppActions';
+import SelectionStore from '../stores/SelectionStore';
+import WorkbenchStore from '../stores/WorkbenchStore';
+import EditParameterForm from './DetailEditParameterForm.react';
+import NewParameterForm from './DetailNewParameterForm.react';
 
 var DetailPane = React.createClass({
 
@@ -99,4 +101,4 @@ var DetailPane = React.createClass({
 	}
 
 });
-module.exports = DetailPane;
+export default DetailPane;

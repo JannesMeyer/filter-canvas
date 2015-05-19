@@ -1,10 +1,10 @@
-var Point = require('../lib/ImmutablePoint');
-var AppActions = require('../flux/AppActions');
-var WorkbenchStore = require('../stores/WorkbenchStore');
-
-var WorkbenchItems = require('./WorkbenchItems.react');
-var CreateSelection = require('./CreateSelection.react');
-var CreateConnection = require('./CreateConnection.react');
+import React from 'react';
+import Point from '../lib/ImmutablePoint';
+import AppActions from '../flux/AppActions';
+import WorkbenchStore from '../stores/WorkbenchStore';
+import WorkbenchItems from './WorkbenchItems.react';
+import CreateSelection from './CreateSelection.react';
+import CreateConnection from './CreateConnection.react';
 
 var Workbench = React.createClass({
 
@@ -94,4 +94,4 @@ var Workbench = React.createClass({
 	}
 
 });
-module.exports = Workbench;
+export default Workbench;

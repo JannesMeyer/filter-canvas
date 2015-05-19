@@ -1,18 +1,18 @@
-var immutable = require('immutable');
-var { Map, Vector } = immutable;
-var Rect = require('../lib/ImmutableRect');
-var BaseStore = require('../lib/BaseStore');
-var WorkbenchLayout = require('../WorkbenchLayout');
-var FilterCompatibility = require('../FilterCompatibility');
-var RepositoryStore; // late import
-var SelectionStore; // late import
-var CreateConnectionStore; // late import
-var Dispatcher = require('../flux/Dispatcher');
-var Constants = require('../flux/Constants');
+import translate from 'counterpart';
+import immutable from 'immutable';
+import Rect from '../lib/ImmutableRect';
+import { createEventEmitter } from '../lib/BaseStore';
+import WorkbenchLayout from '../WorkbenchLayout';
+import FilterCompatibility from '../FilterCompatibility';
+import RepositoryStore from './RepositoryStore';
+import SelectionStore from './SelectionStore';
+import CreateConnectionStore from './CreateConnectionStore';
+import Dispatcher from '../flux/Dispatcher';
+import Constants from '../flux/Constants';
 
 // Data
-var data = Map({
-	items: Vector()
+var data = immutable.Map({
+	items: immutable.Vector()
 });
 var connectorOffsets = {};
 var undoStack = [];
@@ -20,7 +20,7 @@ var redoStack = [];
 
 var isDragging = false;
 var startMousePos;
-var itemPositions = Map();
+var itemPositions = immutable.Map();
 
 
 function makeArray(n, value) {
@@ -95,7 +95,7 @@ function redo() {
  * WorkbenchStore single object
  * (like a singleton)
  */
-var WorkbenchStore = BaseStore.createEventEmitter(['change', 'preliminaryPosition', 'paramChange'], {
+var WorkbenchStore = createEventEmitter(['change', 'preliminaryPosition', 'paramChange'], {
 
 	/**
 	 * returns an immutable.Vector
@@ -744,12 +744,7 @@ WorkbenchStore.dispatchToken = Dispatcher.register(function(action) {
 	}
 });
 
-module.exports = WorkbenchStore;
-
-// Requiring after the export prevents problems with circular dependencies
-RepositoryStore = require('./RepositoryStore');
-SelectionStore = require('./SelectionStore');
-CreateConnectionStore = require('./CreateConnectionStore');
+export default WorkbenchStore;
 
 
 
@@ -783,12 +778,12 @@ function addFilter(name, position, parameter) {
 		throw new Error('The filter class doesn\'t exist');
 	}
 
-	var item = Map({
+	var item = immutable.Map({
 		type: Constants.ITEM_TYPE_FILTER,
 		class: name,
-		inputs: Vector().setLength(f.inputs),
-		outputs: Vector().setLength(f.outputs),
-		parameter: Map(f.parameter).merge(parameter),
+		inputs: immutable.Vector().setLength(f.inputs),
+		outputs: immutable.Vector().setLength(f.outputs),
+		parameter: immutable.Map(f.parameter).merge(parameter),
 		rect: WorkbenchLayout.getFilterFrame(position.x, position.y, name, f.inputs, f.outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
@@ -806,16 +801,16 @@ function addPipe(name, position, parameter) {
 	if (!p) {
 		throw new Error('The pipe class doesn\'t exist');
 	}
-	var item = Map({
+	var item = immutable.Map({
 		type: Constants.ITEM_TYPE_PIPE,
 		class: name,
-		inputs: Vector().setLength(p.inputs),
-		outputs: Vector().setLength(p.outputs),
+		inputs: immutable.Vector().setLength(p.inputs),
+		outputs: immutable.Vector().setLength(p.outputs),
 		minInputs: p.inputs,
 		minOutputs: p.outputs,
 		variableInputs: Boolean(p.variableInputs),
 		variableOutputs: Boolean(p.variableOutputs),
-		parameter: Map(p.parameter).merge(parameter),
+		parameter: immutable.Map(p.parameter).merge(parameter),
 		rect: WorkbenchLayout.getPipeFrame(position.x, position.y, name, p.inputs, p.outputs)
 	});
 	setData(data.updateIn(['items'], items => items.push(item)));
@@ -895,7 +890,7 @@ function getConnectedPairs(pipe) {
 		var input = inputs.get(i) || inputs.last();
 		var output = outputs.get(i) || outputs.last();
 		if (!input || !output) { continue; }
-		pairs.push(Vector(input, output));
+		pairs.push(immutable.Vector(input, output));
 	}
 	return Vector.from(pairs);
 }

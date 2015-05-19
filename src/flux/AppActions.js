@@ -1,10 +1,11 @@
-var saveAs = require('browser-saveas');
-var Point = require('../lib/ImmutablePoint');
-var WorkbenchStore = require('../stores/WorkbenchStore');
-var	SelectionStore = require('../stores/SelectionStore');
-var CreateConnectionStore = require('../stores/CreateConnectionStore');
-var Dispatcher = require('./Dispatcher');
-var Constants = require('./Constants');
+import translate from 'counterpart';
+import saveAs from 'browser-saveas';
+import Point from '../lib/ImmutablePoint';
+import WorkbenchStore from '../stores/WorkbenchStore';
+import SelectionStore from '../stores/SelectionStore';
+import CreateConnectionStore from '../stores/CreateConnectionStore';
+import Dispatcher from './Dispatcher';
+import Constants from './Constants';
 
 /**
  * Global AppActions (like a singleton)
@@ -17,7 +18,7 @@ var Constants = require('./Constants');
  * @see RepositoryStore
  * @see CreateConnectionStore
  */
-var AppActions = {
+export default {
 
 	reloadRepository() {
 		Dispatcher.dispatch({ actionType: Constants.RELOAD_REPOSITORY })
@@ -205,4 +206,3 @@ var AppActions = {
 	}
 
 };
-module.exports = AppActions;

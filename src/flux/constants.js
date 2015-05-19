@@ -1,4 +1,4 @@
-var keyMirror = require('react/lib/keyMirror');
+import keyMirror from 'react/lib/keyMirror';
 
 /**
  * An object containing mostly the action types that can be dispatched through
@@ -57,4 +57,4 @@ var Constants = keyMirror({
 	SELECTION_TYPE_NEW: null,
 	SELECTION_TYPE_EXTEND: null
 });
-module.exports = Constants;
+export default Constants;

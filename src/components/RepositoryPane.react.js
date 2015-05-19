@@ -1,8 +1,10 @@
-var immutable = require('immutable');
-var Constants = require('../flux/Constants');
-var AppActions = require('../flux/AppActions');
-var RepositoryStore = require('../stores/RepositoryStore');
-var RepositoryItem = require('./RepositoryItem.react');
+import React from 'react';
+import translate from 'counterpart';
+import immutable from 'immutable';
+import Constants from '../flux/Constants';
+import AppActions from '../flux/AppActions';
+import RepositoryStore from '../stores/RepositoryStore';
+import RepositoryItem from './RepositoryItem.react';
 
 var RepositoryPane = React.createClass({
 
@@ -107,4 +109,4 @@ var RepositoryPane = React.createClass({
 	}
 
 });
-module.exports = RepositoryPane;
+export default RepositoryPane;

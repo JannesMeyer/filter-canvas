@@ -1,10 +1,10 @@
-var { Vector } = require('immutable');
-var SelectionStore = require('../stores/SelectionStore');
-var WorkbenchStore = require('../stores/WorkbenchStore');
-var WorkbenchLayout = require('../WorkbenchLayout');
-
-var WorkbenchItem = require('./WorkbenchItem.react');
-var WorkbenchWire = require('./WorkbenchWire.react');
+import React from 'react';
+import { Vector } from 'immutable';
+import SelectionStore from '../stores/SelectionStore';
+import WorkbenchStore from '../stores/WorkbenchStore';
+import WorkbenchLayout from '../WorkbenchLayout';
+import WorkbenchItem from './WorkbenchItem.react';
+import WorkbenchWire from './WorkbenchWire.react';
 
 var WorkbenchItems = React.createClass({
 
@@ -70,4 +70,4 @@ var WorkbenchItems = React.createClass({
 	}
 
 });
-module.exports = WorkbenchItems;
+export default WorkbenchItems;

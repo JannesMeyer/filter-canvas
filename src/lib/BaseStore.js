@@ -1,5 +1,5 @@
-var EventEmitter = require('events').EventEmitter;
-var assign = require('react/lib/Object.assign');
+import { EventEmitter } from 'events';
+import assign from 'object.assign';
 
 /**
  * This function creates objects that are based on EventEmitter.
@@ -27,7 +27,7 @@ var assign = require('react/lib/Object.assign');
  *     'otherFunction': [Function]
  *   }
  */
-function createEventEmitter(eventNames, extensions) {
+export function createEventEmitter(eventNames, extensions) {
 	eventNames.forEach(eventName => {
 		// Capitalize the first letter of the name
 		var Name = eventName.charAt(0).toUpperCase() + eventName.substr(1);
@@ -47,5 +47,3 @@ function createEventEmitter(eventNames, extensions) {
 	// Create the EventEmitter instance (and remove the listener limit)
 	return assign({}, EventEmitter.prototype, extensions).setMaxListeners(0);
 }
-
-module.exports.createEventEmitter = createEventEmitter;

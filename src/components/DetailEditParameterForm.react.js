@@ -1,5 +1,7 @@
-var { Set } = require('immutable');
-var AppActions = require('../flux/AppActions');
+import React from 'react';
+import translate from 'counterpart';
+import { Set } from 'immutable';
+import AppActions from '../flux/AppActions';
 
 function isEmptyObject(obj) {
 	for (var name in obj) {
@@ -204,4 +206,4 @@ var EditParameterForm = React.createClass({
 	}
 
 });
-module.exports = EditParameterForm;
+export default EditParameterForm;

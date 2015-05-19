@@ -10,9 +10,6 @@ var config = {
 	},
 	cache: true,
 	watchDelay: 50,
-	plugins: [
-		new webpack.ProvidePlugin({ React: 'react', translate: 'counterpart' })
-	],
 	module: {
 		loaders: [
 			{
@@ -36,14 +33,13 @@ if (process.env.NODE_ENV === 'production') {
 	config.plugins.push(new webpack.DefinePlugin({ 'process.env.NODE_ENV': '"production"' }));
 	config.plugins.push(new webpack.optimize.OccurenceOrderPlugin());
 	config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-		// regex never matches
 		comments: / ^/,
 		compress: { warnings: false }
 	}));
 } else {
 	// Hot module replacement
 	config.entry.unshift('webpack/hot/dev-server');
-	config.plugins.push(new webpack.HotModuleReplacementPlugin());
+	config.plugins = [ new webpack.HotModuleReplacementPlugin() ];
 	// config.plugins.push(new webpack.NoErrorsPlugin());
 	config.module.loaders[0].loaders.unshift('react-hot');
 }

@@ -1,4 +1,5 @@
-var	SelectionStore = require('../stores/SelectionStore');
+import React from 'react';
+import SelectionStore from '../stores/SelectionStore';
 
 var CreateSelection = React.createClass({
 
@@ -34,4 +35,4 @@ var CreateSelection = React.createClass({
 	}
 
 });
-module.exports = CreateSelection;
+export default CreateSelection;

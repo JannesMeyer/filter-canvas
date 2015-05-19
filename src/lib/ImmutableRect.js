@@ -1,7 +1,7 @@
 // TODO: check if point arguments are of the right type (in dev mode)
 // TODO: freeze the object (in dev mode)
 
-class Rect {
+export default class Rect {
 
 	constructor(x, y, width, height) {
 		this.x = x;
@@ -9,12 +9,14 @@ class Rect {
 		this.width = width;
 		this.height = height;
 	}
+
 	/**
 	 * Creates a string-representation of this Rect
 	 */
 	toString() {
 		return 'Rect [ ' + this.x + ', ' + this.y + ' ] [ ' + this.width + ', ' + this.height + ' ]';
 	}
+
 	/**
 	 * Add the point (or anything point-like) to the current position while keeping the
 	 * width and height
@@ -59,6 +61,7 @@ class Rect {
 			this.height + height
 		);
 	}
+
 	/**
 	 * Checks if another Rect or anything rect-like equals to this Rect
 	 */
@@ -68,6 +71,7 @@ class Rect {
 		       this.width  === other.width &&
 		       this.height === other.height;
 	}
+
 	/**
 	 * Test whether two Rects intersect each other
 	 */
@@ -77,6 +81,7 @@ class Rect {
 		       this.y               < other.y + other.height &&
 		       this.y + this.height > other.y;
 	}
+
 	/**
 	 * Test whether the point lies within the Rect
 	 */
@@ -86,6 +91,7 @@ class Rect {
            this.y               <= point.y &&
            this.y + this.height >  point.y;
 	}
+
 	/**
 	 * Calculates the length of the diagonal
 	 */
@@ -94,6 +100,7 @@ class Rect {
 		if (this.height === 0) { return this.width; }
 		return Math.sqrt(this.width * this.width + this.height * this.height);
 	}
+
 	/**
 	 * Calculates the area of a square with the side length of the diagonal
 	 */
@@ -102,13 +109,16 @@ class Rect {
 	}
 
 }
+
 Rect.Zero = new Rect(0, 0, 0, 0);
+
 Rect.fromObject = function(obj) {
 	if (!obj || obj.constructor !== Object) {
 		return;
 	}
 	return new Rect(obj.x, obj.y, obj.width, obj.height);
 };
+
 Rect.fromTwoPoints = function(a, b) {
 	if (!a || !b) {
 		return Rect.Zero;
@@ -130,5 +140,3 @@ Rect.fromTwoPoints = function(a, b) {
 	}
 	return new Rect(x, y, xfar - x, yfar - y);
 }
-
-module.exports = Rect;

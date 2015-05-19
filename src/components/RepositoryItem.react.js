@@ -1,3 +1,5 @@
+import React from 'react';
+
 /**
  * A RepositoryItem is part of the filter/pipe repository in the side panel
  * on the right hand side. Each item can be dragged onto the Workbench.
@@ -32,4 +34,4 @@ var RepositoryItem = React.createClass({
 	}
 
 });
-module.exports = RepositoryItem;
+export default RepositoryItem;

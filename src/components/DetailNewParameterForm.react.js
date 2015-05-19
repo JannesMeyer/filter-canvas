@@ -1,4 +1,6 @@
-var AppActions = require('../flux/AppActions');
+import React from 'react';
+import translate from 'counterpart';
+import AppActions from '../flux/AppActions';
 
 var DetailNewParameterForm = React.createClass({
 
@@ -62,4 +64,4 @@ var DetailNewParameterForm = React.createClass({
 	}
 
 });
-module.exports = DetailNewParameterForm;
+export default DetailNewParameterForm;

@@ -1,9 +1,9 @@
-var { Set } = require('immutable');
-var Rect = require('../lib/ImmutableRect');
-var BaseStore = require('../lib/BaseStore');
-var WorkbenchStore; // late import
-var Dispatcher = require('../flux/Dispatcher');
-var Constants = require('../flux/Constants');
+import { Set } from 'immutable';
+import Rect from '../lib/ImmutableRect';
+import { createEventEmitter } from '../lib/BaseStore';
+import WorkbenchStore from './WorkbenchStore';
+import Dispatcher from '../flux/Dispatcher';
+import Constants from '../flux/Constants';
 
 // Data
 var selectedItems = Set();
@@ -31,7 +31,7 @@ var isMacPlatform = Boolean(typeof navigator !== 'undefined' && navigator.platfo
  * SelectionStore single object
  * (like a singleton)
  */
-var SelectionStore = BaseStore.createEventEmitter(['change'], {
+var SelectionStore = createEventEmitter(['change'], {
 
 	/**
 	 * Helper-function to determine what kind of action should happen
@@ -142,7 +142,4 @@ SelectionStore.dispatchToken = Dispatcher.register(function(action) {
 	}
 });
 
-module.exports = SelectionStore;
-
-// Requiring after the export prevents problems with circular dependencies
-WorkbenchStore = require('./WorkbenchStore')
+export default SelectionStore;

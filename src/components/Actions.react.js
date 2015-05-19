@@ -1,6 +1,8 @@
-var keypress = require('../lib/keypress-tool');
-var AppActions = require('../flux/AppActions');
-var WorkbenchStore = require('../stores/WorkbenchStore');
+import keypress from '../lib/keypress-tool';
+import React from 'react';
+import translate from 'counterpart';
+import AppActions from '../flux/AppActions';
+import WorkbenchStore from '../stores/WorkbenchStore';
 
 var Actions = React.createClass({
 
@@ -82,4 +84,4 @@ var Actions = React.createClass({
 	}
 
 });
-module.exports = Actions;
+export default Actions;

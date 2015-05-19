@@ -1,4 +1,5 @@
-var CreateConnectionStore = require('../stores/CreateConnectionStore');
+import React from 'react';
+import CreateConnectionStore from '../stores/CreateConnectionStore';
 
 var Connector = React.createClass({
 
@@ -33,4 +34,4 @@ var Connector = React.createClass({
 	}
 
 });
-module.exports = Connector;
+export default Connector;

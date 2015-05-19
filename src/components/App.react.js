@@ -1,15 +1,18 @@
-var defaultConfig = require('json!../../example-configurations/default.json');
-var keypress = require('../lib/keypress-tool');
-var Point = require('../lib/ImmutablePoint');
-var AppActions = require('../flux/AppActions');
-var SelectionStore = require('../stores/SelectionStore');
-var CreateConnectionStore = require('../stores/CreateConnectionStore');
-var WorkbenchStore = require('../stores/WorkbenchStore');
+import defaultConfig from 'json!../../example-configurations/default.json';
 
-var Workbench = require('./Workbench.react');
-var RepositoryPane = require('./RepositoryPane.react');
-var DetailPane = require('./DetailPane.react');
-var Actions = require('./Actions.react');
+import React from 'react';
+import translate from 'counterpart';
+import keypress from '../lib/keypress-tool';
+import Point from '../lib/ImmutablePoint';
+import AppActions from '../flux/AppActions';
+import SelectionStore from '../stores/SelectionStore';
+import CreateConnectionStore from '../stores/CreateConnectionStore';
+import WorkbenchStore from '../stores/WorkbenchStore';
+
+import Workbench from './Workbench.react';
+import RepositoryPane from './RepositoryPane.react';
+import DetailPane from './DetailPane.react';
+import Actions from './Actions.react';
 
 var App = React.createClass({
 
@@ -149,4 +152,4 @@ var App = React.createClass({
 		);
 	}
 });
-module.exports = App;
+export default App;

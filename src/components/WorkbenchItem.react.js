@@ -1,12 +1,11 @@
-var cx = require('classnames');
-var { Vector } = require('immutable');
-var Point = require('../lib/ImmutablePoint');
-
-var WorkbenchStore = require('../stores/WorkbenchStore');
-var AppActions = require('../flux/AppActions');
-var Constants = require('../flux/Constants');
-
-var Connector = require('./Connector.react');
+import React from 'react';
+import cx from 'classnames';
+import { Vector } from 'immutable';
+import Point from '../lib/ImmutablePoint';
+import WorkbenchStore from '../stores/WorkbenchStore';
+import AppActions from '../flux/AppActions';
+import Constants from '../flux/Constants';
+import Connector from './Connector.react';
 
 var WorkbenchItem = React.createClass({
 
@@ -81,4 +80,4 @@ var WorkbenchItem = React.createClass({
 	}
 
 });
-module.exports = WorkbenchItem;
+export default WorkbenchItem;

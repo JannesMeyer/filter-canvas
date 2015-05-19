@@ -1,10 +1,10 @@
-var { Vector } = require('immutable');
-var Rect = require('../lib/ImmutableRect');
-var BaseStore = require('../lib/BaseStore');
-var WorkbenchStore = require('./WorkbenchStore');
-var WorkbenchLayout = require('../WorkbenchLayout');
-var Dispatcher = require('../flux/Dispatcher');
-var Constants = require('../flux/Constants');
+import { Vector } from 'immutable';
+import Rect from '../lib/ImmutableRect';
+import { createEventEmitter } from '../lib/BaseStore';
+import WorkbenchStore from './WorkbenchStore';
+import WorkbenchLayout from '../WorkbenchLayout';
+import Dispatcher from '../flux/Dispatcher';
+import Constants from '../flux/Constants';
 
 // Store data
 var isDragging = false;
@@ -16,10 +16,9 @@ var origin;
 var lastPos;
 
 /**
- * CreateConnectionStore single object
- * (like a singleton)
+ * CreateConnectionStore single object (like a singleton)
  */
-var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
+var CreateConnectionStore = createEventEmitter(['change'], {
 
 	/**
 	 * This function signals to the outside that a new connection is currently being
@@ -98,6 +97,7 @@ var CreateConnectionStore = BaseStore.createEventEmitter(['change'], {
 	}
 
 });
+export default CreateConnectionStore;
 
 // Register for all actions with the dispatcher
 CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
@@ -177,5 +177,3 @@ CreateConnectionStore.dispatchToken = Dispatcher.register(function(action) {
 		CreateConnectionStore.emitChange();
 	}
 });
-
-module.exports = CreateConnectionStore;
