@@ -3,7 +3,7 @@ import immutable from 'immutable';
 import Rect from '../lib/ImmutableRect';
 import { createStore } from '../lib/BaseStore';
 import WorkbenchLayout from '../WorkbenchLayout';
-import FilterCompatibility from '../FilterCompatibility';
+import { test as areFiltersCompatible } from '../FilterCompatibility';
 import RepositoryStore from './RepositoryStore';
 import SelectionStore from './SelectionStore';
 import CreateConnectionStore from './CreateConnectionStore';
@@ -864,7 +864,7 @@ function addConnection(output, input) {
 		}
 	}
 
-	if (fromFilter && toFilter && !FilterCompatibility.test(fromFilter, fromFilterIndex, toFilter, toFilterIndex)) {
+	if (fromFilter && toFilter && !areFiltersCompatible(fromFilter, fromFilterIndex, toFilter, toFilterIndex)) {
 		// Dispatcher.waitFor([ CreateConnectionStore.dispatchToken ]);
 		alert(translate('errors.incompatible_filters', { fromFilter, toFilter }));
 		return;
@@ -872,8 +872,8 @@ function addConnection(output, input) {
 
 	// Make the connection come true
 	setData(data.withMutations(data => {
-		data.updateIn(['items', output.get(0), 'outputs', output.get(2)], () => Vector.from(input));
-		data.updateIn(['items', input.get(0), 'inputs', input.get(2)], () => Vector.from(output));
+		data.updateIn(['items', output.get(0), 'outputs', output.get(2)], () => immutable.Vector.from(input));
+		data.updateIn(['items', input.get(0), 'inputs', input.get(2)], () => immutable.Vector.from(output));
 	}));
 }
 
@@ -892,7 +892,7 @@ function getConnectedPairs(pipe) {
 		if (!input || !output) { continue; }
 		pairs.push(immutable.Vector(input, output));
 	}
-	return Vector.from(pairs);
+	return immutable.Vector.from(pairs);
 }
 
 /**
@@ -906,7 +906,7 @@ function testFilterCompatibility() {
 		.filter(pair => { // test the connections for compatibility and keep a list of the incompatible ones
 			var fromFilter = data.getIn(['items', pair.getIn([0, 0]), 'class']);
 			var toFilter = data.getIn(['items', pair.getIn([1, 0]), 'class']);
-			return !FilterCompatibility.test(fromFilter, pair.getIn([0, 2]), toFilter, pair.getIn([1, 2]));
+			return !areFiltersCompatible(fromFilter, pair.getIn([0, 2]), toFilter, pair.getIn([1, 2]));
 		})
 		.cacheResult()
 		.length === 0;
