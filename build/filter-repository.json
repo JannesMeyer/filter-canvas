@@ -1,0 +1,9 @@
+{"total_rows":7,"offset":0,"rows":[
+{"id":"EndFilterExample","key":"EndFilterExample","value":{"rev":"1-d565177d39a79e5b07717ad41d75afbf"},"doc":{"_id":"EndFilterExample","_rev":"1-d565177d39a79e5b07717ad41d75afbf","inputs":1,"outputs":0,"parameter":{"waitMin":10,"waitMax":500000}}},
+{"id":"FindEdges","key":"FindEdges","value":{"rev":"1-6c3c8a505c5d638f3bdc0feb32ef6647"},"doc":{"_id":"FindEdges","_rev":"1-6c3c8a505c5d638f3bdc0feb32ef6647","inputs":1,"outputs":1}},
+{"id":"GLFWImageSink","key":"GLFWImageSink","value":{"rev":"1-7f73af15c285174dc21bd3315bdb1ebb"},"doc":{"_id":"GLFWImageSink","_rev":"1-7f73af15c285174dc21bd3315bdb1ebb","inputs":1,"outputs":0}},
+{"id":"OpenCVImageSource","key":"OpenCVImageSource","value":{"rev":"1-772d72504953db66a0daea2c15abbfd0"},"doc":{"_id":"OpenCVImageSource","_rev":"1-772d72504953db66a0daea2c15abbfd0","inputs":0,"outputs":1}},
+{"id":"RgbToGrayFilter","key":"RgbToGrayFilter","value":{"rev":"1-6c3c8a505c5d638f3bdc0feb32ef6647"},"doc":{"_id":"RgbToGrayFilter","_rev":"1-6c3c8a505c5d638f3bdc0feb32ef6647","inputs":1,"outputs":1}},
+{"id":"SourceFilterExample","key":"SourceFilterExample","value":{"rev":"1-ca67750fdd484f4aeb4fcb9a78dd3981"},"doc":{"_id":"SourceFilterExample","_rev":"1-ca67750fdd484f4aeb4fcb9a78dd3981","inputs":0,"outputs":1,"parameter":{"waitMin":10,"waitMax":500000}}},
+{"id":"WorkFilterExample","key":"WorkFilterExample","value":{"rev":"1-7d6c3db3fc1c3f2846d5bd2929eb82bd"},"doc":{"_id":"WorkFilterExample","_rev":"1-7d6c3db3fc1c3f2846d5bd2929eb82bd","inputs":1,"outputs":1,"parameter":{"waitMin":10,"waitMax":500000}}}
+]}
