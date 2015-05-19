@@ -1,0 +1,5 @@
+{"total_rows":3,"offset":0,"rows":[
+{"id":"ForwardPipe","key":"ForwardPipe","value":{"rev":"1-f271ae14544fb67aadbdc04b708014bc"},"doc":{"_id":"ForwardPipe","_rev":"1-f271ae14544fb67aadbdc04b708014bc","inputs":1,"outputs":1,"variableInputs":true,"variableOutputs":true,"parameter":{"sync":false}}},
+{"id":"JoinPipe","key":"JoinPipe","value":{"rev":"1-f206bf450c8194d12368631cd0cbf618"},"doc":{"_id":"JoinPipe","_rev":"1-f206bf450c8194d12368631cd0cbf618","inputs":2,"outputs":1,"variableInputs":true,"parameter":{"sync":false}}},
+{"id":"SplitPipe","key":"SplitPipe","value":{"rev":"1-831233b88c34a594677609e14c8e2bbc"},"doc":{"_id":"SplitPipe","_rev":"1-831233b88c34a594677609e14c8e2bbc","inputs":1,"outputs":2,"variableOutputs":true,"parameter":{"sync":false}}}
+]}
