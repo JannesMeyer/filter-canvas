@@ -4,7 +4,7 @@
   "repository": "JannesMeyer/filter-canvas",
   "scripts": {
     "start": "./dev-server.js",
-    "prepublish": "NODE_ENV=production ./node_modules/.bin/webpack"
+    "build": "NODE_ENV=production ./node_modules/.bin/webpack"
   },
   "dependencies": {
     "browser-saveas": "^1.0.0",

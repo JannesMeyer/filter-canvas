@@ -8,7 +8,7 @@
 # git push origin $(git subtree split --prefix build gh-pages):gh-pages --force
 
 # Recompile and upload
-npm run prepublish &&
+npm run build &&
 git reset &&
 git add --force build &&
 git commit -m "Recompile $(date +'%d %b %H:%M')" &&
