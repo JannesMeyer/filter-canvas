@@ -6,6 +6,7 @@ import cfg from './config';
 
 // Webpack
 import '../public/index.html';
+import '../public/manifest.appcache';
 import 'normalize.css/normalize.css';
 import '../stylus/main.styl';
 
